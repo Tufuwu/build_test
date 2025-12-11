@@ -1,35 +1,68 @@
-from setuptools import setup
+#!/usr/bin/env python
+# vim: set sw=4 et:
 
-# read in version string
-VERSION_FILE = 'flowio/_version.py'
-__version__ = ''  # to avoid inspection warning and check if __version__ was loaded
-exec(open(VERSION_FILE).read())
+from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
+import glob
 
-# empty strings evaluate as False in a boolean context
-if not __version__:
-    raise RuntimeError("__version__ string not found in file %s" % VERSION_FILE)
+__version__ = '1.7.4'
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        # should work with setuptools <18, 18 18.5
+        self.test_suite = ' '
+
+    def run_tests(self):
+        import pytest
+        import sys
+        import os
+        errcode = pytest.main(['--doctest-modules', './warcio', '--cov', 'warcio', '-v', 'test/'])
+        sys.exit(errcode)
 
 setup(
-    name='FlowIO',
+    name='warcio',
     version=__version__,
-    packages=['flowio'],
-    package_data={'': []},
-    description='FlowIO is a Python library for reading / writing Flow Cytometry Standard (FCS) files',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Scott White',
-    author_email='whitews@gmail.com',
-    license='BSD',
-    license_files=('LICENSE',),
-    url='https://github.com/whitews/flowio',
-    requires=[],
+    author='Ilya Kreymer',
+    author_email='ikreymer@gmail.com',
+    license='Apache 2.0',
+    packages=find_packages(exclude=['test']),
+    url='https://github.com/webrecorder/warcio',
+    description='Streaming WARC (and ARC) IO library',
+    long_description=open('README.rst').read(),
+    provides=[
+        'warcio',
+        ],
+    install_requires=[
+        'six',
+        ],
+    zip_safe=True,
+    entry_points="""
+        [console_scripts]
+        warcio = warcio.cli:main
+    """,
+    cmdclass={'test': PyTest},
+    test_suite='',
+    tests_require=[
+        'pytest',
+        'pytest-cov',
+        'httpbin>=0.10.2',
+        'requests',
+        'wsgiprox',
+    ],
     classifiers=[
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.7'
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities',
     ]
 )
