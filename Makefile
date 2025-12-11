@@ -1,34 +1,42 @@
-#
-# Copyright 2017 Tubular Labs, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+PROJECT = fcache
 
-dev:
-	docker-compose build dev
-	docker-compose run dev bash
-	docker-compose down -v ; exit $$retcode
+.PHONY: docs clean lint test test-all coverage dist release
 
-dist:
-	docker-compose build dev
-	docker-compose run --no-deps dev python setup.py bdist_wheel ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
+help:
+	@echo "clean - remove all build artifacts"
+	@echo "lint - check style with flake8"
+	@echo "test - run tests quickly with the current Python"
+	@echo "test-all - run tests in all environments"
+	@echo "coverage - check code coverage"
+	@echo "docs - generate Sphinx HTML documentation"
+	@echo "dist - make the source and binary distributions"
+	@echo "release - package and upload a release"
 
-docs:
-	docker-compose build dev
-	docker-compose run --no-deps dev python -m sphinx -b html docs/source docs/build
+clean:
+	rm -rf build dist egg *.egg-info htmlcov
+	find . -name '*.py[co]' -exec rm -f {} +
+	$(MAKE) -C docs clean
+
+lint:
+	flake8 $(PROJECT) tests setup.py
 
 test:
-	docker-compose build test
-	docker-compose run test tox ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
+	python setup.py test
 
-.PHONY: docs dist
+test-all:
+	tox
+
+coverage:
+	coverage run --source $(PROJECT) setup.py test
+	coverage report --fail-under=100
+
+docs:
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+	open docs/_build/html/index.html
+
+dist: clean
+	python setup.py sdist bdist_wheel
+
+release: clean dist
+	twine upload -s dist/*
