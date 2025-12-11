@@ -14,5 +14,9 @@
 # limitations under the License.
 #
 
-include requirements.txt README.md
-recursive-include sparkly/resources *
+from sparkly.session import SparklySession
+
+assert SparklySession
+
+
+__version__ = '3.0.0'
