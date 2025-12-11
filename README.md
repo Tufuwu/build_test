@@ -1,116 +1,156 @@
-# sphinx-doc.org on the Read The Docs.
-[![Build Status](https://travis-ci.org/sphinx-doc/sphinx-doc-translations.svg?branch=master)](https://travis-ci.org/sphinx-doc/sphinx-doc-translations)
-[![Documentation Status](https://readthedocs.org/projects/sphinx/badge/?version=master)](https://www.sphinx-doc.org/en/master/?badge=master)
+[![CI](https://github.com/Yelp/clusterman/actions/workflows/ci.yaml/badge.svg)](https://github.com/Yelp/clusterman/actions/workflows/ci.yaml)
+[![Documentation Status](https://readthedocs.org/projects/clusterman/badge/?version=latest)](https://clusterman.readthedocs.io/en/latest/?badge=latest)
 
-This is a project to provide Sphinx official documentation with multiple versions and multiple languages on Read The Docs site.
+# Clusterman - Autoscale and Manage your compute clusters
 
-Current procedure is bit tricky because Read The Docs doesn't have a way to specify options for sphinx-build command.
-conf.py files for each languages have 'language' and 'locale_dirs' values without having full copy of conf.py of sphinx doc. If we want to specify conf.py file that is out of source directory, we will use '-c' option for sphinx-build command. Unfortunately Read the Docs can't. If there are any better way, please let me know.
+![Clusterman Logo](https://raw.githubusercontent.com/Yelp/clusterman/master/clusterman_logo.png)
 
-## URLs
+Clusterman (the Cluster Manager) is an autoscaling engine for Mesos
+and Kubernetes clusters. It looks at metrics and can launch or terminate
+compute to meet the needs of your workloads, similarly to the official
+[Kubernetes Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
+It provides the following set of features:
 
-* RTD project pages for Sphinx:
+* Customizable metrics: All metrics for Clusterman are stored in an
+  external datastore, and are automatically loaded into the signals
+  that need them
+* Pluggable autoscaling signals: Your team knows how the application
+  you're running should scale in response to metrics, so your team
+  should own the signal that tells Clusterman what to do
+* Full-featured simulation environment: Want to know how the autoscaler
+  is going to respond to production traffic before you deploy changes?
+  The Clusterman simulation environment lets you do this.  You can also
+  simulate future traffic so that you can predict usage or cost increase
+  before they happen.
 
-  * https://readthedocs.org/projects/sphinx/  (Master)
-  * https://readthedocs.org/projects/sphinx-ar/
-  * https://readthedocs.org/projects/sphinx-ca-es/
-  * https://readthedocs.org/projects/sphinx-zh-cn/
-  * https://readthedocs.org/projects/sphinx-fr/
-  * https://readthedocs.org/projects/sphinx-de/
-  * https://readthedocs.org/projects/sphinx-it-it/
-  * https://readthedocs.org/projects/sphinx-ja/
-  * https://readthedocs.org/projects/sphinx-ko/
-  * https://readthedocs.org/projects/sphinx-pl-pl/
-  * https://readthedocs.org/projects/sphinx-pt-br/
-  * https://readthedocs.org/projects/sphinx-doc-ru/ (Other project "sphinx-ru" is already exist.)
-  * https://readthedocs.org/projects/sphinx-sr/
-  * https://readthedocs.org/projects/sphinx-sr-rs/
-  * https://readthedocs.org/projects/sphinx-es/
+For more information, see the [Clusterman documentation](https://clusterman.readthedocs.io/en/latest/)
 
-* Documentation pages for each languages:
+## Getting Started
 
-  * http://www.sphinx-doc.org/
-  * http://www.sphinx-doc.org/ar
-  * http://www.sphinx-doc.org/ca_ES
-  * http://www.sphinx-doc.org/zh_CN
-  * http://www.sphinx-doc.org/fr
-  * http://www.sphinx-doc.org/de
-  * http://www.sphinx-doc.org/it_IT
-  * http://www.sphinx-doc.org/ja
-  * http://www.sphinx-doc.org/ko
-  * http://www.sphinx-doc.org/pl_PL
-  * http://www.sphinx-doc.org/pt_BR
-  * http://www.sphinx-doc.org/ru (Other project "sphinx-ru" is already exist.)
-  * http://www.sphinx-doc.org/sr
-  * http://www.sphinx-doc.org/sr_RS
-  * http://www.sphinx-doc.org/es
+You can try out Clusterman in a local development environment against
+a Dockerized Mesos cluster by running the following commands:
 
-## How to setup a translated documentation project on RTD
+    make example
+    clusterman status --cluster local-dev -v
 
-Detail is here: https://docs.readthedocs.org/en/latest/localization.html#project-with-multiple-translations
+All of the Clusterman CLI commands should work in the above environment.
+You can see examples of the Clusterman services by running
 
-Points are:
+    make itest-external
 
-* We must have RTD projects for each languages.
-* Each projects must have correct Language setting on "Settings" page.
-* Master project has connections to each translated projects on "translations settings" page.
+## Components
 
+![Architecture Diagram](https://github.com/Yelp/clusterman/blob/master/images/architecture-diagram.png?raw=true)
 
-## How to update po files
+Clusterman is made up of the following components:
 
-```
-sh ./locale/update.sh
-```
+* Metrics Data Store: All relevant data used by scaling signals is written
+  to a single data store for a single source of truth about historical
+  cluster state.  At Yelp, we use AWS DynamoDB for this datastore.  Metrics are
+  written to the datastore via a separate metrics library.
+* Pluggable Signals: _Metrics_ (from the data store) are consumed by _signals_
+  (small bits of code that are used to produce resource requests.  Signals
+  run in separate processes configured by [supervisord](http://supervisord.org),
+  and use Unix sockets to communicate.
+* Core Autoscaler: The autoscaler logic consumes resource requests from the
+  signals and combines them to determine how many resources to request from or
+  release back to the cloud provider.
+* Resource Groups and Pools: Each autoscaler instance manages exactly one
+  "pool", that is, a logical grouping of machines in a cluster.  Pools consist
+  of "resource groups", such as a Spot Fleet Request (SFR) or AutoScaling Group
+  (ASG) from AWS EC2.
+* Configuration: Clusterman stores global configuration values in a file called
+  `clusterman.yaml`, and per-pool configuration in `clusterman-clusters/<cluster-name>/<pool-name>.(mesos|kubernetes)`.
+  These config files tell the Clusterman services when and how to run, and they
+  serve as the glue to hook up an autoscaler with its signals.  Configure the
+  path to `clusterman.yaml` with the `--env-config-path` flag, and the path to
+  `clusterman-clusters` with `--cluster-config-directory`.
+* An Autoscaling Simulation Environment: Clusterman comes with a complete
+  simulation environment for running tests with your signals on historical data
+  before they are deployed.  This environment can produce information about the
+  cost of your cluster, as well as whether it is over- or under-provisioned.
 
-After that, you should commit updated po files.
+Clusterman has two main ways of interacting with the clusters it manages.  The
+Clusterman CLI provides a set of command-line tools for viewing and managing
+the state of the cluster; type `clusterman --help` to see a list of possible
+subcommands.  See the Clusterman documentation for more details.
 
+The Clusterman service runs as a set of three long-running processes; the first
+process collects data about spot instance pricing from AWS (not required if you
+aren't using AWS, spot instances, or the Clusterman simulator); the second
+process queries each of the pools in a cluster to collect metadata and system
+metrics about the pool; and the third process is responsible for actually
+autoscaling each of the pools.
 
-## How to add a language
+## Integrating Clusterman
 
-1. add language to locale/update.sh:
+At Yelp, we use [PaaSTA](https://github.com/Yelp/PaaSTA), our
+platform-as-a-service, to manage Clusterman.  If you use PaaSTA, setting up
+Clusterman should be relatively straightforward.  Otherwise you will need
+to provide additional tooling to deploy the Clusterman code or Docker image
+to your environment.
 
-   ```
-   - rm -R es ja
-   - tx pull -l es,ja
-   + rm -R es ja pt_BR
-   + tx pull -l es,ja,pt_BR
-   ```
+If you'd like to use Clusterman in your environment, you will need the
+following components set up:
 
-2. update po files
+* A metrics datastore with the appropriate tables.  See `examples/terraform/clusterman.tf`
+  for a Terraform representation of the schema in DynamoDB.
+* A `clusterman_metrics` library that can communicate with your chosen metrics
+  datastore.  There is a reference copy of the metrics library in `examples/clusterman_metrics`
+  that is capable of communicating with AWS DynamoDB.
+* Code to run the autoscaler service. At Yelp, we use an internal
+  batch library called `yelp_batch` for this task; however, the same goal
+  can be achieved by simply running the code in a never-terminating while
+  loop.  See the sample code in `examples/batch` for a place to start.
+* Configuration files.  Clusterman uses one "master" configuration file as well
+  as a configuration file per pool that it autoscales.  You can see examples of
+  these config files in `acceptance/srv-configs`, and the config file schema in
+  `examples/schemas`.
 
-3. commit them
+To build a Debian package for the Clusterman CLI, run `make package`.  To build
+an example Docker image which can run the Clusterman batch code, run `make cook-image-external`
 
-4. add new project on Read The Docs like:
+Clusterman uses EC2 tags in order to find the resource groups that it manages.
+To configure a resource group so that Clusterman can find it, you need to add a
+tag like the following to your ASG or SFR:
 
-   https://readthedocs.org/projects/sphinx-pt-br/
+    tag-name: "{\"paasta_cluster\": \"cluster-name\", \"pool\": \"pool-name\"}"
 
-5. add translation project to parent project like:
+You can specify the value of `tag-name` in your configuration file for the pool:
 
-   https://readthedocs.org/dashboard/sphinx/translations/
+    resource_groups:
+      - (sfr|asg):
+        tag: tag-name
 
+## Design Goals
 
-## How to add a new version
+Clusterman is designed to support a wide range of cluster autoscaling needs at
+Yelp.  We run many different types of workloads (long-running services, batch
+jobs, machine learning tasks, databases, etc.) on top of Kubernetes and Mesos,
+and each of these workloads has a different set of scaling requirements.
+Clusterman is designed to be a unified system that can accomodate each of these
+workloads.  To that end, Clusterman's design goals are:
 
-1. add tag `1.7`
+* A modular design that separates cloud API calls from signal evaluation and
+  the core autoscaling loop
+* Unified autoscaling logic for a multi-tenant cluster
+* Client-owned scaling signals for requesting resources
+* A command-line interface for managing and interacting with clusters
+* A simulation environment for performing cost and behaviour analysis
 
-   ```
-   git tag 1.7
-   ```
+## Licence
 
-2. replace old version `1_7` with `1_8` in:
+Clusterman is licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
-   - release.sh
-   - .travis.yml
+## Contributing
 
-3. commit it and push them:
+Everyone is encouraged to contribute to Clusterman by forking the
+[Github repository](http://github.com/Yelp/clusterman) and making a pull request or
+opening an issue.  Please read our [Code of Conduct](https://github.com/Yelp/clusterman/code-of-conduct.md).
 
-   ```
-   git add release.sh .travis.yml
-   git commit -m "add new version: 1.8"
-   git push --tags
-   ```
+### Instructions for Yelp developers
 
-4. enable version 1.7 on RTD:
+1) Make your changes, push a branch to GitHub, and create a pull request
+2) Once your PR is approved, merge your changes to master
 
-   https://readthedocs.org/projects/sphinx-ja/versions/
-
+A Jenkins pipeline polls GitHub and brings any changes into our internal version. Jenkins will then build and deploy Clusterman as normal.

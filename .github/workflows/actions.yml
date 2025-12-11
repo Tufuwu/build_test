@@ -1,67 +1,41 @@
-name: update-translations
+name: CI
 
 on:
   push:
     branches:
       - main
-
-# on:
-#   schedule:
-#     - cron: "0 0 * * *" #runs at 00:00 UTC everyday
+  pull_request:
+  release:
 
 jobs:
-  ubuntu:
-    runs-on: ubuntu-latest
+  tox:
     env:
-      SPHINXINTL_TRANSIFEX_PROJECT_NAME: sphinx-doc
-      SPHINXINTL_TRANSIFEX_USERNAME: sphinxjp
-      # SPHINXINTL_TRANSIFEX_PASSWORD: ${{ secrets.SPHINXINTL_TRANSIFEX_PASSWORD }}
-
+      PIP_INDEX_URL: https://pypi.python.org/simple
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        make_target:
+          - run-pre-commit
+          - test-external
+          - itest-external
+          - itest_xenial-external
+          - itest_bionic-external
     steps:
-    - uses: actions/checkout@v4
-    - name: Get date
-      id: get-date
-      run: |
-        echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        echo "::set-output name=yyyymm::$(/bin/date -u "+%Y%m")"
-      shell: bash
-    - name: cache pip
-      id: cache-pip
-      uses: actions/checkout@v4
-      with:
-        path: |
-          ~/.cache/pip
-          ~/.local/
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}-${{ steps.get-date.outputs.yyyymm }}
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Check Python version
-      run: python --version
-    - name: Install graphviz
-      run: sudo apt-get install graphviz
-    - name: Install dependencies
-      run: |
-        git branch -a
-        git checkout main  # attach this repo
-        git submodule init
-        git submodule update
-        (cd sphinx; git fetch origin; git checkout main; git reset --hard origin/main; git branch -a)
-        pip install -U pip setuptools
-        pip install -r ./requirements.txt
-    - name: Update translations
-      run: sh ./locale/update.sh
-    - name: After success
-      run: |
-        git branch -a
-        git checkout main  # attach this repo
-        git config --global user.email "sphinx-auto-update"
-        git config --global user.name "sphinx-auto-update"
-        git add .
-        git commit -m "[skip ci] by GHA https://github.com/${{ github.repository }}/actions/runs/${{ github.run_number }}"
-    - name: GitHub Push
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.3'
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.22.0
+      # GHA won't setup tox for us and we use tox-pip-extensions for venv-update
+      - run: pip install tox==3.8.6 tox-pip-extensions==1.6.0
+      - run: go install sigs.k8s.io/kind@v0.11.1
+      - run: make ${{ matrix.make_target }}
