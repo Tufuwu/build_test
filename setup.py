@@ -1,24 +1,56 @@
-from setuptools import setup, find_packages
+#!/usr/bin/env python3
 
-version = __import__('shopify_webhook').__version__
+"""Setuptools Configuration"""
+
+from comnetsemu.net import VERSION
+from setuptools import setup, find_packages
+from os.path import join
+
+# Get version number from source tree
+import sys
+
+sys.path.append(".")
+
+scripts = [join("bin", filename) for filename in ["ce"]]
+modname = distname = "comnetsemu"
 
 setup(
-    name = 'django-shopify-webhook',
-    version = version,
-    description = 'A package for the creation of Shopify Apps using the Embedded App SDK.',
-    long_description = open('README.md').read(),
-    long_description_content_type='text/markdown',
-    author = 'Gavin Ballard',
-    author_email = 'gavin@discolabs.com',
-    url = 'https://github.com/discolabs/django-shopify-webhook',
-    license = 'None',
-
-    packages = find_packages(),
-
-    install_requires = [
-        'django >=1.7',
+    name=distname,
+    version=VERSION,
+    description="Emulator for Computing in Communication Networks.",
+    author="The Deutsche Telekom Chair of Communication Networks, TU Dresden",
+    author_email="zuo.xiang@tu-dresden.de",
+    packages=find_packages(exclude=["app", "examples", "util", "venv"]),
+    long_description="""
+        A holistic testbed/emulator for the book: Computing in Communication Networks: From Theory to Practice
+        """,
+    classifiers=[
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        "Programming Language :: Python:: 3.6",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Topic :: System :: Emulators",
+        "Natural Language :: English",
+        "License :: MIT License",
     ],
-
-    zip_safe = True,
-    classifiers = [],
+    keywords="networking emulator SDN NFV Docker",
+    # license="BSD",
+    # MARK: MINIMAL requirements
+    install_requires=[
+        "docker>=4.1.0,<5.0.0",
+        "pyroute2>=0.5.9,<0.6.0",
+        "requests>=2.22.0,< 3.0.0",
+        "ryu>=4.30,<5.0",
+        "setuptools>=45.2.0,<46.0.0",
+        # Mininet is installed FROM SOURCE CODE because:
+        # - The version in Ubuntu's repo is too old
+        # - It's not fully available on PyPi (The searchable package on PyPi
+        #   does not work out-of-box yet. Check: https://github.com/mininet/mininet/pull/970)
+        # - Mininet needs to be patched when some features of ComNetsEmu can
+        #   not be implemented without modifying the source code of Mininet
+        "mininet>=2.3.0d6",
+    ],
+    scripts=scripts,
 )
