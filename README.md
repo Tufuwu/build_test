@@ -1,25 +1,21 @@
-# 👨‍🍳 The Grill
-[![Build Status](https://travis-ci.org/thegrill/grill.svg?branch=main)](https://travis-ci.org/thegrill/grill)
-[![codecov](https://codecov.io/gh/thegrill/grill/branch/main/graph/badge.svg)](https://codecov.io/gh/thegrill/grill)
-[![Documentation Status](https://readthedocs.org/projects/grill/badge/?version=latest)](https://grill.readthedocs.io/en/latest/?badge=latest)
-[![PyPI version](https://badge.fury.io/py/grill.svg)](https://badge.fury.io/py/grill)
-[![PyPI](https://img.shields.io/pypi/pyversions/grill.svg)](https://pypi.python.org/pypi/grill)
+Django Shopify Webhook
+======================
 
-> Cook digital.
+[![PyPI version](https://badge.fury.io/py/django-shopify-webhook.svg)](http://badge.fury.io/py/django-shopify-webhook)
+[![Tests](https://github.com/discolabs/django-shopify-webhook/actions/workflows/ci.yml/badge.svg)](https://github.com/discolabs/django-shopify-webhook/actions/workflows/ci.yml)
 
-`The Grill` is a toolset that helps with digital content creation. This is the `grill` namespace, a meta-package with core tools and philosophy guidelines.
+This Django package aims to make it easy to add webhook-handling behaviour into
+your Django app. It provides:
 
-With future users and readers in mind, `The Grill` aims to stick to the following principles:
+- A `WebhookView` for catching and verifying webhooks sent from Shopify, and
+  triggering the appropriate webhook signal.
+  
+- `webhook`, `carrier_request` and `app_proxy` view decorators that validate
+  these various types of request.
+  
+- A number of `WebhookSignal`s that can be listened to and handled by your
+  application.
 
-- [DRY (don't repeat yourself)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
-- [SSOT (single source of truth)](https://en.wikipedia.org/wiki/Single_source_of_truth)
-- [Convention over configuration (sensible defaults)](https://en.wikipedia.org/wiki/Convention_over_configuration)
-- [SOLID (understandable, flexible and maintainable)](https://en.wikipedia.org/wiki/SOLID)
-- [KISS (keep it simple)](https://en.wikipedia.org/wiki/KISS_principle)
-
-Foundational tools:
-- [Python](https://docs.python.org/3/)
-- [USD](https://graphics.pixar.com/usd/docs/index.html)
-- [EdgeDB](https://edgedb.com)
-
-Please [visit the docs](https://grill.rtfd.io) for a full walk-through!
+**Note:** This package is no longer actively developed and I'm unable to provide
+support for it. I am happy to review and accept pull requests from anyone who's
+using it in their own applications.
