@@ -1,9 +1,6 @@
-.idea/
+.idea
 *.pyc
-*.vscode/
-dist/
-build/
-grill.egg-info/
-docs/build/
-docs/Makefile
-docs/make.bat
+MANIFEST
+build
+dist
+django_shopify_webhook.egg-info
