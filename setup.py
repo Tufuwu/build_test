@@ -1,35 +1,35 @@
-# Copyright 2019 Yelp Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from setuptools import find_packages
 from setuptools import setup
 
-from clusterman import __version__
+# read in version string
+VERSION_FILE = 'flowio/_version.py'
+__version__ = ''  # to avoid inspection warning and check if __version__ was loaded
+exec(open(VERSION_FILE).read())
+
+# empty strings evaluate as False in a boolean context
+if not __version__:
+    raise RuntimeError("__version__ string not found in file %s" % VERSION_FILE)
+
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
 
 setup(
-    name="clusterman",
+    name='FlowIO',
     version=__version__,
-    provides=["clusterman"],
-    author="Compute Infrastructure",
-    author_email="compute-infra+github@yelp.com",
-    description="Distributed cluster scaling and management tools",
-    packages=find_packages(exclude=["tests"]),
-    setup_requires=["setuptools"],
-    include_package_data=True,
-    install_requires=[],
-    scripts=["clusterman/supervisord/fetch_clusterman_signal", "clusterman/supervisord/run_clusterman_signal",],
-    entry_points={
-        "console_scripts": ["clusterman=clusterman.run:main",],
-        "static_completion": ["clusterman=clusterman.args:get_parser",],
-    },
+    packages=['flowio'],
+    package_data={'': []},
+    description='FlowIO is a Python library for reading / writing Flow Cytometry Standard (FCS) files',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    author='Scott White',
+    author_email='whitews@gmail.com',
+    license='BSD',
+    license_files=('LICENSE',),
+    url='https://github.com/whitews/flowio',
+    requires=[],
+    classifiers=[
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.7'
+    ]
 )
