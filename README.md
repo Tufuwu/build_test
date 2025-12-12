@@ -1,118 +1,82 @@
-# GuardDuty Multi-Account Manager
+# Mattermost Poll
 
-Automate the AWS GuardDuty account invitation lifecycle for all of your 
-organizations AWS accounts in all regions as well as aggregate and normalize 
-the GuardDuty findings
+[![Build Status](https://travis-ci.com/M-Mueller/mattermost-poll.svg?branch=master)](https://travis-ci.com/M-Mueller/mattermost-poll) [![codecov](https://codecov.io/gh/M-Mueller/mattermost-poll/branch/master/graph/badge.svg)](https://codecov.io/gh/M-Mueller/mattermost-poll)
 
-## Architecture
+Provides a slash command to create polls in Mattermost.
 
-!['docs/dgram.png'](docs/dgram.png)
+![Example](/doc/example_yes_no.gif)
 
-> Above is an example architecture for a master account with a member account. 
-> Note: The member account has GuardDuty detectors in every region as does the 
-> master account.
+By default, a poll will only offer the options *Yes* and *No*. However, users can also specify an arbitrary number of choices:
 
-## Why This?
+![Example](/doc/example_colours.png)
 
-As a multi-account user of Amazon Web Services you have a few choices when
-deciding to turn on GuardDuty across your accounts.
+Choices are separated by `--`.
 
-Your options are:
+## Additional options
 
-1. Stack Sets
-2. Human invitations
-3. Something else.
+- `--noprogress`: Do not display the number of votes until the poll is ended
+- `--public`: Show who voted for what at the end of the poll
+- `--votes=X`: Allows users to place a total of *X* votes. Default is 1. Each individual option can still only be voted once.
+- `--bars`: Show results as a bar chart at the end of the poll.
+- `--locale=X`: Use a specific locale for the poll. Supported values are en and de. By default it's the users language.
 
-Due to the nature of stack sets and the distributed governance of Mozilla it
-breaks our trust model to grant the needed permissions to run stack sets.
-Human behavior consistently generates inconsistent results.
+## Help
 
-This is why we elected to create GuardDuty Multi-Account Manager
+`/poll help` will display full usage options. Only visible to you.
 
-## What is it?
+Set the "Autocomplete Hint" in the Slash Command settings to `See "/poll help" for full usage options`
 
-GuardDuty Multi-Account Manager is a series of lambda functions designed to do
-the following:
+## Requirements
 
-* Enable GuardDuty Masters in all AWS Regions present and future.
-* Empower account owners to decide to enable GuardDuty
-* Manage the lifecycle of invitations to the member accounts
-* Aggregate all findings from all detectors in all regions, normalize the data,
-  and send to a single SQS queue
+- Python >= 3.6
+- Flask
+- Tornado
+- A WSGI server (e.g. gunicorn or uWSGI)
 
-## How do I deploy it?
+## Setup
 
-### Dependencies
+Copy `settings.py.example` to `settings.py` and customise your settings.
 
-* AWS Organizations
-  * Either run the GuardDuty Multi-Account Manager from within an AWS
-    Organizations parent account or
-  * Establish an IAM Role in the AWS Organizations parent account that can be
-    assumed by the GuardDuty Multi-Account Manager.
-    [Example IAM Role](docs/example-organizations-reader-iam-role.yml)
-* Deploy the
-  [Cloudformation Cross Account Outputs](https://github.com/mozilla/cloudformation-cross-account-outputs/)
-  service which allows CloudFormation stacks in other AWS accounts to report
-  back output. This is used to convey the
-  [GuardDuty Member Account IAM Role](cloudformation/guardduty-member-account-role.yml)
-  information. In order to deploy this service 
-  [follow the instructions in the README](https://github.com/mozilla/cloudformation-cross-account-outputs#deploy-the-infrastructure)
-  which explains how. 
-  * Make sure that in Step 1 and 2 you deploy each template in only one region. These resources shouldn't be deployed multiple times in an AWS account.
-  * Make sure that in Step 3, you deploy the `cloudformation-sns-emission-consumer.yml`
-  template in every region that you want to allow your GuardDuty members to potentially
-  deploy the GuardDuty member role in. For example, in the included 
-  [`guardduty-member-account-role.yml`](cloudformation/guardduty-member-account-role.yml),
-  it assumes that you'll have deployed `cloudformation-sns-emission-consumer.yml`
-  in both `us-west-2` and `us-east-1`
-* Customize the 
-  [`guardduty-member-account-role.yml`](cloudformation/guardduty-member-account-role.yml)
-  CloudFormation template which you'll distribute to your members. 
-  * You need to set two values in the `Mappings` section of the template
-    * `MasterAccount`:`Principal` : Set this to the 
-      [root principal](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#Principal_specifying)
-      of your AWS account in which you're running the GuardDuty master. For
-      example `arn:aws:iam::123456789012:root`
-    * `SNSTopicForPublishingIAMRoleArn`:`Account` : Set this to the 
-      [AWS Account ID](https://docs.aws.amazon.com/general/latest/gr/acct-identifiers.html#FindingYourAccountIdentifiers)
-      of the AWS account that you've deployed the 
-      [Cloudformation Cross Account Outputs](https://github.com/mozilla/cloudformation-cross-account-outputs/)
-      service in. For example `123456789012`.
-  * Add any additional regions that you wish to support (which you've deployed 
-    Cloudformation Cross Account Outputs in) into the 
-    `TheRegionYouAreDeployingIn` mapping following the example of the existing
-    two regions listed there already.
-  
-### Getting Started
+Start the server:
 
-* Deploy the Cloudformation Stack from
-  [`cloudformation/guardduty-multi-account-manager-parent.yml`](https://s3-us-west-2.amazonaws.com/public.us-west-2.infosec.mozilla.org/guardduty-multi-account-manager/cf/guardduty-multi-account-manager-parent.yml) in the master
-  account. [![Launch GuardDuty Multi Account Manager](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=guardduty-multi-account-manager&templateURL=https://s3-us-west-2.amazonaws.com/public.us-west-2.infosec.mozilla.org/guardduty-multi-account-manager/cf/guardduty-multi-account-manager-parent.yml)
+```bash
+gunicorn --workers 4 --bind :5000 app:app
+```
 
-* The stack will spin up and create all Master Detectors in all regions, a
-  normalization functions, and all SNS Topics with CloudWatch events.
+1. In Mattermost go to *Main Menu -> Integrations -> Slash Commands* and add a new slash command with the URL of the server including the configured port number, e.g. http://localhost:5000.
+1. Choose POST for the request method.
+    - Optionally add the generated token to your `settings.py` (requires server restart).
+1. Edit your Mattermost `config.json` to include "localhost" in the "AllowedUntrustedInternalConnections" setting, e.g. `"AllowedUntrustedInternalConnections": "localhost"`
 
-### Onboarding Accounts
+To resolve usernames in `--public` polls and to provide localization, the server needs access to the
+Mattermost API. For this a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html) must be provided in your `settings.py`. Which user provides the token doesn't matter, e.g. you can create a dummy account. If no token is provided `--public` polls will not be available and all texts will be english.
 
-1. Ensure that the the mappings are configured in the
-   [`cloudformation/guardduty-member-account-role.yml`](cloudformation/guardduty-member-account-role.yml)
-   template as described above
-2. Deploy the customized [`cloudformation/guardduty-member-account-role.yml`](cloudformation/guardduty-member-account-role.yml)
-   CloudFormation template in your member AWS accounts. This CloudFormation template should only be deployed once in a single
-   region in each member AWS account. The account will then register with the master account and go through the invitation
-   process automatically for every region.
+## Docker
 
-## AWS re:invent 2018 SEC403 Presentation
+To integrate with [mattermost-docker](https://github.com/mattermost/mattermost-docker):
 
-* [Watch our presentation on GuardDuty Multi Account Manager](https://www.youtube.com/watch?v=M5yQpegaYF8&t=1889) at AWS re:Invent 2018
-* [Read the slides](https://www.slideshare.net/AmazonWebServices/five-new-security-automations-using-aws-security-services-open-source-sec403-aws-reinvent-2018/47)
+```bash
+cd mattermost-docker
+git submodule add git@github.com:M-Mueller/mattermost-poll.git poll
+```
 
-## License
+and add the following to the `services` section:
 
-guardduty-multi-account-manager is Licensed under the
-[Mozilla Public License 2.0 ( MPL2.0 )](https://www.mozilla.org/en-US/MPL/2.0/)
+```yaml
+  poll:
+    build:
+      context: poll
+      args:
+        - mattermost_url="http://web"
+        - mattermost_tokens=['<mattermost-token-1>', '<mattermost-token-2>']
+        - mattermost_pa_token="<personal-access-token>"
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - ./volumes/poll:/app/volume:rw
+```
 
-## Contributors
-
-* [Gene Wood](https://github.com/gene1wood/)
-* [Andrew Krug](https://github.com/andrewkrug/)
+1. In Mattermost go to *Main Menu -> Integrations -> Slash Commands* and add a new slash command with the URL of the server including the configured port number, e.g. http://poll:5000.
+1. Choose POST for the request method.
+1. Edit your Mattermost `config.json` to include "poll" in the "AllowedUntrustedInternalConnections" setting, e.g. `"AllowedUntrustedInternalConnections": "poll"`
