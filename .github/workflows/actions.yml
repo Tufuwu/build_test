@@ -1,5 +1,4 @@
-name: check-wavelet-prosody-toolkit
-run-name: ${{ github.actor }} is in validation
+name: Build and Test
 on: [push]
 jobs:
   build:
@@ -7,23 +6,39 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8"]
-
     steps:
       - uses: actions/checkout@v4
-
-      # Setup python
-      - name: Setup python
+      - name: Use latest LTS Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
-
-      # Install everything
-      - name: Install wavelet-prosody-toolkit
-        run: pip install -e .
-
-      # Linux and macOS
-      - name: Run the test
-        shell: bash -l {0}
+      - name: Install dependencies
         run: |
-          bash test/run_test.sh
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements-dev.txt
+      - name: Run Django Migrate and Check
+        run: |
+          cp django_airavata/settings_local.py.sample django_airavata/settings_local.py
+          python manage.py migrate
+          python manage.py check
+      - name: Run flake8
+        run: |
+          flake8 .
+      - name: Run ESLint on JavaScript code
+        run: |
+          ./lint_js.sh
+      - name: Build JavaScript code
+        run: |
+          ./build_js.sh
+      - name: Run JavaScript unit tests
+        run: |
+          ./test_js.sh
+      # Need to build the frontend client before running some of the Django tests
+      # that use the Django test Client
+      - name: Run Django unit tests
+        run: |
+          ./runtests.py
