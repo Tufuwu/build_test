@@ -1,2 +1,0 @@
----
-check_master_script_path: "{{ redis_install_dir }}/redis_is_master"

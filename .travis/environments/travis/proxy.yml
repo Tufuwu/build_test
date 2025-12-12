@@ -1,3 +1,0 @@
-SITE_HOST: '{{ groups.proxy.0 }}'
-fake_ssl_cert: yes
-nginx_worker_rlimit_nofile: 65536

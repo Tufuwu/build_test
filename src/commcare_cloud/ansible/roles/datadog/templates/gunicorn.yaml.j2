@@ -1,9 +1,0 @@
-#
-# {{ ansible_managed }}
-#
-init_config:
-
-instances:
-  - proc_name: deployment.gunicorn.commcarehq_wsgi:application
-    tags:
-      - environment:{{ env_monitoring_id }}

@@ -1,5 +1,0 @@
----
-dependencies:
-  - role: monit
-  - role: DavidWittman.redis
-  - role: ruby_install

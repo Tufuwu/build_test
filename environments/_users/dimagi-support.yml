@@ -1,4 +1,0 @@
-dev_users:
-  present: []
-  absent:
-    - ksampat

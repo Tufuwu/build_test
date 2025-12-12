@@ -1,3 +1,0 @@
-tag_deploy_commits: True
-use_shared_dir_for_staticfiles: True
-shared_dir_for_staticfiles: /mnt/shared_india/temp
