@@ -1,1 +1,2 @@
-include grill/resources/*/*
+include LICENSE
+include README.md
