@@ -13,6 +13,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-include requirements.txt README.md
-recursive-include sparkly/resources *
