@@ -1,38 +1,24 @@
-name: build
-on:
-  push:
-  pull_request:
-  release:
-    types: [created]
+on: [pull_request, push]
 jobs:
   build:
-    name: Build
+    # Prevent duplicate builds for 'internal' pull requests on existing commits
+    # Credit: https://github.community/t/duplicate-checks-on-push-and-pull-request-simultaneous-event/18012
+    if: github.event.push || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.8"]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
-      - uses: actions/checkout@v4
-      - name: Install Python dependencies
-        run: python -m pip install --upgrade pip && pip install -r requirements.txt && python -m pip list
-      - name: Lint
-        run: ./lint.sh
-      - name: Test
-        run: ./test.sh
-      - name: SonarQube scan
-        if: github.event_name != 'release' && github.repository == 'IBM/qpylib'
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Build
-        env:
-          BUILD_IDENTIFIER: "${{ github.event_name == 'release' && github.ref_name || format('0.0.dev{0}', github.sha) }}"
-        run: ./build.sh "$BUILD_IDENTIFIER"
-      - name: Deploy
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            dist/qpylib-${{github.ref_name}}.tar.gz
-            dist/qpylib-${{github.ref_name}}-py3-none-any.whl
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: "requirements*.txt"
+      - run: pip install tox
+      - run: tox -e py
+      - if: ${{ always() }}
+        run: python debug-info.py
