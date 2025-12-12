@@ -1,23 +1,60 @@
-name: Run tests
+name: CI
 
 on:
+# Triggers the workflow on push or pull request events for the main/develop branches
   push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  # Allows us to run this workflow manually
+  workflow_dispatch:
 
 jobs:
-  tests:
+  main:
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [
-            '3.8'
-        ]
-    runs-on: ubuntu-latest
+        python-version: ["3.8"]
+   
+    name: "Python ${{ matrix.python-version }}"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install flake8 sphinx
-      - run: pip install .
-      - run: flake8 artist
-      - run: make -C demo test
-      - run: sphinx-build -n doc doc/_build/html
+          
+      - name: Package setup
+        shell: bash
+        run: |
+          pip install -r requirements.txt
+          pip install .
+      
+      - name: Package tests
+        shell: bash
+        run: pytest --cov=./dassh ./tests/ --cov-report xml:coverage_${{ matrix.python-version }}.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
+          files: coverage_${{ matrix.python-version }}.xml
+          # dry_run: true
+
+  #finish:
+  #  needs: main
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: CodeCov
+  #      shell: bash
+  #      run: codecov
+    
