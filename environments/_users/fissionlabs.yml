@@ -1,0 +1,8 @@
+dev_users:
+  present:
+  - pkasha
+  - pviswa
+  absent:
+  - schinthala
+  - rganne
+  - lravula

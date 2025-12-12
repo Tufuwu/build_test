@@ -1,0 +1,134 @@
+---
+# commcare-cloud <env> ansible-playbook letsencrypt_cert.yml
+- hosts: proxy
+  become: yes
+  vars:
+    certbot_min_version: 1.6.0
+  tasks:
+    # Installation instructions: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
+    - name: Remove legacy certbot apt repo
+      apt_repository: repo='ppa:certbot/certbot' state=absent
+
+    - name: Uninstall Certbot via APT
+      apt:
+        name: certbot
+        state: absent
+      ignore_errors: '{{ ansible_check_mode }}'
+
+    - name: Check certbot version
+      shell: "test -x /usr/bin/certbot && certbot --version"
+      register: certbot_version
+      failed_when: false
+      check_mode: no
+
+    - block:
+      - name: update snap core
+        shell: "snap install core; snap refresh core"
+
+      - name: Install certbot snap
+        snap:
+          name: certbot
+          classic: yes
+        register: certbot_install
+
+      - name: Link certbot
+        file:
+          path: /usr/bin/certbot
+          src: /snap/bin/certbot
+          state: link
+
+      - name: update certbot
+        command: "snap refresh certbot"
+        when: not certbot_install is changed
+      when: certbot_version.rc != 0 or certbot_version.stdout.split()[1] is version(certbot_min_version, '<')
+
+    - name: Check that /etc/letsencrypt/ exists
+      stat:
+        path: /etc/letsencrypt/
+      register: stat_result
+
+    - name: Create the directory, if not exist already
+      file:
+        path: /etc/letsencrypt/
+        state: directory
+      when: not stat_result.stat.exists
+
+    - name: Check that /etc/letsencrypt/cli.ini exists
+      stat:
+        path: /etc/letsencrypt/cli.ini
+      register: stat_result
+
+    - name: Create the file, if not exist already
+      file:
+        path: /etc/letsencrypt/cli.ini
+        state: touch
+      when: not stat_result.stat.exists
+
+    - name: Update cerbot to use alternate root chain
+      lineinfile:
+        dest: /etc/letsencrypt/cli.ini
+        regexp: '^preferred-chain'
+        line: "preferred-chain = DST Root CA X3"
+
+    - name: Create Challenge Directory
+      file:
+        path: '/var/www/letsencrypt/.well-known/acme-challenge'
+        owner: www-data
+        group: www-data
+        state: directory
+        recurse: yes
+
+    - name: Create a test file
+      copy:
+        content: ""
+        dest: '/var/www/letsencrypt/.well-known/acme-challenge/test.txt'
+        owner: www-data
+        group: www-data
+      ignore_errors: '{{ ansible_check_mode }}'
+
+    - name: Check that a test page returns a status 200
+      uri:
+        url: 'https://{{SITE_HOST}}/.well-known/acme-challenge/test.txt'
+        validate_certs: no
+
+    - name: Run Certbot command when there is a www host
+      command: "certbot certonly --webroot -w /var/www/letsencrypt/ -m {{ root_email }} --agree-tos -n -d {{SITE_HOST}} -d {{ NO_WWW_SITE_HOST }}{% if ALTERNATE_HOSTS %} -d {{ ALTERNATE_HOSTS | join(' -d ') }}{% endif %} --expand"
+      when: NO_WWW_SITE_HOST | default(False)
+
+    - name: Run Certbot command when there is no www host
+      command: "certbot certonly --webroot -w /var/www/letsencrypt/ -m {{ root_email }} --agree-tos -n -d {{SITE_HOST}}{% if ALTERNATE_HOSTS %} -d {{ ALTERNATE_HOSTS | join(' -d ') }}{% endif %} --expand"
+      when: not NO_WWW_SITE_HOST
+
+    - name: Run Certbot command when there is special host
+      command: "certbot certonly --webroot -w /var/www/letsencrypt/ -m {{ root_email }} --agree-tos -n -d {{ item }} --expand"
+      with_items: "{{ extra_sites }}"
+      when: extra_sites is defined
+
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    # Certbot auto installs this cron file,
+    # but we want to replace it with our own
+    - name: Remove default certbot cron
+      cron:
+        cron_file: certbot
+        user: root
+        state: absent
+
+    - name: Add custom_certbot cron
+      cron:
+        name: "Certbot Renew"
+        job: "test -x /usr/bin/certbot && perl -e 'sleep int(rand(3600))' && certbot -q renew --post-hook '/etc/init.d/nginx reload'"
+        minute: "0"
+        hour: "*/12"
+        user: root
+        cron_file: custom_certbot
+
+    # Cleanup
+    - name: Remove "Reload Nginx to reread SSL" cron job
+      cron:
+        state: absent
+        user: root
+        cron_file: nginx_ssl_reread

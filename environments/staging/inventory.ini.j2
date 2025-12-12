@@ -1,0 +1,188 @@
+# This file currently contains a lot of commented-out hosts
+# that refer to presumed eventual hosts that will live on AWS but don't yet exist
+# As they get added, we'll uncomment them and the IPs will get populated from live AWS resources
+# using the aws-fill-inventory command.
+
+{{ __proxy2__ }}
+{{ __proxy3__ }}
+
+[proxy:children]
+# Amazon EC2
+proxy2
+proxy3
+
+[logproxy:children]
+proxy
+
+{{ __web7__ }} swap_size=1G
+
+{{ __web8__ }} swap_size=1G
+
+[webworkers:children]
+# Amazon EC2
+web7
+web8
+
+{{ __pgproxy4__ }} pgbouncer_processes=2 swap_size=2G
+
+{{ __pgbouncer0__ }}
+
+{{ __rds_pg0__ }}
+
+{{ __rds_pgformplayer0__ }}
+
+[remote_postgresql:children]
+rds_pg0
+rds_pgformplayer0
+
+{{ __pgformplayer_nlb__ }}
+{{ __pgmain_nlb__ }}
+{{ __pgucr_nlb__ }}
+{{ __pgsynclogs_nlb__ }}
+{{ __pgshard_nlb__ }}
+{{ __couch_alb__ }}
+
+[postgresql:children]
+pgproxy4
+remote_postgresql
+pgformplayer_nlb
+pgmain_nlb
+pgucr_nlb
+pgsynclogs_nlb
+pgshard_nlb
+
+[pgbouncer:children]
+pgbouncer0
+
+{{ __couch6__ }}
+
+{{ __couch15__ }}
+
+{{ __couch13__ }}
+
+[couchdb2:children]
+couch6
+couch15
+couch13
+couch_alb
+
+[couchdb2_proxy:children]
+couch_alb
+
+[couchdb2_alb:children]
+couch_alb
+
+{{ __rabbit2__ }}
+{{ __rabbit4__ }}
+
+[rabbitmq:children]
+# Amazon EC2
+rabbit2
+rabbit4
+
+{{ __kafka2__ }} kafka_broker_id=1 zookeeper_server_id=1
+{{ __kafka5__ }} kafka_broker_id=4 zookeeper_server_id=4
+{{ __kafka6__ }} kafka_broker_id=5 zookeeper_server_id=5
+
+[zookeeper:children]
+# Amazon EC2
+kafka2
+kafka5
+kafka6
+
+[kafka:children]
+# Amazon EC2
+kafka2
+kafka5
+kafka6
+
+{{ __celery_a0__ }}
+
+[celery:children]
+celery_a0
+
+[celery:vars]
+swap_size=2G
+
+{{ __pillow3__ }}
+
+[pillowtop:children]
+# Amazon EC2
+pillow3
+
+{{ __formplayer4__ }}
+
+{{ __formplayer5__ }}
+
+[formplayer:children]
+# Amazon EC2
+formplayer4
+formplayer5
+
+[formplayer:vars]
+formplayer_efs_dns={{ aws_resources['formplayer-efs'] }}:/
+
+{{ __es6__ }} elasticsearch_node_name=es6-staging elasticsearch_node_zone=us-east-1a
+
+{{ __es7__ }} elasticsearch_node_name=es7-staging elasticsearch_node_zone=us-east-1a
+
+{{ __es8__ }} elasticsearch_node_name=es8-staging elasticsearch_node_zone=us-east-1a
+
+{{ __es9__ }} elasticsearch_node_name=es9-staging elasticsearch_node_zone=us-east-1b
+
+{{ __es10__ }} elasticsearch_node_name=es10-staging elasticsearch_node_zone=us-east-1b
+
+{{ __es11__ }} elasticsearch_node_name=es11-staging elasticsearch_node_zone=us-east-1b
+
+[elasticsearch:children]
+# Amazon EC2
+es_master
+es_data
+es_coordinator
+
+[es_master:children]
+es6
+es7
+es9
+
+[es_master:vars]
+elasticsearch_master=true
+elasticsearch_data=true
+
+[es_data:children]
+es8
+es10
+
+[es_coordinator:children]
+es11
+
+[es_coordinator:vars]
+elasticsearch_master=false
+elasticsearch_data=false
+
+[shared_efs_client_host:children]
+celery
+django_manage
+proxy
+pillowtop
+webworkers
+
+{{ __control1__ }}
+
+[control:children]
+control1
+
+[ansible_skip:children]
+rds_pg0
+rds_pgformplayer0
+pgformplayer_nlb
+pgmain_nlb
+pgucr_nlb
+pgsynclogs_nlb
+pgshard_nlb
+couch_alb
+
+
+[django_manage:children]
+# Amazon EC2
+web7

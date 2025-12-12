@@ -1,0 +1,25 @@
+# TCL VMs usually are given to us with wcdadmin user and password, the initial SSH
+# prompt is configured to reset that password. This playbook automates this for a 
+# given list of servers. Once IPs and passwords are substituited correctly, the playbook
+# can be run like below.
+#
+# ansible-playbook --connection=local reset.yml
+#
+# Python pexpect module is required
+
+- hosts: localhost
+  vars_prompt:
+   - name: current_password
+     prompt: "Current 'wcdadmin' password:"
+   - name: new_password
+     prompt: "New 'wcdadmin' password:"
+  tasks:
+    - expect:
+        command: ssh wcdadmin@{{item}} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+        responses:
+          "(.*)wcdadmin(.*)": '{{current_password}}'
+          "(current) UNIX password": '{{current_password}}'
+          "Enter new UNIX password": '{{new_password}}'
+          "Retype new UNIX password": '{{new_password}}'
+      with_items:
+       # list of server IP addresses

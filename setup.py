@@ -1,115 +1,65 @@
-#! /usr/bin/env python
-#
-# Copyright (C) 2012-2021 Ben Kurtovic <ben.kurtovic@gmail.com>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+from __future__ import absolute_import
 
-from glob import glob
-import os
-import sys
+from setuptools import setup, find_packages
 
-from setuptools import find_packages, setup, Extension
-from setuptools.command.build_ext import build_ext
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
-
-from mwparserfromhell import __version__
-
-with open("README.rst") as fp:
-    long_docs = fp.read()
-
-use_extension = True
-fallback = True
-
-# Allow env var WITHOUT_EXTENSION and args --with[out]-extension:
-
-env_var = os.environ.get("WITHOUT_EXTENSION")
-if "--without-extension" in sys.argv:
-    use_extension = False
-elif "--with-extension" in sys.argv:
-    fallback = False
-elif env_var is not None:
-    if env_var == "1":
-        use_extension = False
-    elif env_var == "0":
-        fallback = False
-
-# Remove the command line argument as it isn't understood by setuptools:
-
-sys.argv = [
-    arg for arg in sys.argv if arg not in ("--without-extension", "--with-extension")
+install_deps = [
+    'ansible-vault==1.1.1',
+    'ansible~=2.9.7',
+    'argparse>=1.4',
+    'attrs>=18.1.0',
+    'boto3>=1.9.131',
+    'clint',
+    'couchdb-cluster-admin>=0.7.0',
+    'cryptography>=3.2',
+    'datadog>=0.2.0',
+    'dimagi-memoized>=1.1.0',
+    'dnspython',
+    'Fabric3>=1.10.2,<1.11',
+    # can remove once requests bumps its version requirement
+    # https://github.com/requests/requests/issues/4681
+    'idna==2.6',
+    'importlib-metadata==3.1.0',
+    'jinja2-cli',
+    'jsonobject>=0.9.0',
+    'netaddr',
+    'passlib',
+    'pycryptodome>=3.6.6',  # security update
+    'PyGithub>=1.43.3',
+    'pytz==2017.2',
+    'simplejson',
+    'six',
+    'tabulate'
 ]
-
-
-def build_ext_patched(self):
-    try:
-        build_ext_original(self)
-    except Exception as exc:
-        print("error: " + str(exc))
-        print("Falling back to pure Python mode.")
-        del self.extensions[:]
-
-
-if fallback:
-    build_ext.run, build_ext_original = build_ext_patched, build_ext.run
-
-# Project-specific part begins here:
-
-tokenizer = Extension(
-    "mwparserfromhell.parser._tokenizer",
-    sources=sorted(glob("src/mwparserfromhell/parser/ctokenizer/*.c")),
-    depends=sorted(glob("src/mwparserfromhell/parser/ctokenizer/*.h")),
-)
+test_deps = [
+    'modernize',
+    'nose>=1.3.7',
+    'parameterized>=0.6.1',
+    'requests-mock',
+]
+aws_deps = [
+    'awscli',
+]
+extras = {
+    'test': test_deps,
+    'aws': aws_deps,
+}
 
 setup(
-    name="mwparserfromhell",
-    packages=find_packages("src"),
-    package_dir={"": "src"},
-    ext_modules=[tokenizer] if use_extension else [],
-    setup_requires=["pytest-runner"]
-    if "test" in sys.argv or "pytest" in sys.argv
-    else [],
-    tests_require=["pytest"],
-    version=__version__,
-    python_requires=">= 3.6",
-    author="Ben Kurtovic",
-    author_email="ben.kurtovic@gmail.com",
-    url="https://github.com/earwig/mwparserfromhell",
-    description="MWParserFromHell is a parser for MediaWiki wikicode.",
-    long_description=long_docs,
-    download_url="https://github.com/earwig/mwparserfromhell/tarball/v{}".format(
-        __version__
-    ),
-    keywords="earwig mwparserfromhell wikipedia wiki mediawiki wikicode template parsing",
-    license="MIT License",
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Environment :: Console",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Topic :: Text Processing :: Markup",
-    ],
+    name='commcare-cloud',
+    description="A tool for managing commcare deploys.",
+    long_description="",
+    license='BSD-3',
+    include_package_data=True,
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
+    entry_points={
+        'console_scripts': [
+            'commcare-cloud = commcare_cloud.commcare_cloud:main',
+            'cchq = commcare_cloud.commcare_cloud:main',
+            'manage-commcare-cloud = commcare_cloud.manage_commcare_cloud.manage_commcare_cloud:main',
+        ],
+    },
+    install_requires=install_deps,
+    tests_require=test_deps,
+    extras_require=extras,
 )

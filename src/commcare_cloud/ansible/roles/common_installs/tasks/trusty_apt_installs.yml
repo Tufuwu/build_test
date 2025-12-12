@@ -1,0 +1,5 @@
+- name: Install common packages (trusty)
+  become: yes
+  apt:
+    name:
+      - python-software-properties
