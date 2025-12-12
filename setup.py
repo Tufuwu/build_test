@@ -1,76 +1,82 @@
-from setuptools import setup, find_packages
-from os import path
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import re
+import sys
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 
-here = path.abspath(path.dirname(__file__))
-about = {}
-with open(path.join(here, 'vakt', 'version.py'), mode='r', encoding='utf-8') as f:
-    exec(f.read(), about)
+def get_version(*file_paths):
+    """Retrieves the version from django_smoke_tests/__init__.py"""
+    filename = os.path.join(os.path.dirname(__file__), *file_paths)
+    version_file = open(filename).read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+
+version = get_version("django_smoke_tests", "__init__.py")
 
 
-if __name__ == '__main__':
-    setup(
-        name='vakt',
-        description='Attribute-based access control (ABAC) SDK for Python',
-        keywords='ACL ABAC access-control policy security authorization permission',
-        version=about['__version__'],
-        author='Egor Kolotaev',
-        author_email='ekolotaev@gmail.com',
-        license="Apache 2.0 license",
-        url='http://github.com/kolotaev/vakt',
-        long_description=long_description,
-        long_description_content_type='text/markdown',
-        py_modules=['vakt'],
-        python_requires='>=3.4',
-        install_requires=[
-            'jsonpickle>=1.0',
-        ],
-        extras_require={
-            # Dev dependencies are not using pinned compatibility versions
-            # in order to support a wide array of Python versions
-            'dev': [
-                'pytest',
-                'pytest-cov',
-                'pylint',
-                'PyMySQL',
-                'psycopg2cffi~=2.8',
-            ],
-            'mongo': [
-                'pymongo~=3.5',
-            ],
-            'sql': [
-                'SQLAlchemy~=1.3',
-                # 'typing', # sqlalchemy imports typing since v1.3.24
-            ],
-            'redis': [
-                'redis~=3.3'
-            ],
-        },
-        packages=find_packages(exclude='tests'),
-        classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Operating System :: OS Independent',
-            'Topic :: System :: Systems Administration',
-            'Topic :: System :: Networking',
-            'Topic :: System :: Networking :: Firewalls',
-            'Topic :: Security',
-            'Topic :: Software Development',
-            'Topic :: Utilities',
-            'Natural Language :: English',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 3.4',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Programming Language :: Python :: 3.11',
-            'Programming Language :: Python :: Implementation :: PyPy',
-            'Programming Language :: Python :: Implementation :: CPython',
-        ],
-    )
+if sys.argv[-1] == 'publish':
+    try:
+        import wheel
+        print("Wheel version: ", wheel.__version__)
+    except ImportError:
+        print('Wheel library missing. Please run "pip install wheel"')
+        sys.exit()
+    os.system('python setup.py sdist upload')
+    os.system('python setup.py bdist_wheel upload')
+    sys.exit()
+
+if sys.argv[-1] == 'tag':
+    print("Tagging the version on git:")
+    os.system("git tag -a %s -m 'version %s'" % (version, version))
+    os.system("git push --tags")
+    sys.exit()
+
+readme = open('README.rst').read()
+
+_read = lambda f: open(
+    os.path.join(os.path.dirname(__file__), f)).read() if os.path.exists(f) else ''
+
+install_requires = [
+    l.replace('==', '>=') for l in _read('requirements.txt').split('\n')
+    if l and not l.startswith('#') and not l.startswith('-')]
+
+setup(
+    name='django-smoke-tests',
+    version=version,
+    description="""Automatic smoke tests for Django project.""",
+    long_description=readme,
+    author='Kamil Kijak',
+    author_email='kamilkijak@gmail.com',
+    url='https://github.com/kamilkijak/django-smoke-tests',
+    packages=[
+        'django_smoke_tests',
+    ],
+    include_package_data=True,
+    install_requires=install_requires,
+    license="MIT",
+    zip_safe=False,
+    keywords=['django-smoke-tests', 'test', 'smoke'],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Framework :: Django',
+        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.2',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+    ],
+)

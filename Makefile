@@ -1,61 +1,59 @@
-PYTHON = python3
-PIP = ${PYTHON} -m pip
-PY_TEST = ${PYTHON} -m pytest
+.PHONY: clean-pyc clean-build docs help
+.DEFAULT_GOAL := help
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
+try:
+	from urllib import pathname2url
+except:
+	from urllib.request import pathname2url
 
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
+BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
-.PHONY: default
-default: test lint
+help:
+	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: deps
-deps:
-	${PIP} install -e .[dev,mongo,sql,redis]
+clean: clean-build clean-pyc
 
-.PHONY: test
-test:
-	${PY_TEST}
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr *.egg-info
 
-.PHONY: test-ni
-test-ni:
-	${PY_TEST} -m "not integration and not sql_integration"
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
 
-.PHONY: test-i
-test-i:
-	${PY_TEST} -m "integration"
+lint: ## check style with flake8
+	flake8 django_smoke_tests tests
 
-# SQL integration test runs for Sqlite, MySQL and Postgres
-# examples:
-# DATABASE_DSN=sqlite:///:memory: make test-sql-i
-# DATABASE_DSN=mysql://root:root@localhost/vakt_db ...
-# DATABASE_DSN=postgresql+psycopg2://postgres:root@localhost/vakt_db ...
-.PHONY: test-sql-i
-test-sql-i:
-	${PY_TEST} -m "sql_integration"
+test: ## run tests quickly with the default Python
+	python runtests.py tests
 
-.PHONY: coverage
-coverage:
-	${PY_TEST} --cov-config .coveragerc --cov=./ --cov-report html:htmlcov
+test-all: ## run tests on every Python version with tox
+	tox
 
-.PHONY: lint
-lint:
-	pylint vakt
+coverage: ## check code coverage quickly with the default Python
+	coverage run --source django_smoke_tests runtests.py tests
+	coverage report -m
+	coverage html
+	open htmlcov/index.html
 
-.PHONY: release
-release: test
-	${PYTHON} setup.py sdist && ${PYTHON} -m twine upload dist/*
+docs: ## generate Sphinx HTML documentation, including API docs
+	rm -f docs/django-smoke-tests.rst
+	rm -f docs/modules.rst
+	sphinx-apidoc -o docs/ django_smoke_tests
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+	$(BROWSER) docs/_build/html/index.html
 
-# runs mutation testing
-.PHONY: mutation
-mutation:
-	${PIP} install mutmut
-	mutmut run --runner="${PY_TEST}" --paths-to-mutate="vakt/" --dict-synonyms="Struct, NamedStruct"
+release: clean ## package and upload a release
+	python setup.py sdist upload
+	python setup.py bdist_wheel upload
 
-.PHONY: mutation-report
-mutation-report:
-	@ruby -e '`mutmut results`.lines.select{ |i| i =~ /\d,/ }.join(",").split(","). \
-			 map(&:strip).each { |f| puts " Survived ##{f}"; system "mutmut show #{f}" }'
-
-.PHONY: bench
-bench:
-	${PYTHON} benchmark.py --checker regex --number 100000
-	@echo "\n"
-	${PYTHON} benchmark.py --checker rules --number 100000
+sdist: clean ## package
+	python setup.py sdist
+	ls -l dist
