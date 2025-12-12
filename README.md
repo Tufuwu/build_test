@@ -1,91 +1,129 @@
-Python FHIR Parser
-==================
-A Python FHIR specification parser for model class generation.
-If you've come here because you want _Swift_ or _Python_ classes for FHIR data models, look at our client libraries instead:
+# MF2: Multi-Fidelity-Functions
 
-- [Swift-FHIR][] and [Swift-SMART][]
-- Python [client-py][]
+| Package Info | Status                                                                                                                                                                                                                                           | Support                                                                 |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [![PyPI version](https://badge.fury.io/py/mf2.svg)](https://badge.fury.io/py/mf2) | [![tests status][tests-badge]][actions-page] | [![Documentation Status][docs-badge]][docs-url]                         |
+| [![Conda](https://img.shields.io/conda/v/conda-forge/mf2)](https://anaconda.org/conda-forge/mf2) | [![Coverage Status](https://coveralls.io/repos/github/sjvrijn/mf2/badge.svg?branch=master)](https://coveralls.io/github/sjvrijn/mf2?branch=master)                                                                                               | [![Gitter](https://badges.gitter.im/pymf2/community.svg)][gitter-badge] |
+| ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/mf2) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/54144e7d406b4558a14996b06a89adf8)](https://www.codacy.com/manual/sjvrijn/mf2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sjvrijn/mf2&amp;utm_campaign=Badge_Grade) |                                                                         |
+| [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) | [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)                                           |                                                                         |
+| [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4540752.svg)](https://doi.org/10.5281/zenodo.4540752) | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4231/badge)](https://bestpractices.coreinfrastructure.org/projects/4231)                                                                                            |                                                                         |
+| [![status](https://joss.theoj.org/papers/2575e93fc693c5c3bfa8736c60c35398/status.svg)](https://joss.theoj.org/papers/2575e93fc693c5c3bfa8736c60c35398) |                                                                                                                                                                                                                                                  |                                                                         |
 
-The `main` branch is currently capable of parsing _R5_.
+## Introduction
 
-This work is licensed under the [APACHE license][license].
-FHIR® is the registered trademark of [HL7][] and is used with the permission of HL7.
+The `mf2` package provides consistent, efficient and tested Python
+implementations of a variety of multi-fidelity benchmark functions. The goal is
+to simplify life for numerical optimization researchers by saving time otherwise
+spent reimplementing and debugging the same common functions, and enabling
+direct comparisons with other work using the same definitions, improving
+reproducibility in general.
 
+A multi-fidelity function usually reprensents an objective which should be
+optimized. The term 'multi-fidelity' refers to the fact that multiple versions
+of the objective function exist, which differ in the accuracy to describe the
+real objective. A typical real-world example would be the aerodynamic
+efficiency of an airfoil, e.g., its drag value for a given lift value. The
+different fidelity levels are given by the accuracy of the evaluation method
+used to estimate the efficiency. Lower-fidelity versions of the objective
+function refer to less accurate, but simpler approximations of the objective,
+such as computational fluid dynamic simulations on rather coarse meshes,
+whereas higher fidelity levels refer to more accurate but also much more
+demanding evaluations such as prototype tests in wind tunnels. The hope of
+multi-fildelity optimization approaches is that many of the not-so-accurate but
+simple low-fidelity evaluations can be used to achieve improved results on the
+realistic high-fidelity version of the objective where only very few
+evaluations can be performed.
 
-Tech
-----
+The only dependency of the mf2 package is the `numpy` package.
 
-The _generate.py_ script downloads [FHIR specification][fhir] files, parses the profiles (using _fhirspec.py_) and represents them as `FHIRClass` instances with `FHIRClassProperty` properties (found in _fhirclass.py_).
-Additionally, `FHIRUnitTest` (in _fhirunittest.py_) instances get created that can generate unit tests from provided FHIR examples.
-These representations are then used by [Jinja][] templates to create classes in certain programming languages, mentioned below.
+Documentation is available at [mf2.readthedocs.io][docs-url]
 
-This script does its job for the most part, but it doesn't yet handle all FHIR peculiarities and there's no guarantee the output is correct or complete.
-This repository **does not include the templates and base classes** needed for class generation, you must do this yourself in your project.
-You will typically add this repo as a submodule to your framework project, create a directory that contains the necessary base classes and templates, create _settings_ and _mappings_ files and run the script.
-Examples on what you would need to do for Python classes can be found in _Default/settings.py_, _Default/mappings.py_ and _Sample/templates*_.
+## Installation
 
+The recommended way to install `mf2` is with Python's `pip`:
+```
+python3 -m pip install --user mf2
+```
+or alternatively using `conda`:
+```
+conda install -c conda-forge mf2
+```
 
-Use
----
+For the latest version, you can install directly from source:
+```
+python3 -m pip install --user https://github.com/sjvrijn/mf2/archive/master.zip
+```
 
-1. Add `fhir-parser` as a submodule/subdirectory to the project that will use it
-2. Create the file `mappings.py` in your project, to be copied to fhir-parser root.
-    First, import the default mappings using `from Default.mappings import *` (unless you will define all variables yourself anyway).
-    Then adjust your `mappings.py` to your liking by overriding the mappings you wish to change.
-3. Similarly, create the file `settings.py` in your project.
-    First, import the default settings using `from Default.settings import *` and override any settings you want to change.
-    Then, import the mappings you have just created with `from mappings import *`.
-    The default settings import the default mappings, so you may need to overwrite more keys from _mappings_ than you'd first think.
-    You most likely want to change the topmost settings found in the default file, which are determining where the templates can be found and generated classes will be copied to.
-4. Install the generator's requirements by running `pip3` (or `pip`):
-    ```bash
-    pip3 install -r requirements.txt
-    ```
+To work in your own version locally, it is best to clone the repository first,
+and additionally install the dev-requirements:
+```
+git clone https://github.com/sjvrijn/mf2.git
+cd mf2
+python3 -m pip install --user -e .[dev]
+```
 
-5. Create a script that copies your `mappings.py` and `settings.py` file to the root of `fhir-parser`, _cd_s into `fhir-parser` and then runs `generate.py`.
-    The _generate_ script by default wants to use Python _3_, issue `python generate.py` if you don't have Python 3 yet.
-    * Supply the `-f` flag to force a re-download of the spec.
-    * Supply the `--cache-only` (`-c`) flag to deny the re-download of the spec and only use cached resources (incompatible with `-f`).
+## Example Usage
 
-> NOTE that the script currently overwrites existing files without asking and without regret.
+```python
+import mf2
+import numpy as np
 
+# set numpy random seed for reproducibility
+np.random.seed(42)
+# generate 5 random samples in 2D as matrix
+X = np.random.random((5, 2))
 
-Languages
-=========
+# print high fidelity function values
+print(mf2.branin.high(X))
+# Out: array([36.78994906 34.3332972  50.48149005 43.0569396  35.5268224 ])
 
-This repo used to contain templates for Python and Swift classes, but these have been moved to the respective framework repositories.
-A very basic Python sample implementation is included in the `Sample` directory, complementing the default _mapping_ and _settings_ files in `Default`.
+# print low fidelity function values
+print(mf2.branin.low(X))
+# Out: array([-5.8762639  -6.66852889  3.84944507 -1.56314141 -6.23242223])
+```
 
-To get a sense of how to use _fhir-parser_, take a look at these libraries:
+For more usage examples, please refer to the full documentation on
+[readthedocs][docs-url].
 
-- [**Swift-FHIR**][swift-fhir]
-- [**fhirclient**][client-py]
+## Contributing
 
+Contributions to this project such as bug reports or benchmark function
+suggestions are more than welcome! Please [refer to ``CONTRIBUTING.md``] for more
+details.
 
-Tech Details
-============
+## Contact
 
-This parser still applies some tricks, stemming from the evolving nature of FHIR's profile definitions.
-Some tricks may have become obsolete and should be cleaned up.
+The [Gitter][gitter] channel is the preferred way to get in touch for any other
+questions, comments or discussions about this package.
 
-### How are property names determined?
+## Citation
 
-Every “property” of a class, meaning every `element` in a profile snapshot, is represented as a `FHIRStructureDefinitionElement` instance.
-If an element itself defines a class, e.g. `Patient.animal`, calling the instance's `as_properties()` method returns a list of `FHIRClassProperty` instances – usually only one – that indicates a class was found in the profile.
-The class of this property is derived from `element.type`, which is expected to only contain one entry, in this matter:
+Was this package useful to you? Great! If this leads to a publication, we'd
+appreciate it if you would cite our [JOSS paper]:
 
-- If _type_ is `BackboneElement`, a class name is constructed from the parent element (in this case _Patient_) and the property name (in this case _animal_), camel-cased (in this case _PatientAnimal_).
-- If _type_ is `*`, a class for all classes found in settings` `star_expand_types` is created
-- Otherwise, the type is taken as-is (e.g. _CodeableConcept_) and mapped according to mappings' `classmap`, which is expected to be a valid FHIR class.
+```
+@article{vanRijn2020,
+  doi = {10.21105/joss.02049},
+  url = {https://doi.org/10.21105/joss.02049},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {52},
+  pages = {2049},
+  author = {Sander van Rijn and Sebastian Schmitt},
+  title = {MF2: A Collection of Multi-Fidelity Benchmark Functions in Python},
+  journal = {Journal of Open Source Software}
+}
+```
 
-> TODO: should `http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name` be respected?
+[actions-page]:       https://github.com/sjvrijn/mf2/actions
+[tests-badge]:	      https://github.com/sjvrijn/mf2/workflows/tests/badge.svg
+[docs-url]:           https://mf2.readthedocs.io/en/latest/?badge=latest
+[docs-badge]:         https://readthedocs.org/projects/mf2/badge/?version=latest
+[gitter]:             https://gitter.im/pymf2/community
+[gitter-badge]:       https://gitter.im/pymf2/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[new-issue]:          https://github.com/sjvrijn/mf2/issues/new
+[pytest-regressions]: https://github.com/ESSS/pytest-regressions
+[JOSS paper]:         https://joss.theoj.org/papers/10.21105/joss.02049
+[refer to ``CONTRIBUTING.md``]: https://github.com/sjvrijn/mf2/blob/master/CONTRIBUTING.md
 
-
-[license]: ./LICENSE.txt
-[hl7]: http://hl7.org/
-[fhir]: http://www.hl7.org/implement/standards/fhir/
-[jinja]: http://jinja.pocoo.org/
-[swift]: https://developer.apple.com/swift/
-[swift-fhir]: https://github.com/smart-on-fhir/Swift-FHIR
-[swift-smart]: https://github.com/smart-on-fhir/Swift-SMART
-[client-py]: https://github.com/smart-on-fhir/client-py
