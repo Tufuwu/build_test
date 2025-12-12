@@ -1,19 +1,19 @@
 # Release process
 
-Signing key: B993FF98A90C9AB1 (https://bargen.dev/B993FF98A90C9AB1.txt)
+Signing key: https://dbrgn.ch/F2F3A5FA.asc
 
 Used variables:
 
     export VERSION={VERSION}
-    export GPG=B993FF98A90C9AB1
+    export GPG=F2F3A5FA
 
-Update version numbers:
+Update version number in setup.py and CHANGELOG.md:
 
-    vim -p setup.py CHANGELOG.md RPLCD/__init__.py docs/conf.py
+    vim -p setup.py CHANGELOG.md
 
 Do a signed commit and signed tag of the release:
 
-    git add setup.py CHANGELOG.md RPLCD/__init__.py docs/conf.py
+    git add setup.py CHANGELOG.md
     git commit -S${GPG} -m "Release v${VERSION}"
     git tag -u ${GPG} -m "Release v${VERSION}" v${VERSION}
 
@@ -24,11 +24,11 @@ Build source and binary distributions:
 
 Sign files:
 
-    gpg --detach-sign -u ${GPG} -a dist/RPLCD-${VERSION}.tar.gz
-    gpg --detach-sign -u ${GPG} -a dist/RPLCD-${VERSION}-py3-none-any.whl
+    gpg --detach-sign -u ${GPG} -a dist/drf_dynamic_fields-${VERSION}.tar.gz
+    gpg --detach-sign -u ${GPG} -a dist/drf_dynamic_fields-${VERSION}-py2.py3-none-any.whl
 
 Upload package to PyPI:
 
-    twine3 upload dist/RPLCD-${VERSION}*
+    twine3 upload dist/drf_dynamic_fields-${VERSION}*
     git push
     git push --tags

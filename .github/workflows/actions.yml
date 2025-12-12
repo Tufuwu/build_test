@@ -12,19 +12,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        python: "3.8"
         deps:
-          - { python: "3.8" }
-      fail-fast: false
-    name: Python ${{ matrix.deps.python }}
+          - { django: '<2', drf: '<3.8' }
+          - { django: '<2', drf: '<3.9' }
+          - { django: '<2.1', drf: '<3.9' }
+          - { django: '<2.2', drf: '<3.9' }
+    name: Python ${{ matrix.python }} / Django ${{ matrix.deps.django }} / DRF ${{ matrix.deps.drf }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup python ${{ matrix.deps.python }}
+      - name: Setup python ${{ matrix.python }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.deps.python }}
-      - name: Upgrade pip
-        run: pip install -U pip
-      - name: Install dev dependencies
-        run: pip install -r requirements-dev.txt
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: pip install "django${{ matrix.deps.django }}" "django-rest-framework${{ matrix.deps.drf }}"
       - name: Run tests
-        run: pytest
+        run: python runtests.py
+
+    #check-formatting:
+    #  runs-on: ubuntu-latest
+    #  name: Check code formatting
+    #  steps:
+    #    - uses: actions/checkout@v4
+    #    - name: Black Code Formatter
+    #      uses: lgeiger/black-action@main
+    #      with:
+    #        args: "drf_dynamic_fields --check --diff"
