@@ -1,43 +1,49 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-#
-"""
-"""
-
 from setuptools import setup, find_packages
+import os
+import codecs
+from os.path import join
 
-# Setuptools config
-NAME = "numerizer"
-DESCRIPTION = "Python module for converting natural language numbers into ints and floats."
-with open('README.rst', encoding='utf-8') as f:
-    LONG_DESCRIPTION = f.read()
-MAINTAINER = 'Jaidev Deshpande'
-MAINTAINER_EMAIL = 'deshpande.jaidev@gmail.com'
-URL = "https://github.com/jaidevd/numerizer"
-DOWNLOAD_URL = 'https://pypi.org/project/numerizer/#files'
-LICENSE = 'MIT'
-PROJECT_URLS = {
-    'Bug Tracker': 'https://github.com/jaidevd/numerizer/issues',
-    'Documentation': 'https://github.com/jaidevd/numerizer/tree/master/README.rst',
-    'Source Code': 'https://github.com/jaidevd/numerizer'
-}
-VERSION = '0.2.3'
+project_root = os.path.dirname(os.path.abspath(__file__))
 
-# Requirements
-install_requires = []
+version = {}
+REQUIRED_EXTRAS = {}
+with open(join(project_root, 'pya/version.py')) as read_file:
+    exec(read_file.read(), version)
 
-# Setup
+with open(join(project_root, 'requirements.txt')) as read_file:
+    REQUIRED = read_file.read().splitlines()
+
+with open(join(project_root, 'requirements_remote.txt')) as read_file:
+    REQUIRED_EXTRAS['remote'] = read_file.read().splitlines()
+
+with open(join(project_root, 'requirements_test.txt')) as read_file:
+    REQUIRED_TEST = read_file.read().splitlines()
+
+with codecs.open(join(project_root, 'README.md'), 'r', 'utf-8') as f:
+    long_description = ''.join(f.readlines())
+
 setup(
-    name=NAME,
-    maintainer=MAINTAINER,
-    maintainer_email=MAINTAINER_EMAIL,
-    description=DESCRIPTION,
-    license=LICENSE,
-    url=URL,
-    download_url=DOWNLOAD_URL,
-    version=VERSION,
-    long_description=LONG_DESCRIPTION,
-    packages=find_packages(),
-    install_requires=install_requires
+    name='pya',
+    version=version['__version__'],
+    description='Python audio coding classes - for dsp and sonification',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    license='MIT',
+    packages=find_packages(exclude=["tests"]),
+    install_requires=REQUIRED,
+    extras_require=REQUIRED_EXTRAS,
+    tests_require=REQUIRED_TEST,
+    author='Thomas Hermann',
+    author_email='thermann@techfak.uni-bielefeld.de',
+    keywords=['sonification, sound synthesis'],
+    url='https://github.com/interactive-sonification/pya',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Development Status :: 4 - Beta",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Topic :: Multimedia :: Sound/Audio",
+        "Topic :: Multimedia :: Sound/Audio :: Analysis",
+        "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis"
+    ],
 )
