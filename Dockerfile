@@ -1,12 +1,23 @@
-# This Docker image helps to run the tests in a fresh environment
-# docker build -t pysec-test .
-# docker run -it --rm pysec-test:latest /bin/bash
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /code
+WORKDIR /code
 
-FROM python:3.6-slim
+COPY Pipfile Pipfile.lock ./
+RUN pip install pipenv
+RUN pipenv install --system --deploy
 
-RUN apt-get update && apt-get install -y git
-WORKDIR /root/home
-RUN pip install --upgrade pip
-RUN git clone https://github.com/SAP/cloud-pysec
-WORKDIR /root/home/cloud-pysec
-RUN pip install -r requirements-tests.txt
+COPY myrecommendations ./myrecommendations
+COPY myrestaurants ./myrestaurants
+COPY templates ./templates
+COPY manage.py ./
+# Copy media files just for demo purposes
+COPY media ./media
+
+ENV PORT 8000
+EXPOSE $PORT
+RUN python manage.py collectstatic --noinput --clear
+# Init DB if local, might also require `$> python manage.py createsuperuser`
+RUN python manage.py migrate
+# Set DJANGO_SETTINGS_MODULE=myrecommendations.settings_heroku when deploying on Heroku
+CMD gunicorn -b 0.0.0.0:$PORT myrecommendations.wsgi
