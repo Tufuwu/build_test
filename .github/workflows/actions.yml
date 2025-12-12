@@ -1,38 +1,29 @@
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-
+name: check-wavelet-prosody-toolkit
+run-name: ${{ github.actor }} is in validation
+on: [push]
 jobs:
-
-  travis-check:
-
-    name: Python ${{ matrix.python-version }}
+  build:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         python-version: ["3.8"]
-      fail-fast: false
 
     steps:
-      - run: echo "Job triggered by a ${{ github.event_name }} event on branch is ${{ github.ref }} in repository is ${{ github.repository }}"
-      - name: Check out repository code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
+
+      # Setup python
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          architecture: x64
+
+      # Install everything
+      - name: Install wavelet-prosody-toolkit
+        run: pip install -e .
+
+      # Linux and macOS
+      - name: Run the test
+        shell: bash -l {0}
         run: |
-         pip install sphinx
-         pip install -r requirements-travis.txt
-      - name: Run inspekt
-        run: inspekt checkall --disable-style E501,E265,W601,E402,E722,E741 --enable-lint W0611,W1201 --no-license-check
-      - run: echo "This job's status is ${{ job.status }}."
+          bash test/run_test.sh
