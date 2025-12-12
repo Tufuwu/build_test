@@ -1,24 +1,16 @@
-name: Tests
-
+name: run-tests
 on:
-  push:
-  workflow_dispatch:
-
+  pull_request:
+    branches:
+      - main
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    name: Check CloudFormation syntax with cfn-lint
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Build images
-        run: docker-compose build
-
-      - name: Run tests
-        run: docker-compose run ckan
-
-      - name: Run coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: docker-compose run -e COVERALLS_REPO_TOKEN ckan coveralls --service=github
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - run: pip install --requirement $GITHUB_WORKSPACE/requirements.txt
+      - run: make cfn-lint
