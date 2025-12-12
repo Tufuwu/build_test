@@ -1,23 +1,28 @@
-name: CI
+name: ADF CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8"]
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      - name: Install linters
-        run: sudo apt-get install -y pyflakes3 pycodestyle pydocstyle codespell pylint3
-
-      - name: Run tests
-        run: make test
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set the correct Node version using nvm
+        shell: bash -l {0} 
+        run: nvm install
+      - name: Install dependencies
+        run: make init
+      - name: Run tox
+        # Run tox using the version of Python in `PATH`
+        run: |
+          tox --version
+          tox
