@@ -1,82 +1,64 @@
+![Build status](https://github.com/em92/quakelive-local-ratings/actions/workflows/build.yml/badge.svg)
+[![Coverage](https://codecov.io/gh/em92/quakelive-local-ratings/branch/master/graph/badge.svg)](https://codecov.io/gh/em92/quakelive-local-ratings)
 
+# quakelive-local-ratings (qllr)
 
-## Magnetic Model
+QLLR is webservice that:
 
-This repository contains various utilities related to Earth magnetic field
-modelling and spherical harmonics.
+- stores match results
+- generates player's ratings
+- gives API to be used in [minqlx](https://github.com/MinoMino/minqlx) with [balance](https://github.com/MinoMino/minqlx-plugins/blob/master/balance.py) plugin to give **balanced teams**
 
-The repository contains following directories:
+Usually it is used with [feeder](https://github.com/em92/qlstats-feeder-mini) based on [Predath0r's](https://github.com/PredatH0r) [QLStats feeder](https://github.com/PredatH0r/XonStat/feeder) in order to collect match data from online quake live servers.
 
-- `eoxmagmod` - Collection models of the Earth magnetic field - python module
-- `qdipole` - Quasi-Dipole apex coordinates evaluation - Fortran code compiled
-  as a shared library (dependency of the `eoxmagmod` package)
-- `libcdf` - [CDF library](https://cdf.gsfc.nasa.gov/) source installation
-  (dependency of the `eoxmagmod` package)
+### Supported gametypes
 
-### Installation from Sources
+* Attack & Defend
+* Capture The Flag
+* Clan Arena
+* Freeze Tag
+* Team Deathmatch
+* Team Deathmatch (2v2)
 
-#### CDF
+### Differences between QLLR and [QLStats](http://qlstats.net/)
+
+* supports TrueSkill-based rating and average player performance based rating (TODO: note in configuration)
+* player ratings per map support (see [docs](docs/minqlx_config.md#map-based-ratings))
+* limited supported gametypes
+* [GDPR](http://eur-lex.europa.eu/eli/reg/2016/679/oj) incompatible
+
+### Requirements
+
+For qllr itself:
+
+* Python 3.6 with pip
+* PostgreSQL 9.5
+
+For feeder:
+
+* Node.js 0.11.13
+* libzmq3
+
+### Docker
+
+For development:
 
 ```
-$ cd libcdf/
-$ make build
-$ sudo make install
+docker build . -t em92/qllr-dev -f Dockerfile.develop
 ```
 
-By default, the library gets installed in `/usr/local/cdf` directory.
-To install it to a different path override the `INSTALLDIR`
-variable:
-```
-$ make install INSTALLDIR=<install directory>
-```
-
-#### QDIPOLE
+For production:
 
 ```
-$ cd qdipole/
-$ ./configure
-$ make build
-$ sudo make install
+docker build . -t em92/qllr -f Dockerfile.production
 ```
 
-#### EOxMagMod
-Requires QDIPOLE, CDF libraries + NumPy and SpacePy Python packages
-to be installed.
-NumPy and SpacePy can be installed using `pip`.
+### Docs
 
-```
-$ cd eoxmagmod/
-$ python ./setup.py build
-$ sudo python ./setup.py install
-```
+* [Installation (on Debian Buster)](docs/install.md)
+* [Backing up database](docs/backup.md)
+* [qlds/minqlx configuration](docs/minqlx_config.md)
 
-### Conda installation
+### Note to European A&D and #qlpickup.ru communities
 
-The package contains the `conda-build` scripts allowing local conda build and
-installation following this procedure:
-
-1) build the binary dependencies:
-```
-conda install conda-build
-conda build ./qdipole
-conda build ./libcdf
-conda build purge
-```
-Tested on GNU/Linux. Possibly works on other POSIX systems. Does not work on MS
-Windows (primarily because of a missing Fortran compiler).
-
-2) install the `eoxmagmod` in your conda environment:
-```
-conda activate <target-environment>
-conda install --use-local qdipole cdf
-conda install numpy scipy matplotlib h5py networkx
-conda install gcc_linux-64           # spacepy and eoxmagmod require C compiler
-conda install gfortran_linux-64      # spacepy requires Fortran compiler
-conda deactivate
-conda activate <target-environment>  # re-activation is required to update the environment variables
-pip install spacepy
-pip install ./eoxmagmod
-```
-
-The `gfortran_linux-64` and`gcc_linux-64` compilers work on a x86_64 GNU/Linux system.
-Other platforms might provide different compilers.
+Backups of database and feeder config are [here](https://disk.yandex.ru/d/hJfHip6ue7UCNg)

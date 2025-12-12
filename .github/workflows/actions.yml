@@ -1,50 +1,39 @@
-name: CI
-on: push
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
 jobs:
-  testing:
-    runs-on: ubuntu-latest
+  test:
     strategy:
-      fail-fast: false
       matrix:
-        include:
-        - python: "3.8"
+        python-version: ["3.8"]
+        os: ["ubuntu-latest"]
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Get packages
+      - name: Include ppa repository
+        run: sudo add-apt-repository ppa:deadsnakes/ppa
+      - name: Set up Python ${{ matrix.python-version }}
         run: |
-          python3 --version
-          sudo apt-get install gfortran
-          sudo apt-get install libhdf5-dev
-      - name: Install
+          sudo apt-get install python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-distutils
+          sudo update-alternatives --install /usr/bin/python3 python3 `which python${{ matrix.python-version }}` 1
+          sudo update-alternatives --install /usr/bin/python3-config python3-config `which python${{ matrix.python-version }}-config` 1
+      - name: Upgrade setuptools for Python 3.12
+        if: matrix.python-version == '3.12'
         run: |
-          ( cd libcdf && make build && sudo make install )
-          ( cd qdipole && ./configure && make build && sudo make install )
-          pip3 install --upgrade pip
-          pip3 install wheel
-          pip3 install scipy
-          export SETUPTOOLS_USE_DISTUTILS=stdlib # https://github.com/pypa/setuptools/issues/3693
-          pip3 install spacepy
-          unset SETUPTOOLS_USE_DISTUTILS
-          pip3 install ./eoxmagmod/
-      - name: Scripts
-        run: |
-          pip3 list
-          mkdir -p ./test && cd ./test
-          pip3 show -f eoxmagmod
-          python3 -c 'import eoxmagmod' && python3 -m unittest discover -p '[a-z]*.py' -v eoxmagmod
-  notification:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    needs: testing
-    steps:
-      # send Slack notifications to the eox organization
-      - name: action-slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ needs.testing.result }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py "setuptools > 69.0"
+      - name: Install requirements
+        run: python3 -m pip install -r requirements.txt
+      - name: Install development requirements
+        run: python3 -m pip install -r requirements_dev.txt
+      - name: Install postgresql
+        run: sudo apt-get install postgresql
+      - name: Test
+        run: ./scripts/test
+      - uses: codecov/codecov-action@v1
