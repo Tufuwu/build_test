@@ -1,82 +1,25 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-import os
-import re
-import sys
+from setuptools import setup
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+path_requirements = 'requirements.txt'
+list_packages = ['bayeso_benchmarks']
 
-
-def get_version(*file_paths):
-    """Retrieves the version from django_smoke_tests/__init__.py"""
-    filename = os.path.join(os.path.dirname(__file__), *file_paths)
-    version_file = open(filename).read()
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError('Unable to find version string.')
-
-
-version = get_version("django_smoke_tests", "__init__.py")
-
-
-if sys.argv[-1] == 'publish':
-    try:
-        import wheel
-        print("Wheel version: ", wheel.__version__)
-    except ImportError:
-        print('Wheel library missing. Please run "pip install wheel"')
-        sys.exit()
-    os.system('python setup.py sdist upload')
-    os.system('python setup.py bdist_wheel upload')
-    sys.exit()
-
-if sys.argv[-1] == 'tag':
-    print("Tagging the version on git:")
-    os.system("git tag -a %s -m 'version %s'" % (version, version))
-    os.system("git push --tags")
-    sys.exit()
-
-readme = open('README.rst').read()
-
-_read = lambda f: open(
-    os.path.join(os.path.dirname(__file__), f)).read() if os.path.exists(f) else ''
-
-install_requires = [
-    l.replace('==', '>=') for l in _read('requirements.txt').split('\n')
-    if l and not l.startswith('#') and not l.startswith('-')]
+with open(path_requirements) as f:
+    required = f.read().splitlines()
 
 setup(
-    name='django-smoke-tests',
-    version=version,
-    description="""Automatic smoke tests for Django project.""",
-    long_description=readme,
-    author='Kamil Kijak',
-    author_email='kamilkijak@gmail.com',
-    url='https://github.com/kamilkijak/django-smoke-tests',
-    packages=[
-        'django_smoke_tests',
-    ],
-    include_package_data=True,
-    install_requires=install_requires,
-    license="MIT",
-    zip_safe=False,
-    keywords=['django-smoke-tests', 'test', 'smoke'],
+    name='bayeso-benchmarks',
+    version='0.1.6',
+    author='Jungtaek Kim',
+    author_email='jtkim@postech.ac.kr',
+    url='https://github.com/jungtaekkim/bayeso-benchmarks',
+    license='MIT',
+    description='Benchmarks for Bayesian optimization',
+    packages=list_packages,
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, != 3.3.*, !=3.4.*, !=3.5.*, <4',
+    install_requires=required,
     classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Framework :: Django',
-        'Framework :: Django :: 2.2',
-        'Framework :: Django :: 3.2',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-    ],
+        'License :: OSI Approved :: MIT License',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    ]
 )

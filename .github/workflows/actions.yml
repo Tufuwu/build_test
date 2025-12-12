@@ -1,29 +1,25 @@
-name: Run tests
-on: [push]
+name: pytest
+
+on: [push, pull_request]
 
 jobs:
-  Run-Tests:
-    runs-on: '${{ matrix.os }}'
+  test:
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            python-version: '3.8'
-            TOX_ENV: py-django-22
-          - os: ubuntu-latest
-            python-version: '3.8'
-            TOX_ENV: py-django-32
-
+        python-version:
+          - "3.8"
+    runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - name: 'Set up Python ${{ matrix.python-version }}'
-        uses: actions/setup-python@v4
-        with:
-          python-version: '${{ matrix.python-version }}'
       - uses: actions/checkout@v4
-      - run: pip install -r requirements_test.txt
-      - run: tox -e $TOX_ENV
-        env:
-          TOX_ENV: '${{ matrix.TOX_ENV }}'
-      - run: codecov -e TOX_ENV
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install pytest
+          pip install scipy
+      - name: Run pytest
+        run: |
+          pip install .
+          pytest
