@@ -1,28 +1,38 @@
-name: ADF CI
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
+
+  travis-check:
+
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: ["3.8"]
+      fail-fast: false
 
     steps:
-      - name: Checkout Repo
+      - run: echo "Job triggered by a ${{ github.event_name }} event on branch is ${{ github.ref }} in repository is ${{ github.repository }}"
+      - name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Set the correct Node version using nvm
-        shell: bash -l {0} 
-        run: nvm install
       - name: Install dependencies
-        run: make init
-      - name: Run tox
-        # Run tox using the version of Python in `PATH`
         run: |
-          tox --version
-          tox
+         pip install sphinx
+         pip install -r requirements-travis.txt
+      - name: Run inspekt
+        run: inspekt checkall --disable-style E501,E265,W601,E402,E722,E741 --enable-lint W0611,W1201 --no-license-check
+      - run: echo "This job's status is ${{ job.status }}."
