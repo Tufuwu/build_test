@@ -1,34 +1,55 @@
-name: main
+# (c) 2025 by flonatel GmbH & Co. KG / Andreas Florath
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# This file is part of rmtoo.
+#
+# rmtoo is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# rmtoo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with rmtoo.  If not, see <https://www.gnu.org/licenses/>.
+
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        python-version:
-          - "3.8"
+        python-version: ["3.8"]
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install pep8 rstcheck pyflakes
-      - name: Test
-        run: |
-          cd t/ && verbose=t make all
-      - name: Check that no untracked files are left by testing
-        run: |
-          ! git status --porcelain | grep -e '^??'
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+        pip install tox
+    - name: Run tests with tox
+      run: |
+        tox
+    - name: Run PEP8 checks
+      run: tox -e pep8

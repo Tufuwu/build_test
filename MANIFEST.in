@@ -1,7 +1,8 @@
-include COPYING
-include git-multimail/README
-include git-multimail/CHANGES
-include git-multimail/README.migrate-from-post-receive-email
-include git-multimail/post-receive.example
-include git-multimail/migrate-mailhook-config
-include doc/*.rst
+include *.txt
+include *.rst
+recursive-include doc *
+recursive-include contrib *
+recursive-include share *
+recursive-include rmtoo/collection *
+prune *~
+prune *.pyc
