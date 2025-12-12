@@ -1,60 +1,37 @@
-name: CI
-
+name: Tests
 on:
-# Triggers the workflow on push or pull request events for the main/develop branches
   push:
     branches:
       - main
-      - develop
   pull_request:
-    branches:
-      - main
-      - develop
-  # Allows us to run this workflow manually
-  workflow_dispatch:
 
 jobs:
-  main:
+  build:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         python-version: ["3.8"]
-   
-    name: "Python ${{ matrix.python-version }}"
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          
-      - name: Package setup
-        shell: bash
+      - run: |
+          npm install -g elm
+          pip install tox
+      - name: Run Tox
         run: |
-          pip install -r requirements.txt
-          pip install .
-      
-      - name: Package tests
-        shell: bash
-        run: pytest --cov=./dassh ./tests/ --cov-report xml:coverage_${{ matrix.python-version }}.xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
-          files: coverage_${{ matrix.python-version }}.xml
-          # dry_run: true
-
-  #finish:
-  #  needs: main
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - name: CodeCov
-  #      shell: bash
-  #      run: codecov
-    
+          if [[ "${{ matrix.python-version }}" == "3.7" ]]; then
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              echo "Running tests for cover and black"
+              tox -e cover
+              tox -e black
+            else
+              tox
+            fi
+          else
+            tox
+          fi
+      - name: Coveralls
+        if: success() && github.event_name == 'push' && matrix.python-version == '3.7'
+        run: coveralls
