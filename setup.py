@@ -1,41 +1,38 @@
-from codecs import open
-from os import path
+# coding=utf-8
+import codecs
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+def long_description():
+    try:
+        with codecs.open('README.md', 'r', 'utf-8') as f:
+            return f.read()
+    except:
+        return 'Error loading README.md'
+
 
 setup(
-    name='aws_list_all',
-    version='0.8.0',
-    description='List all your AWS resources, all regions, all services.',
-    long_description=long_description,
-    url='https://github.com/JohannesEbke/aws_list_all',
-    author='Johannes Ebke',
-    author_email='johannes@ebke.org',
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-    ],
-    keywords='aws boto3 listings resources region services',
-    packages=['aws_list_all'],
-    install_requires=['boto3>=1.26.5', 'app_json_file_cache>=0.2.2'],
-    entry_points={
-        'console_scripts': [
-            'aws_list_all=aws_list_all.__main__:main',
-            'aws-list-all=aws_list_all.__main__:main',
-        ],
-    },
+    name='django-earthdistance',
+    version='1.1.3',
+    install_requires=[
+        'django>=1.8'],
+    url='https://github.com/jneight/django-earthdistance',
+    description='Add support for PostgreSQL earthdistance extension to Django',
+    long_description=long_description(),
+    long_description_content_type='text/markdown',
+    packages=find_packages(),
     include_package_data=True,
+    license='Apache 2.0',
+    classifiers=[
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+    ],
+    author='Javier Cordero Martinez',
+    author_email='github@j2i.me'
 )
