@@ -1,41 +1,40 @@
-name: CI
+name: Build & test
 
 on:
   push:
     branches:
       - main
-  pull_request:
-  release:
 
 jobs:
-  tox:
-    env:
-      PIP_INDEX_URL: https://pypi.python.org/simple
+  test:
     runs-on: ubuntu-latest
+
     strategy:
-      fail-fast: false
       matrix:
-        make_target:
-          - run-pre-commit
-          - test-external
-          - itest-external
-          - itest_xenial-external
-          - itest_bionic-external
+        python-version: ["3.8"]
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          python-version: 3.8
-      - uses: actions/setup-python@v4
+          ref: 'main'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
-      - uses: actions/setup-go@v2
+          python-version: ${{ matrix.python-version }}
+
+      - run: pip install coverage
+      - run: pip install -r requirements_test.txt
+
+      - name: Run tests with coverage
+        run: |
+          coverage run --source flowio --omit="flowio/tests/*" run_tests.py
+          coverage xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
         with:
-          go-version: '1.17.3'
-      - uses: azure/setup-kubectl@v1
-        with:
-          version: v1.22.0
-      # GHA won't setup tox for us and we use tox-pip-extensions for venv-update
-      - run: pip install tox==3.8.6 tox-pip-extensions==1.6.0
-      - run: go install sigs.k8s.io/kind@v0.11.1
-      - run: make ${{ matrix.make_target }}
+          files: coverage.xml
+          fail_ci_if_error: true
+          verbose: true
