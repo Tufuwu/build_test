@@ -1,9 +1,11 @@
-.cache/
-.coverage
+.project
+.pydevproject
 *.swp
+
 *.pyc
-__pycache__
-dist/
-*.egg-info/
+
+.DS_Store
+
+artist.egg-info
 build/
-.tox/
+dist/

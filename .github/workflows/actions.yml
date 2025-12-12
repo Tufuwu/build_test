@@ -1,41 +1,23 @@
+name: Run tests
+
 on:
   push:
-    branches:
-      - main
-  pull_request:
-
-name: CI
 
 jobs:
-
-  test:
-    runs-on: ubuntu-latest
+  tests:
     strategy:
       matrix:
-        python: "3.8"
-        deps:
-          - { django: '<2', drf: '<3.8' }
-          - { django: '<2', drf: '<3.9' }
-          - { django: '<2.1', drf: '<3.9' }
-          - { django: '<2.2', drf: '<3.9' }
-    name: Python ${{ matrix.python }} / Django ${{ matrix.deps.django }} / DRF ${{ matrix.deps.drf }}
+        python-version: [
+            '3.8'
+        ]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup python ${{ matrix.python }}
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: pip install "django${{ matrix.deps.django }}" "django-rest-framework${{ matrix.deps.drf }}"
-      - name: Run tests
-        run: python runtests.py
-
-    #check-formatting:
-    #  runs-on: ubuntu-latest
-    #  name: Check code formatting
-    #  steps:
-    #    - uses: actions/checkout@v4
-    #    - name: Black Code Formatter
-    #      uses: lgeiger/black-action@main
-    #      with:
-    #        args: "drf_dynamic_fields --check --diff"
+          python-version: ${{ matrix.python-version }}
+      - run: pip install flake8 sphinx
+      - run: pip install .
+      - run: flake8 artist
+      - run: make -C demo test
+      - run: sphinx-build -n doc doc/_build/html
