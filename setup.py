@@ -1,32 +1,29 @@
-import setuptools
+#!/usr/bin/env python
+from setuptools import setup, find_packages  # This setup relies on setuptools since distutils is insufficient and badly hacked code
 
-with open('README.md') as f:
-    long_description = f.read()
+version = '0.1.0'
+author = 'Pascal Wolf'
+author_email = 'wolf@physik.uni-bonn.de'
+
 with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
-with open('requirements-dev.txt') as f:
-    requirements_dev = f.read().splitlines()
+    required = f.read().splitlines()
 
-setuptools.setup(
-    name='mf2',
-    version='2022.06.0',
-    description='A collection of analytical benchmark functions in multiple fidelities',
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    author='Sander van Rijn',
-    author_email='s.j.van.rijn@liacs.leidenuniv.nl',
-    url="https://github.com/sjvrijn/mf2",
-    packages=setuptools.find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    ],
-    python_requires=">=3.6",
-    install_requires=requirements,
-    extras_require={"dev": requirements_dev},
+setup(
+    name='irrad_spectroscopy',
+    version=version,
+    description='Gamma spectroscopy of irradiated sensors, chips and PCBs.',
+    url='https://github.com/SiLab-Bonn/irrad_spectroscopy',
+    license='MIT License',
+    long_description='',
+    author=author,
+    maintainer=author,
+    author_email=author_email,
+    maintainer_email=author_email,
+    packages=find_packages(),
+    setup_requires=['setuptools'],
+    install_requires=required,
+    include_package_data=True,  # accept all data files and directories matched by MANIFEST.in or found in source control
+    package_data={'': ['README.*', 'VERSION'], 'docs': ['*'], 'examples': ['*']},
+    keywords=['silicon', 'irradiation', 'radioactivity', 'gamma', 'spectroscopy'],
+    platforms='any'
 )

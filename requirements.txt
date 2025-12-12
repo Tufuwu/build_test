@@ -1,1 +1,7 @@
-numpy
+# Core functionality
+numpy<1.20
+scipy
+matplotlib
+pyyaml
+jupyter  # examples
+pandas  # creating isotope libraries
