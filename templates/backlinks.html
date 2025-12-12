@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block body %}
+<ul>
+  {% for backlink in topic.backlinks %}
+  <li>
+    <a href="{{ url_for('.topic', topic=backlink) }}">
+      {{ backlink.name }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
+{% block submenu %}
+<a class="btn btn-outline-primary" href="{{ url_for('topic', topic=topic) }}">Back</a>
+{% endblock %}

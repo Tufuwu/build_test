@@ -1,17 +1,15 @@
-# Byte-compiled / optimized files
-__pycache__/
-*.py[cod]
+syntax:glob
 
-# Distribution / packaging
-env/
-build/
-dist/
-/MANIFEST
-*.egg-info/
-*.egg
-
-# pytest
-.cache/
-
-# Coverage report
+env
+.envrc
 .coverage
+.direnv
+*.pyc
+test.db
+node_modules
+bower_components
+static/bundles/*
+
+.cache/v/cache/lastfailed
+
+.vscode
