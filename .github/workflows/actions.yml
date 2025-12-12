@@ -1,41 +1,29 @@
-name: pytest
-
+name: Tests
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
-
+  push:
+    branches:
+      - main
 jobs:
-  build:
-
+  tests:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    name: Run Tests with Python ${{ matrix.python-version }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.8"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r tests/requirements.txt
-        pip install codecov
-    - name: Test with pytest
-      run: |
-        python -m pytest --cov-report xml --cov=app --cov=poll --cov=formatters --cov=mattermost_api
-
-    - name: Codecov Report
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-        files: ./coverage.xml
-        env_vars: OS,PYTHON
-        flags: unittests
-        fail_ci_if_error: true
-        verbose: true
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      -
+        name: Install Dependencies
+        run: pip install flask nose mock
+      -
+        name: Unit tests
+        run: python setup.py test
