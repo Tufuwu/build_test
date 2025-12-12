@@ -1,3 +1,11 @@
-_build/*
-locale/**/*.mo
-locale/pot/.doctrees
+*.pyc
+__pycache__
+env
+/.idea/
+
+# ignore mappings and settings files
+/mappings.py
+/settings.py
+
+# ignore downloads
+/downloads
