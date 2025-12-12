@@ -1,9 +1,6 @@
 include README.md
+include CHANGELOG.adoc
 include LICENSE
-
-recursive-include tests *
-
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
-
-recursive-include docs *.rst conf.py Makefile make.bat
+include MANIFEST.in
+include etc/ldap.conf
+include etc/openssh-lpk.schema

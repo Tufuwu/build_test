@@ -1,14 +1,19 @@
-# top-most EditorConfig file
+# http://editorconfig.org/
 root = true
 
-# Match all files...
 [*]
-end_of_line = lf
-
-# Python files
-[*.py]
 charset = utf-8
-indent_style = tab
-tab_width = 4
+end_of_line = lf
+indent_style = space
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+[*.schema]
+indent_style = tab
+
+[bin/ssh-ldap-pubkey-wrapper]
+indent_style = tab
+
+[*.yml]
+indent_size = 2
