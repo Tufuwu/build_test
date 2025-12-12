@@ -1,2 +1,6 @@
-six>=1.9
-webencodings
+gevent
+pyVows
+coverage
+colorama
+tox
+six

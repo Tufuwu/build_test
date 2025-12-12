@@ -1,24 +1,25 @@
-on: [pull_request, push]
+name: unittests
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
 jobs:
   build:
-    # Prevent duplicate builds for 'internal' pull requests on existing commits
-    # Credit: https://github.community/t/duplicate-checks-on-push-and-pull-request-simultaneous-event/18012
-    if: github.event.push || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        python: ["3.8"]
+        python-version: ["3.8"]
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v4
         with:
-          submodules: true
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-          cache: pip
-          cache-dependency-path: "requirements*.txt"
-      - run: pip install tox
-      - run: tox -e py
-      - if: ${{ always() }}
-        run: python debug-info.py
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y librtmp-dev libevent-dev
+          python -m pip install --upgrade pip
+          make setup
+      - name: Test with pyvows
+        run: make test
