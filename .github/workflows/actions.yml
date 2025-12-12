@@ -1,38 +1,41 @@
-name: ComNetsEmu CI
+name: CI
 
 on:
   push:
     branches:
       - main
-      - dev
-      - dev-zuo
   pull_request:
-    branches:
-      - main
-      - dev
+  release:
 
 jobs:
-  test:
+  tox:
+    env:
+      PIP_INDEX_URL: https://pypi.python.org/simple
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        make_target:
+          - run-pre-commit
+          - test-external
+          - itest-external
+          - itest_xenial-external
+          - itest_bionic-external
     steps:
-      - name: Checkout ComNetsEmu source
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
-
-      - name: Install ComNetsEmu
-        run: |
-          # Full upgrade is too slow...
-          sudo apt-get update -qq
-          # Remove the pre-installed versions on the CI VM. They are too old and lead to install errors
-          sudo apt-get remove -q -y docker docker-engine docker.io containerd runc
-          # The CI VM can not resolve the runc and containerd dependency of docker.io automatically... I don't know the detailed reason yet...
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y runc containerd
-          PYTHON=python3 ./util/install.sh -a
-
-      - name: Run core tests
-        run:  |
-          sudo make test-quick
+          python-version: 3.8
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.3'
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: v1.22.0
+      # GHA won't setup tox for us and we use tox-pip-extensions for venv-update
+      - run: pip install tox==3.8.6 tox-pip-extensions==1.6.0
+      - run: go install sigs.k8s.io/kind@v0.11.1
+      - run: make ${{ matrix.make_target }}

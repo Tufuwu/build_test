@@ -1,104 +1,179 @@
-# vim:ft=make
+# Copyright 2019 Yelp Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+PKG_NAME=clusterman
+DOCKER_TAG ?= ${PKG_NAME}-dev-$(USER)
+VIRTUALENV_RUN_TARGET = virtualenv_run-dev
+VIRTUALENV_RUN_REQUIREMENTS = requirements.txt requirements-dev.txt
+ifeq ($(findstring .yelpcorp.com,$(shell hostname -f)), .yelpcorp.com)
+	export DOCKER_REGISTRY ?= docker-dev.yelpcorp.com
+	export XENIAL_IMAGE_NAME ?= xenial_pkgbuild
+	export BIONIC_IMAGE_NAME ?= bionic_pkgbuild
+else
+	export DOCKER_REGISTRY ?= docker.io
+	export XENIAL_IMAGE_NAME ?= ubuntu:xenial
+	export BIONIC_IMAGE_NAME ?= ubuntu:bionic
+endif
 
-COMNETSEMU = comnetsemu/*.py
-CE_BIN = bin/ce
-UNITTESTS = comnetsemu/test/unit/*.py
-TESTS = $(UNITTESTS) comnetsemu/test/*.py
-EXAMPLES = $(shell find ./examples/ -name '*.py')
-PYSRC = $(COMNETSEMU) $(EXAMPLES) $(CE_BIN) $(TESTS)
-PYTHON ?= python3
-PYTYPE = pytype
-CHECKERRIGNORE=W503,E501,C0330
-PREFIX ?= /usr
-DOCDIRS = doc/html doc/latex
-BASHSRCS := $(shell find ./ -name '*.sh')
+.PHONY: all
+all: development
 
-CFLAGS += -Wall -Wextra
+# https://www.gnu.org/software/make/manual/html_node/Target_002dspecific
+.PHONY: production
+production: virtualenv_run
+production: export VIRTUALENV_RUN_REQUIREMENTS = requirements.txt
+production: export VIRTUALENV_RUN_TARGET = virtualenv_run
 
-all: errcheck
+.PHONY: development
+development: virtualenv_run install-hooks
 
-clean:
-	rm -rf build dist *.egg-info *.pyc $(DOCDIRS)
+.PHONY: docs
+docs:
+	-rm -rf docs/build
+	tox -e docs
 
-codecheck: $(PYSRC)
-	@echo "*** Running checks for code quality"
-	$(PYTHON) -m flake8 --ignore=W503,E501,C0330 --max-complexity 10 $(PYSRC)
-	$(PYTHON) -m pylint --rcfile=.pylint $(PYSRC)
-	@echo "*** Run shellcheck for BASH sources"
-	shellcheck $(BASHSRCS)
+.PHONY: test
+test: clean-cache
+	tox -e yelp
 
-errcheck: $(PYSRC)
-	@echo "*** Running checks for errors only"
-	$(PYTHON) -m flake8 --ignore=$(CHECKERRIGNORE) $(PYSRC)
-	$(PYTHON) -m pylint -E --rcfile=.pylint $(PYSRC)
-	@echo "*** Run shellcheck for BASH sources"
-	shellcheck $(BASHSRCS)
+.PHONY: test-external
+test-external: clean-cache
+	tox -e external -- --tags=-yelp
 
-typecheck: $(PYSRC)
-	@echo "*** Running type checks with $(PYTYPE)..."
-	$(PYTYPE) $(COMNETSEMU)
+.PHONY: itest
+itest: export EXTRA_VOLUME_MOUNTS=/nail/etc/services/services.yaml:/nail/etc/services/services.yaml:ro
+itest: cook-image
+	COMPOSE_PROJECT_NAME=clusterman_bionic tox -e acceptance
+	./service-itest-runner clusterman.batch.spot_price_collector "--aws-region=us-west-1 "
+	./service-itest-runner clusterman.batch.cluster_metrics_collector "--cluster=local-dev"
+	./service-itest-runner clusterman.batch.autoscaler_bootstrap "" clusterman.batch.autoscaler
+	make -C acceptance local-cluster-clean && make -C acceptance acceptance-internal
 
-test-examples: $(COMNETSEMU) $(EXAMPLES)
-	cd ./examples && bash ./run.sh
+.PHONY: itest-external
+itest-external: cook-image-external
+	COMPOSE_PROJECT_NAME=clusterman_bionic tox -e acceptance
+	./service-itest-runner examples.batch.spot_price_collector "--aws-region=us-west-1 --env-config-path=acceptance/srv-configs/clusterman-external.yaml"
+	./service-itest-runner examples.batch.cluster_metrics_collector "--cluster=local-dev --env-config-path=acceptance/srv-configs/clusterman-external.yaml"
+	./service-itest-runner examples.batch.autoscaler_bootstrap "--env-config-path=acceptance/srv-configs/clusterman-external.yaml" examples.batch.autoscaler
+	make -C acceptance local-cluster-clean && make -C acceptance acceptance-external
 
-test-examples-all: $(COMNETSEMU) $(EXAMPLES)
-	cd ./examples && bash ./run.sh -a
+.PHONY: cook-image
+cook-image:
+	git rev-parse HEAD > version
+	docker build --build-arg DOCKER_REGISTRY=${DOCKER_REGISTRY} --build-arg IMAGE_NAME=${BIONIC_IMAGE_NAME} -t $(DOCKER_TAG) .
 
-test: $(COMNETSEMU) $(UNITTESTS)
-	@echo "Running all unit tests of ComNetsEmu python package."
-	$(PYTHON) ./comnetsemu/test/unit/runner.py -v
+.PHONY: cook-image-external
+cook-image-external:
+	git rev-parse HEAD > version
+	docker build --build-arg DOCKER_REGISTRY=${DOCKER_REGISTRY} --build-arg IMAGE_NAME=${BIONIC_IMAGE_NAME} -t $(DOCKER_TAG) -f Dockerfile.external .
 
-test-quick: $(COMNETSEMU) $(UNITTESTS)
-	@echo "Running quick unit tests of ComNetsEmu python package."
-	$(PYTHON) ./comnetsemu/test/unit/runner.py -v -quick
+.PHONY: completions
+completions:
+	mkdir -p completions
+	tox -e completions
 
-coverage: $(COMNETSEMU) $(UNITTESTS)
-	@echo "Running coverage tests of ComNetsEmu core functions."
-	$(PYTHON) -m coverage run --source ./comnetsemu ./comnetsemu/test/unit/runner.py -v
-	$(PYTHON) -m coverage report -m
+.PHONY: install-hooks
+install-hooks: virtualenv_run
+	./virtualenv_run/bin/pre-commit install -f --install-hooks
 
-installercheck: ./util/install.sh
-	@echo "*** Check installer"
-	bash ./check_installer.sh
+.PHONY: run-hooks
+run-pre-commit: virtualenv_run
+	./virtualenv_run/bin/pre-commit run -a
 
-update-deps:
-	@echo "*** Update ComNetsEmu's dependencies."
-	cd ./util/ && ./install.sh -u
+virtualenv_run: $(VIRTUALENV_RUN_REQUIREMENTS)
+	tox -e $(VIRTUALENV_RUN_TARGET)
 
-# PLEASE run following tests before any pushes to master/dev branches.
-run-tests-before-push-dev: errcheck typecheck test test-examples-all doc
+.PHONY: version-bump
+version-bump:
+	@set -e; \
+	if [ -z ${EDITOR} ]; then \
+		echo "EDITOR environment variable not set, please set and try again"; \
+		false; \
+	fi; \
+	OLD_PACKAGE_VERSION=$$(python setup.py --version); \
+	${EDITOR} ${PKG_NAME}/__init__.py; \
+	PACKAGE_VERSION=$$(python setup.py --version); \
+	if [ "$${OLD_PACKAGE_VERSION}" = "$${PACKAGE_VERSION}" ]; then \
+		echo "package version unchanged; aborting"; \
+		false; \
+	elif [ ! -f debian/changelog ]; then \
+		dch -v $${PACKAGE_VERSION} --create --package=$(PKG_NAME) -D "xenial bionic" -u low ${ARGS}; \
+	else \
+		dch -v $${PACKAGE_VERSION} -D "xenial bionic" -u low ${ARGS}; \
+	fi; \
+	git add debian/changelog ${PKG_NAME}/__init__.py; \
+	set +e; git commit -m "Bump to version $${PACKAGE_VERSION}"; \
+	if [ $$? -ne 0 ]; then \
+		git add debian/changelog ${PKG_NAME}/__init__.py; \
+		git commit -m "Bump to version $${PACKAGE_VERSION}"; \
+	fi; \
+	if [ $$? -eq 0 ]; then git tag "v$${PACKAGE_VERSION}"; fi
 
-format: $(PYSRC)
-	@echo "Format Python sources with black"
-	black $(PYSRC)
+dist:
+	ln -sf package/dist ./dist
 
+itest_%: dist completions
+	COMPOSE_PROJECT_NAME=clusterman_$* tox -e acceptance
+	make -C package $@
 
-install:
-	$(PYTHON) setup.py install
+itest_%-external: dist
+	COMPOSE_PROJECT_NAME=clusterman_$* tox -e acceptance
+	make -C package $@
 
-develop: $(MNEXEC) $(MANPAGES)
-	$(PYTHON) setup.py develop
+.PHONY:
+package: itest_xenial itest_bionic
 
-.PHONY: doc
+.PHONY:
+package-external: itest_xenial-external itest_bionic-external
 
-doc: $(PYSRC)
-	@echo "Build documentation in HTML format"
-	cd ./doc/ && make html
+.PHONY:
+example: export EXAMPLE=true
+example: itest_bionic-external
 
-build-test-containers:
-	@echo "Build all test containers"
-	cd ./test_containers/ && python3 ./build.py
+.PHONY:
+clean: clean-cache
+	-docker-compose -f acceptance/docker-compose.yaml down
+	-rm -rf docs/build
+	-rm -rf virtualenv_run/
+	-rm -rf .tox
+	-unlink dist
+	-rm -rf package/dist/*
 
-## Cleanup utilities
+.PHONY:
+clean-cache:
+	find -name '*.pyc' -delete
+	find -name '__pycache__' -delete
+	rm -rf .mypy_cache
+	rm -rf .pytest_cache
 
-rm-all-containers:
-	@echo "Remove all docker containers"
-	docker container rm $$(docker ps -aq) -f
+.PHONY:
+debug:
+	docker build . -t clusterman_debug_container
+	paasta_docker_wrapper run -it \
+		-v $(shell pwd)/clusterman:/code/clusterman:rw \
+		-v $(shell pwd)/clusterman.conf:/var/lib/clusterman/clusterman.conf:rw \
+		-v $(shell pwd)/.cman_debug_bashrc:/home/nobody/.bashrc:ro \
+		-v $(shell pwd)/etc-kubernetes:/etc/kubernetes:ro \
+		-v /nail/srv/configs:/nail/srv/configs:ro \
+		-v $(shell pwd)/clusterman.yaml:/nail/srv/configs/clusterman.yaml:ro \
+		-v $(shell pwd)/default.kubernetes:/nail/srv/configs/clusterman-clusters/kubestage/default.kubernetes:ro \
+		-v /nail/etc/services:/nail/etc/services:ro \
+		-v /etc/boto_cfg:/etc/boto_cfg:ro \
+		-e "CMAN_CLUSTER=kubestage" \
+		-e "CMAN_POOL=default" \
+		-e "CMAN_SCHEDULER=kubernetes" \
+		clusterman_debug_container /bin/bash
 
-rm-dangling-images:
-	@echo "Remove all dangling docker images"
-	docker image prune -f
-
-pp-empty-dirs:
-	@echo "Print empty directories"
-	@find -maxdepth 3 -type d -empty
+.PHONY:
+upgrade-requirements:
+	upgrade-requirements --python python3.7

@@ -1,56 +1,35 @@
-#!/usr/bin/env python3
+# Copyright 2019 Yelp Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from setuptools import find_packages
+from setuptools import setup
 
-"""Setuptools Configuration"""
-
-from comnetsemu.net import VERSION
-from setuptools import setup, find_packages
-from os.path import join
-
-# Get version number from source tree
-import sys
-
-sys.path.append(".")
-
-scripts = [join("bin", filename) for filename in ["ce"]]
-modname = distname = "comnetsemu"
+from clusterman import __version__
 
 setup(
-    name=distname,
-    version=VERSION,
-    description="Emulator for Computing in Communication Networks.",
-    author="The Deutsche Telekom Chair of Communication Networks, TU Dresden",
-    author_email="zuo.xiang@tu-dresden.de",
-    packages=find_packages(exclude=["app", "examples", "util", "venv"]),
-    long_description="""
-        A holistic testbed/emulator for the book: Computing in Communication Networks: From Theory to Practice
-        """,
-    classifiers=[
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
-        "Programming Language :: Python:: 3.6",
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Developers",
-        "Topic :: System :: Emulators",
-        "Natural Language :: English",
-        "License :: MIT License",
-    ],
-    keywords="networking emulator SDN NFV Docker",
-    # license="BSD",
-    # MARK: MINIMAL requirements
-    install_requires=[
-        "docker>=4.1.0,<5.0.0",
-        "pyroute2>=0.5.9,<0.6.0",
-        "requests>=2.22.0,< 3.0.0",
-        "ryu>=4.30,<5.0",
-        "setuptools>=45.2.0,<46.0.0",
-        # Mininet is installed FROM SOURCE CODE because:
-        # - The version in Ubuntu's repo is too old
-        # - It's not fully available on PyPi (The searchable package on PyPi
-        #   does not work out-of-box yet. Check: https://github.com/mininet/mininet/pull/970)
-        # - Mininet needs to be patched when some features of ComNetsEmu can
-        #   not be implemented without modifying the source code of Mininet
-        "mininet>=2.3.0d6",
-    ],
-    scripts=scripts,
+    name="clusterman",
+    version=__version__,
+    provides=["clusterman"],
+    author="Compute Infrastructure",
+    author_email="compute-infra+github@yelp.com",
+    description="Distributed cluster scaling and management tools",
+    packages=find_packages(exclude=["tests"]),
+    setup_requires=["setuptools"],
+    include_package_data=True,
+    install_requires=[],
+    scripts=["clusterman/supervisord/fetch_clusterman_signal", "clusterman/supervisord/run_clusterman_signal",],
+    entry_points={
+        "console_scripts": ["clusterman=clusterman.run:main",],
+        "static_completion": ["clusterman=clusterman.args:get_parser",],
+    },
 )
