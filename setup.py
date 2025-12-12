@@ -1,49 +1,39 @@
-from setuptools import setup, find_packages
-import os
-import codecs
-from os.path import join
+"""
+Copyright 2019 IBM Corporation All Rights Reserved.
 
-project_root = os.path.dirname(os.path.abspath(__file__))
+SPDX-License-Identifier: Apache-2.0
+"""
+import setuptools
 
-version = {}
-REQUIRED_EXTRAS = {}
-with open(join(project_root, 'pya/version.py')) as read_file:
-    exec(read_file.read(), version)
+def main():
+    with open("qpylib/version.py", "r") as version_file:
+        line = version_file.read().rstrip()
+        _, _, version = line.replace("'", '').split()
 
-with open(join(project_root, 'requirements.txt')) as read_file:
-    REQUIRED = read_file.read().splitlines()
+    with open("README.md", "r") as readme:
+        long_desc = readme.read()
 
-with open(join(project_root, 'requirements_remote.txt')) as read_file:
-    REQUIRED_EXTRAS['remote'] = read_file.read().splitlines()
+    setuptools.setup(
+        name="qpylib",
+        author="IBM",
+        author_email="<>",
+        version=version,
+        description="QRadar app utility library",
+        long_description=long_desc,
+        long_description_content_type="text/markdown",
+        license="SPDX-License-Identifier: Apache-2.0",
+        url="https://github.com/ibm/qpylib",
+        packages=setuptools.find_packages(),
+        install_requires=[
+            "flask>=1.1,<2",
+            "requests>=2.22,<3",
+            "pycryptodome>=3.9,<4",
+            "cryptography>=2.8,<4"
+        ],
+        classifiers=[
+            "Programming Language :: Python :: 3",
+            "Operating System :: OS Independent",
+        ],
+    )
 
-with open(join(project_root, 'requirements_test.txt')) as read_file:
-    REQUIRED_TEST = read_file.read().splitlines()
-
-with codecs.open(join(project_root, 'README.md'), 'r', 'utf-8') as f:
-    long_description = ''.join(f.readlines())
-
-setup(
-    name='pya',
-    version=version['__version__'],
-    description='Python audio coding classes - for dsp and sonification',
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    license='MIT',
-    packages=find_packages(exclude=["tests"]),
-    install_requires=REQUIRED,
-    extras_require=REQUIRED_EXTRAS,
-    tests_require=REQUIRED_TEST,
-    author='Thomas Hermann',
-    author_email='thermann@techfak.uni-bielefeld.de',
-    keywords=['sonification, sound synthesis'],
-    url='https://github.com/interactive-sonification/pya',
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Topic :: Multimedia :: Sound/Audio",
-        "Topic :: Multimedia :: Sound/Audio :: Analysis",
-        "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis"
-    ],
-)
+main()
