@@ -1,222 +1,252 @@
-# pytest-automock
-[![Github actions status for master branch](https://github.com/pohmelie/pytest-automock/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/pohmelie/pytest-automock/actions)
-[![Codecov coverage for master branch](https://codecov.io/gh/pohmelie/pytest-automock/branch/master/graph/badge.svg)](https://codecov.io/gh/pohmelie/pytest-automock)
-[![Pypi version](https://img.shields.io/pypi/v/pytest-automock.svg)](https://pypi.org/project/pytest-automock/)
-[![Pypi downloads count](https://img.shields.io/pypi/dm/pytest-automock)](https://pypi.org/project/pytest-automock/)
+# Opentrons Protocol Library
 
-# Reason
-* No generic automock solution
+This is where Opentrons protocols are stored for everyone to use.
 
-# Features
-* Pytest plugin
-* Autogenerate/autouse mocks for functions and objects
-* Sync and async support
-* Locked mode to be sure mocked objects stay untouched
-* Customizable serialization
+The `master` branch populates http://protocols.opentrons.com/, our Protocol Library. Please let us know if you would like to contribute your protocols, or just submit a pull request. We would love to add your Opentrons protocols to the Library!
 
-# Limitaions
-* No support for dunder methods (can be partly solved in future)
-* No support for sync/async generators/contexts
-* Races can break tests, since order counts
-* Non-determenistic representation will break tests, since representation is a part of call snapshot key
+All the best,
 
-# License
-`pytest-automock` is offered under MIT license.
+Will Canine
+Co-Founder, Opentrons
+will@opentrons.com
 
-# Requirements
-* python 3.6+
+# Contributing
 
-# Usage
-Lets say you have some module `mymod.py`:
-``` python
-import time
+## `develop` staging branch
 
-class Network:
-    def get_data_from_network(self, x, y):
-        time.sleep(1)
-        return x + y
+The `develop` branch populates the staging version of the Opentrons Protocol Library at http://develop.protocols.opentrons.com/. Pull requests should be made to `develop` to be staged, and we will merge the changes into `master` as a second step.
 
-    def send_data_to_network(self, value):
-        time.sleep(1)
+# Formatting protocols
 
-def logic(x):
-    n = Network()
-    a, b = 0, 1
-    while b < x:
-        c = n.get_data_from_network(a, b)
-        a, b = b, c
-        n.send_data_to_network("ok")
-    return b
+Every protocol needs its own folder. In that folder, there needs to be:
+
+- A single `README.md` readme file
+- A single `.py` [Opentrons protocol](http://docs.opentrons.com) file
+- Optional "dot files" (see below)
+
+## README file format
+
+Every protocol should have a README file in its folder, with the file name `README.md`. It is a [Markdown](https://daringfireball.net/projects/markdown/syntax) file, with a specific format. See `template/README.md` for an example.
+
+## "Dot files"
+
+"Dot files" are files inside a protocol folder which start with a dot (`.`).
+
+These files are usually blank text files. They have special names that indicate specific properties for that protocol:
+
+- `.feature` - The protocol will be listed under "Featured Protocols" on the website.
+- `.ignore` - The protocol will not be shown on the Opentrons Protocol Library, even if you search for it.
+- `.notests` - The protocol will not be tested by continuous integration. This is intended only for ignored protocols.
+- `.embedded` - This is for "embedded apps" that generate a protocol and are designed to be shown in the Protocol Library in an iframe. This file should not be blank, it should contain a URL to the web app that will be embedded in the iframe.
+- `.hide-from-search` - do not show this protocol in any search results. The protocol page should only be accessible from direct URL.
+
+# Writing Custom Protocols
+
+## NOTE
+
+Custom protocols is an early-stage feature, under active development. They are subject to change.
+
+## Part 1: Set up basic protocol
+
+In the Protocol APIv2 `def run(context):` function, use `context` to load your pipettes, labware, and modules. Proceed with the protocol steps.
+
+For some protocols, you might want "number of destination plates" to be a variable. However, the deck map on the website is currently not dynamic - it will only show containers loaded at the top of the file. For this reason, you should load all the containers you might need in the first lines of the `run` function body, and then only use what you need during the actual execution.
+
+**PLEASE NOTE!** The convention for APIv2 protocol file names is `protocols/{NAME}/{NAME}.ot2.apiv2.py`. The "{NAME}" should match the name of the folder in protocols. Eg in the folder `protocols/my_cool_protocol/` the Python file should be called `my_cool_protocol.ot2.apiv2.py`.
+
+## Part 2: Set your customizable arguments
+
+To make a protocol customizable, write a `fields.json` file and save it in the protocol folder, as a sibling of the `.ot2.apiv2.py` file. Eg `protocols/my_cool_protocol/fields.json`.
+
+The information in the `fields.json` file will be used to create input forms on the Protocol Library website page for your protocol, which get passed into the protocol.
+
+The `fields.json` file should be an array of field objects. Here's an example:
+
+```json
+[
+  {
+    "type": "float",
+    "label": "Master Mix Volume (uL)",
+    "name": "master_mix_volume",
+    "default": 20
+  },
+  {
+    "type": "int",
+    "label": "Integer example",
+    "name": "integer_example",
+    "default": 10
+  },
+  {
+    "type": "dropDown",
+    "label": "Example Dropdown",
+    "name": "example_dropdown",
+    "options": [
+      { "label": "Something here", "value": "aaa" },
+      { "label": "Other thing", "value": "bbb" }
+    ]
+  },
+  {
+    "type": "textFile",
+    "label": "Example file",
+    "name": "example_file",
+    "default": "1,2,3"
+  }
+]
 ```
-And you want to create mocks for your `Network` class (since testing time and sane counts), but you are too lazy to write them... `conftest.py`:
-``` python
-import pytest
-import mymod
 
-@pytest.fixture(autouse=True)
-def _mocks(automock):
-    with automock((mymod, "Network")):
-        yield
-```
-You can also use module path notation:
-``` python
-import pytest
+### Get values in the Python protocol with `get_values`
 
-@pytest.fixture(autouse=True)
-def _mocks(automock):
-    with automock("mymod.Network"):
-        yield
-```
-`test_logic.py`:
-``` python
-from mymod import logic
+To allow you to get the parametric values inside the protocol, a function `def get_values(*names)` will be injected into the Python protocol when a user downloads the protocol from the site. It returns an **array** of values for each of the field names you give it as arguments.
 
-def test_logic():
-    assert logic(7) == 8
-    assert logic(10) == 13
-```
-If you run `pytest` on this setup, then you will see fail:
-``` bash
-$ pytest -x
-...
-E           RuntimeError: Mock is locked, but '__init__' wanted
-```
-`automock` can work in two modes: locked and unlocked. Locked mode is default, real methods calls of mocked objects are
-not allowed in this mode. So, above error says that we can't call `__init__` of our `Network`.
-In locked mode there is no mock-files update also.
+```py
+import opentrons
 
-To allow real calls and mocks generation `automock` provides extra cli argument to `pytest`: `--automock-unlocked`
-``` bash
-$ pytest -x --automock-unlocked
-...
-test_logic.py .
-...
-1 passed in 22.09s
+def run(context):
+    [example_dropdown, integer_example, float_example, example_file] = get_values(  # noqa: F821
+        'example_dropdown', 'integer_example', 'float_example', 'example_file')
+
+    # ... do stuff with those values
 ```
-After that you can see that `tests/mocks/test_logic/mymod/Network` file was created. This is mock for your test sequence.
-Now you can rerun tests and see what happens (you can omit `--automock-unlocked` key for ensurance, that real object
-will not be touched (actually even created)).
-``` bash
-$ pytest -x
-...
-test_logic.py .
-...
-1 passed in 0.04s
+
+#### Linting error?
+
+You should expect to get a linting error: `[F821] undefined name 'get_values'`. That's OK, because the special `get_values` fn will be injected into the
+protocol at download time.
+
+To avoid this linting error from failing the build in CI, make sure to add `# noqa: F821` inline with all calls to `get_values`
+
+### `name`
+
+This field is used as an ID for accessing a field. If you have a field with `"name": example_field"` in `fields.json`, in the Python protocol you use that same name to get the value `get_values('example_field')`
+
+Each field must have a unique `name`, otherwise unexpected behavior may occur.
+
+### `type`
+
+The `type` field specifies what kind of input field you want. The options are `float`, `int`, `str`, `dropDown`, or `textFile`.
+
+### `label`
+
+This is the human-readable label shown on the website describing what the user should enter in the field.
+
+### `float` & `int` type
+
+An `int` will not allow floating-point values to be entered from the website. A `float` will allow any number of decimal places.
+
+```js
+// float example:
+{
+    "type": "float",
+    "label": "Master Mix Volume (uL)",
+    "name": "master_mix_volume",
+    "default": 20
+}
+
+// int example:
+{
+    "type": "int",
+    "label": "Integer example",
+    "name": "integer_example",
+    "default": 10
+}
 ```
-# API
-## `automock` (fixture)
-`automock` fixture is a **context manager**
+
+### `str` type
+
+A field that lets users type in arbitrary text, read into the Python protocol as a string. Useful for things like entering a single well eg `"B2"`.
+
+```json
+{
+  "type": "str",
+  "label": "Example String",
+  "name": "example_string",
+  "default": "blah"
+}
+```
+
+### `dropDown` type
+
+A `dropDown` will make a dropdown (aka `select`) UI widget.
+
+Describe the `options` that are available in the dropdown by specifying the `label` (the text that the user sees) and the `value` (the text that `get_values('example_dropdown')` uses)
+
+```json
+{
+  "type": "dropDown",
+  "label": "Example Dropdown",
+  "name": "example_dropdown",
+  "options": [
+    { "label": "Something here", "value": "aaa" },
+    { "label": "Other thing", "value": "bbb" }
+  ]
+}
+```
+
+If the user selects "Other thing", `[x] = get_values('example_dropdown')` will give you `x === "bbb"`.
+
+Note that unlike other field types, `dropDown` has no `default`. Instead, it will always default to the first option.
+
+### `textFile` type
+
+This creates a file upload widget.
+
+It's important for PL that you specify a working `default` value so that the protocol can be simulated using that default value.
+
+```json
+{
+  "type": "textFile",
+  "label": "Example file",
+  "name": "example_file",
+  "default": "1,2,3"
+}
+```
+
+##### Common Use Case: CSV file upload
+
+Here's a useful function for working with CSV files. Remember, the file will just be read as a string. It's up
+to your protocol to parse that string into a useful data format.
+
 ```python
-def automock(*targets,
-             storage: Union[str, Path] = "tests/mocks",
-             override_name: Optional[str] = None,
-             unlocked: Optional[bool] = None,
-             remove: Optional[bool] = None,
-             encode: Callable[[Any], bytes] = default_encode,
-             decode: Callable[[bytes], Any] = default_decode,
-             debug: Optional[Callable[[Dict, Call, Optional[Call]], None]] = None)
+def well_csv_to_list(csv_string):
+    """
+    Takes a csv string and flattens it to a list, re-ordering to match
+    Opentrons API well order convention (A1, B1, C1, ..., A2, B2, B2, ...).
+
+    The orientation of the CSV cells should match the "landscape" orientation
+    of plates on the OT-2: well A1 should be on the top left cell. Example:
+
+    A1, B1, C1, ...
+    A2, B2, C2, ...
+    A3, B3, C3, ...
+
+    Returns a list: [A1, B1, C1, ..., A2, B2, C3, ...]
+    where each CSV cell is a string in the list.
+    """
+    return [
+        well for row in csv_string.split('\n') if row
+        for well in row.split(',') if well]
+
+def run(context):
+    [example_file] = get_values('example_file')
+    # pass the file contents string into this utility fn
+    well_list = well_csv_to_list(example_file)
 ```
-* `*targets`: pair/tuple of object/module and attribute name (`str`) or module path to object/function with dot delimiter (`(mymod, "Network")` or `"mymod.Network"`)
-* `storage`: root path for storing mocks
-* `override_name`: forced mock-file name
-* `unlocked`: mode selector (if omited, selected by `--automock-unlocked`)
-* `remove`: remove test mock before test run (if omited, selected by `--automock-remove`)
-* `encode`: encode routine
-* `decode`: decode routine
-* `debug`: function for debugging failed cases, when you do not understand why automock bakes. Arguments are:
-    * `memory` for current failed test
-    * `call_wanted` which is a call you want to do right now
-    * `call_saved` which is a call you saved last time you generate mocks for this test
 
-`call_wanted` and `call_saved` are rich `Call` class objects, inspect it in `mock.py` file. Also, you can use a `"pdb"` string instead of your own function as a `debug` argument value, to use internal function with `pdb.set_trace()` instruction. Default `encode`/`decode` routine uses `pickle` and `gzip`.
+### Validation? Nope
 
-## `automock_unlocked` (fixture)
-Fixture with default mode from cli parameter (`bool`).
+Basic validation exists for `int` and `float` types, though it's possible to get the string `'NaN'`.
 
-## `automock_remove` (fixture)
-Fixture with default mode from cli parameter (`bool`).
+Field/form validation, such as setting min and max values, is not currently supported.
 
-## `automock` (function)
-`automock` function is not supposed to be used by anyone but `automock` fixture
-``` python
-def automock(factory: Callable, *,
-             memory: Dict,
-             locked: bool = True,
-             encode: Callable[[Any], bytes] = default_encode,
-             decode: Callable[[bytes], Any] = default_decode,
-             debug: Optional[Callable[[Dict, Call, Optional[Call]], None]] = None):
-```
-* `factory`: object/function to wrap
-* `memory`: dicrionary to get/put mocks
-* `locked`: mode selector
-* `encode`: encode routine
-* `decode`: decode routine
-* `debug`: same as for ficture
+If any validation is necessary, add it in the protocol itself, eg:
 
-Default `encode`/`decode` routine uses `pickle` and `gzip`.
+```python
+def run(context):
+    [some_field, other_field] = get_values(  # noqa: F821
+        'some_fields', 'other_field')
+    assert some_field > 0
+    assert other_field + some_field <= 96
+    # et cetera
 
-# Caveats
-## Order
-As feature paragraph described: «order counts». What does it mean?
-
-### Functions
-Mocked functions/coroutines call order counts. If you mock sequence
-``` python
-func(1, 2)
-func(2, 3)
-```
-and trying to use mocked data with sequence
-``` python
-func(2, 3)
-func(1, 2)
-```
-You will get an error, since calling order is part of idea of deterministic tests
-
-### Objects
-Mocked objects have same behavior, but methods call are individual, so if you mock sequence
-``` python
-t1 = T(1)
-t2 = T(2)
-t1.func(1, 2)
-t2.func(2, 3)
-```
-then calling order are individual for method calls, so this is ok:
-``` python
-t1 = T(1)
-t2 = T(2)
-t2.func(2, 3)
-t1.func(1, 2)
-```
-But not for `__init__` method, since mocks are internaly attached to instance
-``` python
-t2 = T(2)
-t1 = T(1)
-t1.func(1, 2)
-t2.func(2, 3)
-```
-will fail
-
-## Function arguments
-Internally, key for mocks consists of instance number and call number. This leads to some «unobvious» behavior:
-``` python
-import time
-from pytest_automock import automock
-
-def nop(x):
-    return x
-
-m = {}
-mocked = automock(nop, memory=m, locked=False)
-mocked(time.time())
-
-mocked = automock(nop, memory=m, locked=True)
-mocked(time.time())
-```
-Will fail because of argument in mock creation time differs from argument in mock use time. Same thing will break mocks if pickled representation is not determenistic.
-
-# Development
-## Run tests
-Since coverage issue/feature, plugins coverage is broken by default. [Workaround](https://pytest-cov.readthedocs.io/en/latest/plugins.html):
-``` bash
-COV_CORE_SOURCE=pytest_automock COV_CORE_CONFIG=.coveragerc COV_CORE_DATAFILE=.coverage.eager pytest
+    # ... do stuff here ...
 ```

@@ -1,47 +1,52 @@
-name: build
-on: [push, pull_request]
+name: Build and deploy a branch
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '*'
+  workflow_dispatch:
+
+env:
+  CI: true
+  DEPLOY_BUCKET: protocol-library-builds
+
 
 jobs:
-
-  lint:
-    runs-on: ubuntu-latest
+  build-deploy:
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.x'
+          python-version: '3.8'
+      - run: curl https://pyenv.run | bash
+      - run: sudo apt-get update && sudo apt-get install libsystemd-dev
+      - uses: 'actions/checkout@v4'
       - run: |
-          pip install flake8
-          flake8 pytest_automock tests
-
-  tests:
-    needs: lint
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+          pip install -e otcustomizers
+          pip install -r protolib/requirements.txt
+          pip install flake8==3.8.4 pytest
+      - run: make setup
       - run: |
-          pip install -e ./[dev]
-          pytest
-      - uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          verbose: true
-
-  deploy:
-    needs: tests
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-      - uses: casperdcl/deploy-pypi@v2
-        with:
-          password: ${{ secrets.PYPI_TOKEN }}
-          build: true
-          skip_existing: true
+          python --version
+          python3 --version
+      - name: 'Lint with flake8'
+        run: |
+          flake8 protocols/ protolib/
+      - name: 'Check builds up to date'
+        run: |
+          ./checkChanges.sh
+      - name: 'Check readme.md'
+        run: |
+          python ./scripts/bad-README-subcategory.py
+      - name: 'Build'
+        run: |
+          make build
+      - name: 'Deploy'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-west-2
+        run: |
+          aws s3 sync --acl=private releases/deploy/ s3://${{env.DEPLOY_BUCKET}}/${{github.ref_name}}
