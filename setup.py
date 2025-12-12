@@ -1,64 +1,57 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#! /usr/bin/env python
 
-# thumbor imaging service
-# https://github.com/globocom/thumbor/wiki
-
-# Licensed under the MIT license:
-# http://www.opensource.org/licenses/mit-license
-# Copyright (c) 2011 globo.com timehome@corp.globo.com
-
+import sys
+import os
 from setuptools import setup
-from derpconf.version import __version__
+
+assert 0x02040000 <= sys.hexversion, \
+    "Install Python, version 2.4 or greater"
+
+URL = 'https://github.com/git-multimail/git-multimail'
 
 
-tests_require = [
-    'gevent',
-    'pyVows',
-    'coverage',
-    'colorama',
-    'tox',
-    'six',
-]
+def read_version():
+    sys.path.insert(0, os.path.join('git-multimail'))
+    import git_multimail
+    return git_multimail.__version__
 
 
-def run_setup(extension_modules=[]):
-    setup(
-        name='derpconf',
-        version=__version__,
-        description="derpconf abstracts loading configuration files for your app",
-        long_description="""
-            derpconf abstracts loading configuration files for your app.
-        """,
-        keywords='configuration',
-        author='globo.com',
-        author_email='timehome@corp.globo.com',
-        url='https://github.com/globocom/derpconf',
-        license='MIT',
-        classifiers=[
-            'Development Status :: 4 - Beta',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
-            'Natural Language :: English',
-            'Operating System :: MacOS',
-            'Operating System :: POSIX :: Linux',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Programming Language :: Python :: 3.11',
-            'Programming Language :: Python :: 3.12',
+def read_readme():
+    readme = open(os.path.join('git-multimail', 'README.rst')).read()
+    if hasattr(readme, 'decode'):
+        # In Python 3, turn bytes into str.
+        readme = readme.decode('utf8')
+    # Turn relative links into absolute ones
+    readme = readme.replace("`<doc/", "`<" + URL + "/blob/master/doc/")
+    readme = readme.replace("`<CONTRIBUTING.rst", "`<" + URL + "/blob/master/CONTRIBUTING.rst")
+    return readme
+
+
+setup(
+    name='git-multimail',
+    version=read_version(),
+    description='Send notification emails for Git pushes',
+    long_description=read_readme(),
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: No Input/Output (Daemon)',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Communications :: Email',
+        'Topic :: Software Development :: Version Control',
         ],
-        packages=['derpconf'],
-        package_dir={"derpconf": "derpconf"},
-        install_requires=[
-            'six',
-        ],
-
-        extras_require={
-            'tests': tests_require,
-        },
-
-        include_package_data=False
+    keywords='git hook email',
+    url=URL,
+    author='Michael Haggerty',
+    author_email='mhagger@alum.mit.edu',
+    maintainer='Matthieu Moy',
+    maintainer_email='git@matthieu-moy.fr',
+    license='GPLv2',
+    package_dir={'': 'git-multimail'},
+    py_modules=['git_multimail'],
+    scripts=['git-multimail/git_multimail.py'],
     )
-
-run_setup()

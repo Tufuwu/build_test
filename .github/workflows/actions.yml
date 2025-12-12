@@ -1,25 +1,34 @@
-name: unittests
+name: main
+
 on:
   push:
+    branches: [ "main" ]
   pull_request:
-    types: [opened, reopened]
+    branches: [ "main" ]
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.8"]
+        python-version:
+          - "3.8"
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        id: setup-python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          sudo apt-get install -y librtmp-dev libevent-dev
           python -m pip install --upgrade pip
-          make setup
-      - name: Test with pyvows
-        run: make test
+          python -m pip install pep8 rstcheck pyflakes
+      - name: Test
+        run: |
+          cd t/ && verbose=t make all
+      - name: Check that no untracked files are left by testing
+        run: |
+          ! git status --porcelain | grep -e '^??'
