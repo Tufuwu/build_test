@@ -1,30 +1,28 @@
-name: Release Package
-
-# need to setup:
-# secrets.PYPI_API_TOKEN (See: https://pypi.org/help/#apitoken)
-# secrets.TESTPYPI_API_TOKEN (See: https://test.pypi.org/help/#apitoken)
+name: Docker Image CI
 
 on:
-  # schedule:
-  # - cron: 0 0 * * *
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  release:
+  build:
+    strategy:
+      matrix:
+        include:
+          - python_version: 3.8-bullseye
+            postgres_version: 14
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_VERSION: ${{ matrix.postgres_version }}
+      PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Install poetry
-      run: pipx install poetry
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
-        cache: poetry
-    - name: Setup Poetry to publish
-      run: |
-        poetry install --no-interaction
-        poetry config repositories.testpypi 'https://test.pypi.org/legacy/'
-        poetry config pypi-token.testpypi '${{ secrets.TESTPYPI_API_TOKEN }}'
-        poetry config pypi-token.pypi '${{ secrets.PYPI_API_TOKEN }}'
-    - name: Publish package
-      run: poetry run task publish
+    - name: Build the Docker image
+      uses: actions/checkout@v4 
+
+    - name: Start containers
+      run: docker-compose build
+
+    - name: Run tests
+      run: docker-compose run --entrypoint="pytest tests" nycdb
