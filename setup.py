@@ -1,72 +1,41 @@
-# LyricsGenius
-# Copyright 2018 John W. Miller
-# See LICENSE for details.
-
-import sys
-import re
+from codecs import open
 from os import path
-from setuptools import find_packages, setup
 
-assert sys.version_info[0] == 3, "LyricsGenius requires Python 3."
+from setuptools import setup
 
-VERSIONFILE = "lyricsgenius/__init__.py"
-ver_file = open(VERSIONFILE, "rt").read()
-VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VSRE, ver_file, re.M)
+here = path.abspath(path.dirname(__file__))
 
-if mo:
-    version = mo.group(1)
-else:
-    raise RuntimeError(
-        "Unable to find version string in {}".format(VERSIONFILE))
-
-this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+# Get the long description from the README file
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-extras_require = {
-    'docs': [
-        'sphinx~=3.3',
-        'sphinx-rtd-theme',
-        'jinja2<3.1',
-    ],
-    'checks': [
-        'tox~=3.2',
-        'doc8',
-        'flake8',
-        'flake8-bugbear',
-        'pygments',
-    ]
-}
-extras_require['dev'] = (
-    extras_require['docs'] + extras_require['checks']
-)
-
 setup(
-    name='lyricsgenius',
-    version=version,
-    description='Download lyrics and metadata from Genius.com',
+    name='aws_list_all',
+    version='0.8.0',
+    description='List all your AWS resources, all regions, all services.',
     long_description=long_description,
-    long_description_content_type='text/markdown',
-    license="MIT",
-    author='John W. Miller',
-    author_email='john.w.millr+lg@gmail.com',
-    url='https://github.com/johnwmillr/lyricsgenius',
-    keywords='genius api genius-api music lyrics artists albums songs',
-    packages=find_packages(exclude=['tests']),
-    install_requires=[
-        'beautifulsoup4>=4.6.0',
-        'requests>=2.20.0'
+    url='https://github.com/JohannesEbke/aws_list_all',
+    author='Johannes Ebke',
+    author_email='johannes@ebke.org',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
     ],
-    extras_require=extras_require,
+    keywords='aws boto3 listings resources region services',
+    packages=['aws_list_all'],
+    install_requires=['boto3>=1.26.5', 'app_json_file_cache>=0.2.2'],
     entry_points={
         'console_scripts': [
-            'lyricsgenius = lyricsgenius.__main__:main']
+            'aws_list_all=aws_list_all.__main__:main',
+            'aws-list-all=aws_list_all.__main__:main',
+        ],
     },
-    classifiers=[
-        'Topic :: Software Development :: Libraries',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-    ]
+    include_package_data=True,
 )

@@ -1,35 +1,25 @@
-name: build
-
-on:
-  push:
-    branches:
-      - main
-    tags-ignore:
-      - '*'
-  pull_request:
-
+name: Tests
+run-name: Push by ${{ github.actor }}
+on: [push]
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  pytest:
     strategy:
       matrix:
-        python-version: ["3.8"]
-
+        version: [3.8]
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{matrix.python-version}}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{matrix.python-version}}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
-    - name: Run tox
-      env:
-        GENIUS_ACCESS_TOKEN: ${{ secrets.GENIUS_ACCESS_TOKEN }}
-        GENIUS_CLIENT_ID: ${{ secrets.GENIUS_CLIENT_ID }}
-        GENIUS_CLIENT_SECRET: ${{ secrets.GENIUS_CLIENT_SECRET }}
-        GENIUS_REDIRECT_URI: ${{ secrets.GENIUS_REDIRECT_URI }}
-      run: tox
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Python ${{ matrix.version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+      - name: Install Dependencies
+        run: pip install flake8 yapf pytest
+      - name: Install aws-list-all
+        run: python setup.py install
+      - name: Check that aws-list-all --help works.
+        run: aws_list_all --help
+      - run: pytest -vvv aws_list_all
+      - run: flake8 aws_list_all
+      - run: yapf -d -r aws_list_all/
