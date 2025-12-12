@@ -1,2 +1,8 @@
-__pycache__
-generated
+*.o
+*.so
+*.pyc
+*.exe
+MANIFEST
+build
+dist
+*.egg-info
