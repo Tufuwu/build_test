@@ -1,77 +1,58 @@
-Sparkly
-=======
+fcache
+======
 
-|Sparkly PyPi Version| |Documentation Status|
+.. image:: https://badge.fury.io/py/fcache.png
+    :target: http://badge.fury.io/py/fcache
 
-Helpers & syntax sugar for PySpark. There are several features to make your life easier:
+.. image:: https://travis-ci.org/tsroten/fcache.png?branch=develop
+    :target: https://travis-ci.org/tsroten/fcache
 
-- Definition of spark packages, external jars, UDFs and spark options within your code;
-- Simplified reader/writer api for Cassandra, Elastic, MySQL, Kafka;
-- Testing framework for spark applications.
+fcache is a dictionary-like, file-based cache module for Python. It's simple
+to use, has an optional write buffer, and is
+`Shelf <http://docs.python.org/3/library/shelve.html#shelve.Shelf>`_-compatible.
 
-More details could be found in `the official
-documentation <https://sparkly.readthedocs.org>`__.
+.. code:: python
 
-Installation
-------------
+    >>> from fcache.cache import FileCache
+    >>> mycache = FileCache('myapp')
+    >>> mycache['foo'] = [1, 2, 3, 4, 5]
+    >>> mycache['foo']
+    [1, 2, 3, 4, 5]
+    >>> mycache['bar'] = 'value'
+    >>> list(mycache)
+    ['foo', 'bar']
+    >>> del mycache['foo']
+    >>> mycache['foo']
+        ...
+        KeyError: 'foo'
 
-Sparkly itself is easy to install::
+.. code:: python
 
-    pip install pyspark  # pick your version
-    pip install sparkly (compatible with spark >= 2.4)
+   with FileCache('myapp') as mycache:
+       mycache['foo'] = [1, 2, 3, 4, 5]
 
-
-Getting Started
----------------
-
-Here is a small code snippet to show how to easily read Cassandra table
-and write its content to ElasticSearch index::
-
-    from sparkly import SparklySession
-
-
-    class MySession(SparklySession):
-        packages = [
-            'datastax:spark-cassandra-connector:2.0.0-M2-s_2.11',
-            'org.elasticsearch:elasticsearch-spark-20_2.11:6.5.4',
-        ]
-
-
-    if __name__ == '__main__':
-        spark = MySession()
-        df = spark.read_ext.cassandra('localhost', 'my_keyspace', 'my_table')
-        df.write_ext.elastic('localhost', 'my_index', 'my_type')
-
-See `the online documentation <https://sparkly.readthedocs.org>`__ for
-more details.
-
-Testing
+Install
 -------
 
-To run tests you have to have `docker <https://www.docker.com/>`__ and
-`docker-compose <https://docs.docker.com/compose/>`__ installed on your
-system. If you are working on MacOS we highly recommend you to use
-`docker-machine <https://docs.docker.com/machine/>`__. As soon as the
-tools mentioned above have been installed, all you need is to run::
+To install fcache, use pip:
 
-    make test
+.. code:: bash
 
-Supported Spark Versions
-------------------------
+    $ pip3 install fcache
 
-At the moment we support:
+fcache also requires the `appdirs <https://github.com/ActiveState/appdirs>`_ package.
 
-+---------------------------------------------------------------------------+
-| sparkly >= 2.7 | Spark 2.4.x                                              |
-+---------------------------------------------------------------------------+
-| sparkly 2.x    | Spark 2.0.x and Spark 2.1.x and Spark 2.2.x              |
-+---------------------------------------------------------------------------+
-| sparkly 1.x    | Spark 1.6.x                                              |
-+---------------------------------------------------------------------------+
+Documentation
+-------------
 
-.. |Sparkly PyPi Version| image:: http://img.shields.io/pypi/v/sparkly.svg
-   :target: https://pypi.python.org/pypi/sparkly
-.. |Sparkly Build Status| image:: https://app.travis-ci.com/tubular/sparkly.svg?branch=master
-   :target: https://app.travis-ci.com/github/tubular/sparkly
-.. |Documentation Status| image:: https://readthedocs.org/projects/sparkly/badge/?version=latest
-   :target: http://sparkly.readthedocs.io/en/latest/?badge=latest
+`fcache's documentation <https://fcache.readthedocs.org/>`_ contains an introduction along with an API overview. For more information on how to get started with fcache, be sure to read the documentation.
+
+Bug/Issues Tracker
+------------------
+
+fcache uses its `GitHub Issues page <https://github.com/tsroten/fcache/issues>`_ to track bugs, feature requests, and support questions.
+
+License
+-------
+
+fcache is released under the OSI-approved `MIT License <http://opensource.org/licenses/MIT>`_. See the file LICENSE.txt for more information.
