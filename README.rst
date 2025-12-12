@@ -1,109 +1,216 @@
-.. image:: https://img.shields.io/travis/cuducos/webassets-elm.svg?style=flat
-  :target: https://travis-ci.org/cuducos/webassets-elm
-  :alt: Travis CI
+.. image:: https://travis-ci.org/cocreators-ee/migrate-anything.svg?branch=master
+    :target: https://travis-ci.org/cocreators-ee/migrate-anything
 
-.. image:: https://img.shields.io/coveralls/cuducos/webassets-elm.svg?style=flat
-  :target: https://coveralls.io/github/cuducos/webassets-elm
-  :alt: Covearge
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
 
-.. image:: https://img.shields.io/pypi/status/webassets-elm.svg?style=flat
-  :target: https://pypi.python.org/pypi/webassets-elm
-  :alt: Status
+.. image:: https://codecov.io/gh/cocreators-ee/migrate-anything/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/cocreators-ee/migrate-anything
 
-.. image:: https://img.shields.io/pypi/v/webassets-elm.svg?style=flat
-  :target: https://pypi.python.org/pypi/webassets-elm
-  :alt: Latest release
+.. image:: https://sonarcloud.io/api/project_badges/measure?project=Lieturd_migrate-anything&metric=alert_status
+    :target: https://sonarcloud.io/dashboard?id=Lieturd_migrate-anything
 
-.. image:: https://img.shields.io/pypi/pyversions/webassets-elm.svg?style=flat
-  :target: https://pypi.python.org/pypi/webassets-elm
-  :alt: Python versions
+.. image:: https://img.shields.io/github/issues/cocreators-ee/migrate-anything
+    :target: https://github.com/cocreators-ee/migrate-anything/issues
+    :alt: GitHub issues
 
-.. image:: https://img.shields.io/pypi/l/webassets-elm.svg?style=flat
-  :target: https://pypi.python.org/pypi/webassets-elm
-  :alt: License
+.. image:: https://img.shields.io/pypi/dm/migrate-anything
+    :target: https://pypi.org/project/migrate-anything/
+    :alt: PyPI - Downloads
 
-Elm filter for webassets
-########################
+.. image:: https://img.shields.io/pypi/v/migrate-anything
+    :target: https://pypi.org/project/migrate-anything/
+    :alt: PyPI
 
-Filter for compiling `Elm <http://elm-lang.org>`_ files using `webassets <http://webassets.readthedocs.org>`_.
+.. image:: https://img.shields.io/pypi/pyversions/migrate-anything
+    :target: https://pypi.org/project/migrate-anything/
+    :alt: PyPI - Python Version
 
-Install
-*******
+.. image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
+    :target: https://opensource.org/licenses/BSD-3-Clause
 
-::
+Migrate anything - database (etc.) migration utility, especially for Python projects.
 
-    pip install webassets-elm
 
-As of version 0.2.0, this plugin requires **Elm 0.19** or newer (building with ``elm make``).
+What is this?
+=============
 
-If you need to build your Elm project with ``elm-make`` (Elm 0.18 and older), you can pin your ``webassets-elm`` package to version ``0.1.7``.
+It's kinda annoying how often you run into the question of how to handle migrations in your project, and there hasn't seem to emerged any good, DB -agnostic, framework-agnostic, and storage-agnostic tool to manage them.
 
-Basic usage
-***********
+This project is an attempt to change that.
 
-.. code:: python
+Basically what it does when you run :code:`migrate-anything migrations` is:
 
-    from webassets.filter import register_filter
-    from webassets_elm import Elm
+1. Find all the files :code:`migrations/*.py` and sort them
+2. Any that are not yet registered in the DB will be loaded, their :code:`up()` is executed, and the file's contents stored in the DB
+3. Any files that are missing from the fs but are in the DB will have their code loaded from the DB and their :code:`down()` is executed - in reverse order
 
-    register_filter(Elm)
 
-Settings
-========
+License
+-------
 
-**Optionally** as an evironment variable you can have:
+Licensing is important. This project uses BSD 3-clause license, and adds no other dependencies to your project (it does use a few things during build & testing) - that's about as simple, safe, and free to use as it gets.
 
-* ``ELM_BIN``: alternative path to ``elm`` if it is **not** available globally (e.g. ``node_modules/.bin/elm``).
+For more information check the `LICENSE <https://github.com/cocreators-ee/migrate-anything/blob/master/LICENSE>`_ -file.
 
-* ``ELM_OPTIMIZE``: enable the Elm compiler optimization option. Recommended for production output.
 
-* ``ELM_DEBUG``: enable the Elm compiler debug option.
+Usage examples
+==============
 
-Examples
-========
+Firstly you'll need this package in your project. Pick one of these:
 
-Flask with `flask-assets <http://flask-assets.readthedocs.io/>`_
-----------------------------------------------------------------
+.. code-block:: python
 
-.. code:: python
+    pip install -U migrate-anything
+    poetry add migrate-anything
+    pipenv install migrate-anything
 
-    from flask import Flask
-    from flask_assets import Bundle, Environment
-    from webassets.filter import register_filter
-    from webassets_elm import Elm
+Simply put, create a Python package, don't be too clever and call it e.g. ``migrations``. Then put files in that package:
 
-    app = Flask(__name__)
+.. code-block:: python
 
-    register_filter(Elm)
-    assets = Environment(app)
+    # migrations/__init__.py
+    from migrate_anything import configure, CSVStorage
 
-    elm_js = Bundle('elm/main.elm', filters=('elm',), output='app.js')
-    assets.register('elm_js', elm_js)
+    configure(storage=CSVStorage("migration_status.csv"))
 
-Django with `django-assets <http://django-assets.readthedocs.org>`_
--------------------------------------------------------------------
+.. code-block:: python
 
-.. code:: python
+    # migrations/01-initialize-db.py
+    # Please note that this is built for a completely hypothetical DB layer
+    from my_db import get_db
 
-    from django_assets import Bundle, register
-    from webassets.filter import register_filter
-    from webassets_elm import Elm
+    DB = get_db()
 
-    register_filter(Elm)
+    def up():
+        DB.create_table("example")
 
-    elm_js = Bundle('elm/main.elm', filters=('elm',), output='app.js')
-    register('elm_js', elm_js)
+    def down():
+        DB.delete_table("example")
+
+This would configure your migrations' status to be stored in a local file called ``migration_status.csv`` and set up your first migration script. If you have a ``my_db`` module that works like this you could just run this with a single command:
+
+.. code-block:: shell
+
+    migrate-anything migrations
+    poetry run migrate-anything migrations
+    pipenv run migrate-anything migrations
+
+Now in the real world you might want something more durable and a realistic example, so here's e.g. what you'd do when using MongoDB:
+
+.. code-block:: python
+
+    # __init__.py
+    from migrate_anything import configure, MongoDBStorage
+    import pymongo
+
+    db = pymongo.MongoClient().my_db
+
+    configure(storage=MongoDBStorage(db.migrations))
+
+.. code-block:: python
+
+    # 01-initialize-db.py
+    from pymongo import MongoClient
+
+    client = MongoClient()
+    db = client.my_db
+
+    def up():
+        db.posts.insert_one({
+            "id": "post-1",
+            "title": "We're live!",
+            "content": "This is our first post, yay."
+        })
+        db.posts.create_index("id")
+
+    def down():
+        db.posts.drop()
+
+This would configure storage to a ``my_db.migrations`` MongoDB collection.
+
+Future ideas include support for other DB engines (feel free to contribute),
+and Kubernetes ConfigMap. Annoyingly storage to Kubernetes from inside a pod
+and in code is not quite as simple as just running ``kubectl``.
+
+Oh and your Kubernetes pods will likely require the necessary RBAC rules to manage their ConfigMap. It's unfortunately kinda complex, but I'm sure you can figure it out e.g. with this `guide <https://docs.bitnami.com/kubernetes/how-to/configure-rbac-in-your-kubernetes-cluster/>`_.
+
+Alternatively you can just write your own - it's easy.
+
+.. code-block:: python
+
+    # __init__.py
+    from migrate_anything import configure
+
+
+    class CustomStorage(object):
+        def __init__(self, file):
+            self.file = file
+
+        def save_migration(self, name, code):
+            with open(self.file, "a", encoding="utf-8") as file:
+                file.write("{},{}\n".format(name, code))
+
+        def list_migrations(self):
+            try:
+                with open(self.file, encoding="utf-8") as file:
+                    return [
+                        line.split(",")
+                        for line in file.readlines()
+                        if line.strip()  # Skip empty lines
+                    ]
+            except FileNotFoundError:
+                return []
+
+        def remove_migration(self, name):
+            migrations = [
+                migration for migration in self.list_migrations() if migration[0] != name
+            ]
+
+            with open(self.file, "w", encoding="utf-8") as file:
+                for row in migrations:
+                    file.write("{},{}\n".format(*row))
+
+
+    configure(storage=CustomStorage("test.txt"))
+
+You can also check out the `examples <https://github.com/cocreators-ee/migrate-anything/tree/master/examples>`_.
+
 
 Contributing
 ============
 
-Feel free to `report an issue <http://github.com/cuducos/webassets-elm/issues>`_, `open a pull request <http://github.com/cuducos/webassets-elm/pulls>`_, or `drop a line <http://twitter.com/cuducos>`_.
+This project is run on GitHub using the issue tracking and pull requests here. If you want to contribute, feel free to `submit issues <https://github.com/cocreators-ee/migrate-anything/issues>`_ (incl. feature requests) or PRs here.
 
-Don't forget to write and run tests, and format code with `Black <https://black.readthedocs.io/>`_:
+You will need `pre-commit <https://pre-commit.com/#install>`_ set up to make contributions.
 
-::
+To set up development tools for this, run:
 
-    python setup.py test
-    black .
+.. code-block:: shell
 
-Please note you need ``elm`` binary available to run tests, here you can find different ways to `install Elm <http://elm-lang.org/install>`_.
+    pre-commit install
+    virtualenv .venv
+
+    .venv/bin/activate
+    # OR
+    .venv\Scripts\activate.bat
+
+    pip install -r dev-requirements.txt
+    pip install -e .
+
+And then to run the tests
+
+.. code-block:: shell
+
+    pytest
+
+When you have improvements to make, commit (and include any cleanup pre-commit might do), push your changes to your own fork, make a PR.
+
+
+Financial support
+=================
+
+This project has been made possible thanks to `Cocreators <https://cocreators.ee>`_ and `Lietu <https://lietu.net>`_. You can help us continue our open source work by supporting us on `Buy me a coffee <https://www.buymeacoffee.com/cocreators>`_.
+
+.. image:: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+   :target: https://www.buymeacoffee.com/cocreators

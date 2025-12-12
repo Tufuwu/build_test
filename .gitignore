@@ -1,20 +1,15 @@
-# Python
+.idea
+__pycache__
+.pytest_cache
 *.pyc
-.eggs/
-webassets_elm.egg-info/
-build/
-dist/
-
-# Elm
-elm-stuff/
-node_modules/
-
-# Python third-party packages
+*.bak
+*.log
+examples/**/*.txt
+*.csv
+*.egg-info
+build
+dist
+MANIFEST
 .coverage
-.python-version
-.tox
-cover/
-
-# OS, IDE & editor
-.DS_Store
-.ropeproject/
+coverage.xml
+.venv

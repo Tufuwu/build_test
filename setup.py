@@ -1,32 +1,36 @@
-from pathlib import Path
+# -*- coding: utf-8 -*-
 from setuptools import setup
+from io import open
+from os import path
 
+here = path.abspath(path.dirname(__file__))
+with open(path.join(here, "README.rst"), encoding="utf-8") as f:
+    long_description = f.read()
 
 setup(
-    author="Eduardo Cuducos",
-    author_email="cuducos@gmail.com",
+    name="migrate-anything",
+    entry_points={"console_scripts": ["migrate-anything = migrate_anything.main:main"]},
+    version="0.1.7",
+    description="Helps manage migrations for databases and anything else",
+    long_description=long_description,
+    long_description_content_type="text/x-rst",
+    url="https://github.com/cocreators-ee/migrate-anything",
+    author="Cocreators OÜ",
+    author_email="janne@cocreators.ee",
+    packages=["migrate_anything", "migrate_anything.storage"],
+    keywords="migrate database db release",
+    python_requires=">=3.6, <4",
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Environment :: Web Environment",
-        "Framework :: Django",
-        "Framework :: Flask",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.8",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
-    description="Elm filter for webassets",
-    install_requires=["webassets"],
-    keywords=["elm", "webassets", "assets", "django", "flask"],
-    license="MIT",
-    long_description=Path("README.rst").read_text(),
-    name="webassets-elm",
-    py_modules=["webassets_elm"],
-    python_requires=">=3.5",
-    test_suite="nose.collector",
-    tests_require=["nose"],
-    url="https://github.com/cuducos/webassets-elm",
-    version="0.2.1",
-    zip_safe=False,
+    project_urls={
+        "Bug Reports": "https://github.com/cocreators-ee/migrate-anything/issues",
+        "Source": "https://github.com/cocreators-ee/migrate-anything/",
+    },
 )
