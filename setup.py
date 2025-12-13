@@ -1,30 +1,46 @@
-import setuptools
+#!/usr/bin/env python
+#
+# Shadow Daemon -- Web Application Firewall
+#
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+#
+# This file is part of Shadow Daemon. Shadow Daemon is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation, version 2.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-desc_file = "README.md"
+import os
+from setuptools import setup, Command
 
-with open(desc_file, "r") as fh:
-    long_description = fh.read()
+README = os.path.join(os.path.dirname(__file__), 'README.rst')
+long_description = open(README).read() + '\n\n'
 
-setuptools.setup(
-    name="casbin-django-orm-adapter",
-    author="Yang Luo",
-    author_email="hsluoyz@qq.com",
-    description="Django's ORM adapter for PyCasbin",
+setup(
+    name='shadowd',
+    version='3.0.1',
+    description='Python connector for the Shadow Daemon web application firewall',
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/pycasbin/django-orm-adapter",
-    keywords=["casbin", "adapter", "storage-driver", "django", "orm", "django-orm", "access-control", "authorization"],
-    packages=setuptools.find_packages(exclude=("tests",)),
-    install_requires=["casbin", "django"],
-    python_requires=">=3.7",
-    license="Apache 2.0",
+    url='http://github.com/zecure/shadowd_python',
+    author='Hendrik Buchwald',
+    author_email='hb@zecure.org',
+    license='GPLv2',
+    packages=['shadowd'],
     classifiers=[
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: System Administrators',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'Programming Language :: Python :: 2',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: System :: Networking :: Firewalls',
     ],
-    data_files=[desc_file],
+    keywords='waf security shadowd',
+    test_suite = 'shadowd.tests.test_all',
 )
