@@ -14,7 +14,7 @@ from . import ContribHost
 from . import ServerHost
 
 import os
-import sentry_sdk
+from sentry_sdk import init as sentry_init
 
 sentry_sdk.init(os.environ.get("SENTRY_DSN"))
 
