@@ -42,5 +42,5 @@ setup(
         'Topic :: System :: Networking :: Firewalls',
     ],
     keywords='waf security shadowd',
-    # test_suite = 'shadowd.tests.test_all',
+    test_suite = 'shadowd.tests.test_all',
 )
