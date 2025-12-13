@@ -16,7 +16,6 @@ concurrency:
 jobs:
   tests:
     strategy:
-      fail-fast: false
       matrix:
         python_version: ["3.8"]
         django_version: ["32", "42", "50"]

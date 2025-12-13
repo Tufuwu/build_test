@@ -11,7 +11,7 @@ name = "django-codemirror2"
 dependencies = [
     "django<6",
 ]
-requires-python = ">= 3.5"
+requires-python = ">= 3.6"
 authors = [
     {name="Alexander Clausen", email="alex@gc-web.de"},
 ]
