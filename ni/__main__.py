@@ -16,7 +16,7 @@ from . import ServerHost
 import os
 from sentry_sdk import init as sentry_init
 
-sentry_sdk.init(os.environ.get("SENTRY_DSN"))
+sentry_init(os.environ.get("SENTRY_DSN"))
 
 
 def handler(create_client: Callable[[], aiohttp.ClientSession], server: ni_abc.ServerHost,
