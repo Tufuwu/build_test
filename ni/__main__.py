@@ -14,10 +14,11 @@ from . import ContribHost
 from . import ServerHost
 
 import os
-from sentry_sdk import init as sentry_init
 
-sentry_init(os.environ.get("SENTRY_DSN"))
+import sentry_sdk
 
+with sentry_sdk.init(os.environ.get("SENTRY_DSN")):
+    pass
 
 def handler(create_client: Callable[[], aiohttp.ClientSession], server: ni_abc.ServerHost,
             cla_records: ni_abc.CLAHost) -> Callable[[web.Request], Awaitable[web.Response]]:
