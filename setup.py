@@ -1,30 +1,72 @@
-from setuptools import setup, find_packages
-import install_bashhub
-import sys
+import re
 
-exec (open('bashhub/version.py').read())
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-tests_require = ['pytest>=3.3.1']
+with open("loguru/__init__.py", "r") as file:
+    regex_version = r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]'
+    version = re.search(regex_version, file.read(), re.MULTILINE).group(1)
 
-setup(name='bashhub',
-      version='1.6.5',
-      description='Bashhub.com python client',
-      url='https://github.com/rcaloras/bashhub-client',
-      author='Ryan Caloras',
-      author_email='ryan@bashhub.com',
-      license='Apache',
-      packages=find_packages(),
-      include_package_data=True,
-      install_requires=[
-          'requests==2.23.0', 'jsonpickle==2.0.0', 'click==6.7',
-          'npyscreen==4.10.5', 'python-dateutil==2.8.1',
-          'pymongo==3.10.1', 'inflection==0.3.1', 'humanize==1.0.0',
-          'future==0.18.3', 'mock==3.0.5'
-      ],
-      tests_require=tests_require,
-      extras_require={'test': tests_require},
-      entry_points={
-          'console_scripts': ['bh=bashhub.bh:main',
-                              'bashhub=bashhub.bashhub:main']
-      },
-      zip_safe=False)
+with open("README.rst", "rb") as file:
+    readme = file.read().decode("utf-8")
+
+setup(
+    name="loguru",
+    version=version,
+    packages=["loguru"],
+    package_data={"loguru": ["__init__.pyi", "py.typed"]},
+    description="Python logging made (stupidly) simple",
+    long_description=readme,
+    long_description_content_type="text/x-rst",
+    author="Delgan",
+    author_email="delgan.py@gmail.com",
+    url="https://github.com/Delgan/loguru",
+    download_url="https://github.com/Delgan/loguru/archive/{}.tar.gz".format(version),
+    project_urls={
+        "Changelog": "https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst",
+        "Documentation": "https://loguru.readthedocs.io/en/stable/index.html",
+    },
+    keywords=["loguru", "logging", "logger", "log"],
+    license="MIT license",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Topic :: System :: Logging",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Programming Language :: Python :: Implementation :: CPython",
+    ],
+    install_requires=[
+        "colorama>=0.3.4 ; sys_platform=='win32'",
+        "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+        "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+    ],
+    extras_require={
+        "dev": [
+            "black>=19.10b0 ; python_version>='3.6'",
+            "colorama>=0.3.4",
+            "docutils==0.16",
+            "flake8>=3.7.7",
+            "isort>=5.1.1 ; python_version>='3.6'",
+            "tox>=3.9.0",
+            "pytest>=4.6.2",
+            "pytest-cov>=2.7.1",
+            "Sphinx>=4.1.1 ; python_version>='3.6'",
+            "sphinx-autobuild>=0.7.1 ; python_version>='3.6'",
+            "sphinx-rtd-theme>=0.4.3 ; python_version>='3.6'",
+        ]
+    },
+    python_requires=">=3.5",
+)
