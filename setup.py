@@ -1,53 +1,54 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
 
-from setuptools import setup, find_packages
-from codecs import open
+import os
+import sys
 
-requires = ["mesa >= 0.8.6", "geopandas", "libpysal", "rtree"]
+import dynamic_preferences
 
-version = ""
-with open("mesa_geo/__init__.py", "r") as fd:
-    version = re.search(
-        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
-    ).group(1)
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-with open("README.md", "r") as f:
-    readme = f.read()
+version = dynamic_preferences.__version__
+
+if sys.argv[-1] == "publish":
+    os.system("python setup.py sdist upload")
+    print("You probably want to also tag the version now:")
+    print("  git tag -a %s -m 'version %s'" % (version, version))
+    print("  git push --tags")
+    sys.exit()
+
+readme = open("README.rst").read()
 
 setup(
-    name="mesa-geo",
+    name="django-dynamic-preferences",
     version=version,
-    description="Agent-based modeling (ABM) in Python 3+",
+    description="""Dynamic global and instance settings for your django project""",
     long_description=readme,
-    long_description_content_type="text/markdown",
-    author="Project GeoMesa Team",
-    author_email="",
-    url="https://github.com/corvince/mesa-geo",
-    packages=find_packages(),
-    package_data={
-        "mesa_geo": [
-            "visualization/templates/*.html",
-            "visualization/templates/css/*",
-            "visualization/templates/fonts/*",
-            "visualization/templates/js/*",
-        ]
-    },
+    author="Agate Blue",
+    author_email="me+github@agate.blue",
+    url="https://github.com/agateblue/django-dynamic-preferences",
+    packages=["dynamic_preferences"],
     include_package_data=True,
-    install_requires=requires,
-    keywords="agent based modeling model ABM simulation multi-agent",
-    license="Apache 2.0",
+    install_requires=[
+        'django>=1.11',
+        'six',
+        'persisting_theory>=0.2.1',
+    ],
+    license="BSD",
     zip_safe=False,
-    classifiers=(
-        "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Artificial Life",
-        "Topic :: Scientific/Engineering :: Artificial Intelligence",
-        "Intended Audience :: Science/Research",
-        "Programming Language :: Python :: 3 :: Only",
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+    keywords="django-dynamic-preferences",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Framework :: Django",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
-    ),
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+    ],
 )
