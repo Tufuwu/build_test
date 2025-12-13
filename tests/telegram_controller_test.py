@@ -190,7 +190,7 @@ class TelegramControllerTests(unittest.TestCase):
         tcb.post_worker.post_task.call_args[0][0]["runnable"](task)
 
         tcb._send_http.assert_called_once_with(
-            "https://api.telegram.org/banana/sendMessage?chat_id=to_banana&text=hello%7E%20banana&reply_markup=banana_keyboard_markup"
+            'https://api.telegram.org/banana/sendMessage?chat_id=to_banana&text=hello~%20banana&reply_markup=banana_keyboard_markup'
         )
 
     def test__get_updates_call_getUpdates_api_correctly(self):
