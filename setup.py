@@ -7,7 +7,7 @@ exec (open('bashhub/version.py').read())
 tests_require = ['pytest>=3.3.1']
 
 setup(name='bashhub',
-      version='__version__',
+      version='2.3.1',
       description='Bashhub.com python client',
       url='https://github.com/rcaloras/bashhub-client',
       author='Ryan Caloras',
