@@ -3,7 +3,7 @@ name: Run tests with tox
 on: 
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
 
