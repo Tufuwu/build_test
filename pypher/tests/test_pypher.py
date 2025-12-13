@@ -56,7 +56,7 @@ class TestFits(object):
         pscale = get_pixscale('image.fits')
         assert round(pscale, 1) == PIXSCALE
 
-    def test_add_single_comment(self, fitscleandir):
+    def test_add_single_comment(self):
         add_comments('image.fits', "single comment")
         comments = str(fits.getval('image.fits', 'COMMENT')).split('\n')
         assert comments[-1] == "single comment"
