@@ -1,128 +1,101 @@
-.. -*- mode: rst -*-
+====================================================
+PyPHER - Python-based PSF Homogenization kERnels
+====================================================
 
-|
+|pypi| |docs| |license| |doi| |actions|
 
-.. image:: https://badge.fury.io/py/yasa.svg
-    :target: https://badge.fury.io/py/yasa
+Compute an homogenization kernel between two PSFs.
 
-.. image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
-    :target: https://www.python.org/downloads/
+This code is well suited for PSF matching applications in both an astronomical or microscopy context.
 
-.. image:: https://img.shields.io/github/license/raphaelvallat/yasa.svg
-    :target: https://github.com/raphaelvallat/yasa/blob/master/LICENSE
+It has been developed as part of the ESA `Euclid <http://www.cosmos.esa.int/web/euclid>`_ mission and is currently being used for multi-band photometric studies of `HST <https://www.spacetelescope.org/>`_ (visible) and `Herschel <http://www.cosmos.esa.int/web/herschel/home>`_ (IR) data.
 
-.. image:: https://codecov.io/gh/raphaelvallat/yasa/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/raphaelvallat/yasa
+:Paper: http://arxiv.org/abs/1609.02006
+:Documentation: https://pypher.readthedocs.io
 
-.. image:: https://pepy.tech/badge/yasa
-    :target: https://pepy.tech/badge/yasa
+Features
+========
 
-----------------
+1. **Warp** (rotation + resampling) the PSF images (if necessary),
+2. **Filter** images in Fourier space using a regularized Wiener filter,
+3. **Produce** a homogenization kernel.
 
-.. figure::  /docs/pictures/yasa_logo.png
-   :align:   center
+**Note:** ``pypher`` needs the pixel scale information to be present in the FITS files. If not, use the provided ``addpixscl`` method to add this missing info.
 
-**YASA** (*Yet Another Spindle Algorithm*) is a command-line sleep analysis toolbox in Python. The main functions of YASA are:
+**Warning:** This code **does not**
 
-* Automatic sleep staging of polysomnography data (see `preprint article <https://doi.org/10.1101/2021.05.28.446165>`_).
-* Event detection: sleep spindles, slow-waves and rapid eye movements, on single or multi-channel EEG data.
-* Artefact rejection, on single or multi-channel EEG data.
-* Spectral analyses: bandpower, phase-amplitude coupling, 1/f slope, and more!
-* Hypnogram analysis: sleep statistics and stage tranisitions.
+    * interpolate NaN values (replaced by 0 instead),
+    * center PSF images,
+    * minimize the kernel size.
 
-For more details, check out the `API documentation <https://raphaelvallat.com/yasa/build/html/index.html>`_, try the
-`tutorial (Jupyter notebooks) <https://github.com/raphaelvallat/yasa/tree/master/notebooks>`_ or read the `FAQ <https://raphaelvallat.com/yasa/build/html/faq.html>`_.
-
-----------------
 
 Installation
-~~~~~~~~~~~~
+============
 
-To install YASA, simply open a terminal or Anaconda command prompt and enter:
+PyPHER works both with Python 2.7 and 3.4 or later and relies on `numpy <http://www.numpy.org/>`_, `scipy <http://www.scipy.org/>`_ and `astropy <http://www.astropy.org/>`_ libraries.
 
-.. code-block:: shell
+Option 1: `Pip <https://pypi.python.org/pypi/pypher>`_
+------------------------------------------------------
 
-  pip install --upgrade yasa
+.. code:: bash
 
-**What are the prerequisites for using YASA?**
+    $ pip install pypher
 
-To use YASA, all you need is:
+Option 2: from `source <https://git.ias.u-psud.fr/aboucaud/pypher>`_
+--------------------------------------------------------------------
 
-- Some basic knowledge of Python, especially the `NumPy <https://docs.scipy.org/doc/numpy/user/quickstart.html>`_, `Pandas <https://pandas.pydata.org/pandas-docs/stable/getting_started/10min.html>`_ and `MNE <https://martinos.org/mne/stable/index.html>`_ packages.
-- A Python editor: YASA works best with `Jupyter Lab <https://jupyterlab.readthedocs.io/en/stable/index.html>`_, a web-based interactive user interface.
-- Some sleep EEG data and optionally a sleep staging file (hypnogram).
+.. code:: bash
 
-**I have sleep data in European Data Format (.edf), how do I load the data in Python?**
+    $ git clone https://git.ias.u-psud.fr/aboucaud/pypher.git
+    $ cd pypher
+    $ python setup.py install
 
-If you have sleep EEG data in standard formats (e.g. EDF or BrainVision), you can use the `MNE package <https://mne.tools/stable/index.html>`_ to load and preprocess your data in Python. A simple preprocessing pipeline using MNE is shown below:
 
-.. code-block:: python
+Basic example
+=============
 
-  import mne
-  # Load the EDF file
-  raw = mne.io.read_raw_edf('MYEDFFILE.edf', preload=True)
-  # Downsample the data to 100 Hz
-  raw.resample(100)
-  # Apply a bandpass filter from 0.1 to 40 Hz
-  raw.filter(0.1, 40)
-  # Select a subset of EEG channels
-  raw.pick_channels(['C4-A1', 'C3-A2'])
+.. code:: bash
 
-How do I get started with YASA?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    $ pypher psf_a.fits psf_b.fits kernel_a_to_b.fits -r 1.e-5
 
-If you want to dive right in, you can simply go to the main `documentation <https://raphaelvallat.com/yasa/build/html/api.html>`_ and try to apply YASA's functions on your own EEG data.
-However, for most users, we strongly recommend that you first try running the examples Jupyter notebooks to get a sense of how YASA works and what it can do!
-The notebooks also come with example datasets so they should work right out of the box as long as you've installed YASA first.
-The notebooks and datasets can be found on `GitHub <https://github.com/raphaelvallat/yasa/tree/master/notebooks>`_ (make sure that you download the whole *notebooks/* folder). A short description of all notebooks is provided below:
+This will create the desired kernel ``kernel_a_to_b.fits`` and a short
+log ``kernel_a_to_b.log`` with information about the processing.
 
-**Automatic sleep staging**
 
-* `automatic_staging <notebooks/14_automatic_sleep_staging.ipynb>`_: Automatic sleep staging of polysomnography data.
+Acknowledging
+=============
 
-**Event detection**
+If you make use of any product of this code in a scientific publication,
+please consider acknowledging the work by citing the paper |arxiv| as
+well as the code itself |doi|.
 
-* `spindles_detection <notebooks/01_spindles_detection.ipynb>`_: single-channel spindles detection and step-by-step description of the spindles detection algorithm.
-* `spindles_detection_multi <notebooks/02_spindles_detection_multi.ipynb>`_: multi-channel spindles detection.
-* `spindles_detection_NREM_only <notebooks/03_spindles_detection_NREM_only.ipynb>`_: how to limit the spindles detection on specific sleep stages using an hypnogram.
-* `spindles_slow_fast <notebooks/04_spindles_slow_fast.ipynb>`_: slow versus fast spindles.
-* `sw_detection <notebooks/05_sw_detection.ipynb>`_: single-channel slow-waves detection and step-by-step description of the slow-waves detection algorithm.
-* `sw_detection_multi <notebooks/06_sw_detection_multi.ipynb>`_: multi-channel slow-waves detection.
-* `artifact_rejection <notebooks/13_artifact_rejection.ipynb>`_: automatic artifact rejection on single and multi-channel EEG data.
-* `REMs_detection <notebooks/07_REMs_detection.ipynb>`_: REMs detection.
-* `run_visbrain <notebooks/run_visbrain.py>`_: interactive display of the detected spindles using the Visbrain visualization software in Python.
 
-**Spectral analysis**
+.. |pypi| image:: https://img.shields.io/pypi/v/pypher.svg
+    :alt: Latest Version
+    :scale: 100%
+    :target: https://pypi.python.org/pypi/pypher
 
-* `bandpower <notebooks/08_bandpower.ipynb>`_: calculate spectral band power, optionally averaged across channels and sleep stages.
-* `IRASA <notebooks/09_IRASA.ipynb>`_: separate the aperiodic (= fractal = 1/f) components of the EEG power spectrum using the IRASA method.
-* `spectrogram <notebooks/10_spectrogram.ipynb>`_: plot a multi-taper full-night spectrogram on single-channel EEG data with the hypnogram on top.
-* `nonlinear_features <notebooks/11_nonlinear_features.ipynb>`_: calculate non-linear EEG features on 30-seconds epochs and perform a naive sleep stage classification.
-* `SO-sigma_coupling <notebooks/12_SO-sigma_coupling.ipynb>`_: slow-oscillations/spindles phase-amplitude coupling and data-driven comodulogram.
-* `topoplot <notebooks/15_topoplot.ipynb>`_: topoplot.
+.. |docs| image:: https://readthedocs.org/projects/pypher/badge/?version=latest
+    :alt: Documentation Status
+    :scale: 100%
+    :target: https://pypher.readthedocs.org/en/latest/?badge=latest
 
-Gallery
-~~~~~~~
+.. |license| image:: https://img.shields.io/badge/license-BSD-blue.svg?style=flat
+    :alt: License type
+    :scale: 100%
+    :target: https://git.ias.u-psud.fr/aboucaud/pypher/blob/master/LICENSE
 
-Below some plots demonstrating the functionalities of YASA. To reproduce these, check out the `tutorial (Jupyter notebooks) <https://github.com/raphaelvallat/yasa/tree/master/notebooks>`_.
+.. |doi| image:: https://zenodo.org/badge/21241/aboucaud/pypher.svg
+    :alt: DOI number
+    :scale: 100%
+    :target: https://zenodo.org/badge/latestdoi/21241/aboucaud/pypher
 
-.. figure::  /docs/pictures/gallery.png
-  :align:   center
+.. |arxiv| image:: http://img.shields.io/badge/arXiv-1609.02006-yellow.svg?style=flat
+     :alt: arXiv paper
+     :scale: 100%
+     :target: https://arxiv.org/abs/1609.02006
 
-  *The top plot show an overlay of the detected spindles on real EEG data. The middle left panel shows a time-frequency representation of the whole-night recording (spectrogram), plotted with the hypnogram (sleep stages) on top. The middle right panel shows the sleep stage probability transition matrix, calculated across the entire night. The bottom row shows, from left to right: a topographic plot, the average template of all detected slow-waves across the entire night stratified by channels, and a phase-amplitude coupling comodulogram.*
-
-Development
-~~~~~~~~~~~
-
-YASA was created and is maintained by `Raphael Vallat <https://raphaelvallat.com>`_, a postdoctoral researcher in `Matthew Walker's lab <https://www.humansleepscience.com/>`_ at UC Berkeley. Contributions are more than welcome so feel free to contact me, open an issue or submit a pull request!
-
-To see the code or report a bug, please visit the `GitHub repository <https://github.com/raphaelvallat/yasa>`_.
-
-Note that this program is provided with NO WARRANTY OF ANY KIND.
-
-Citation
-~~~~~~~~
-
-To cite YASA, please use the `eLife publication <https://elifesciences.org/articles/70092>`_:
-
-* Vallat, Raphael, and Matthew P. Walker. "An open-source, high-performance tool for automated sleep staging." Elife 10 (2021). doi: https://doi.org/10.7554/eLife.70092
+.. |actions| image:: https://github.com/aboucaud/pypher/actions/workflows/pytest.yml/badge.svg
+    :alt: GitHub CI
+    :scale: 100%
+    :target: https://github.com/aboucaud/pypher/actions/workflows/pytest.yml
