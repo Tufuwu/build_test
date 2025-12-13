@@ -1,0 +1,52 @@
+{
+  "span": 3,
+  "title": "test title",
+  "type": "singlestat",
+  "valueName": "value-name",
+  "nullPointMode": "connected",
+  "targets": ["mocked <class 'grafana_dashboards.components.targets.Targets'>"],
+  "links": [
+    "mocked <class 'grafana_dashboards.components.links.Links'>"
+  ],
+  "format": "bytes",
+  "postfix": "postfix",
+  "prefix": "prefix",
+  "nullText": "n/a",
+  "colorBackground": true,
+  "colorValue": true,
+  "colors": [
+    "rgba(50, 172, 45, 0.97)"
+  ],
+  "maxDataPoints": 100,
+  "postfixFontSize": "50%",
+  "prefixFontSize": "50%",
+  "thresholds": "0,0,0",
+  "valueFontSize": "80%",
+  "sparkline": {
+    "fillColor": "rgba(1, 2, 3, 4)",
+    "full": true,
+    "lineColor": "rgb(1, 2, 3)",
+    "show": true
+  },
+  "valueMaps": [
+    {
+      "value": "null",
+      "op": "=",
+      "text": "N/A"
+    }
+  ],
+  "datasource": "datasource",
+  "repeat": "var",
+  "repeatDirection": "v",
+  "decimals": 1,
+  "minSpan": 2,
+  "gauge" : {
+    "show": true,
+    "minValue": 1,
+    "maxValue": 2,
+    "thresholdMarkers": false,
+    "thresholdLabels": true
+  },
+  "description": "description",
+  "colorPostfix": true
+}

@@ -1,0 +1,8 @@
+rows:
+  - row-defined-elsewhere
+  - row-with-params:
+      param1: 1
+  - row-with-{placeholder}:
+      placeholder:
+        - 1
+        - 2

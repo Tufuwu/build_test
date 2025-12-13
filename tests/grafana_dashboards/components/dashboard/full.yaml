@@ -1,0 +1,15 @@
+name: name
+dashboard:
+  title: title
+  tags:
+    - tag1
+    - tag2
+  time_options: [1h]
+  refresh_intervals: [5m]
+  refresh: 5m
+  templates:
+    - query:
+  time:
+    from: now-12h
+    to: now
+  sharedCrosshair: true

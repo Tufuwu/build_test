@@ -1,0 +1,16 @@
+{
+  "span": 12,
+  "targets": ["mocked <class 'grafana_dashboards.components.targets.Targets'>"],
+  "title": null,
+  "type": "graph",
+  "nullPointMode": "null",
+  "leftYAxisLabel": "label",
+  "y_formats": [
+    "short",
+    "short"
+  ],
+  "xaxis": {
+    "format": "time",
+    "show": true
+  }
+}

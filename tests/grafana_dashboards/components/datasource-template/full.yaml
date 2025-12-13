@@ -1,0 +1,5 @@
+datasource-template:
+  name: name
+  current: o1
+  query: prometheus
+  regex: '/^prod/'

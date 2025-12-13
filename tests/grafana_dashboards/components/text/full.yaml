@@ -1,0 +1,9 @@
+text:
+  span: 3
+  title: 'test title'
+  mode: 'text'
+  content: |
+    this is
+    multiline
+    text
+  description: description

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "var1",
+    "query": "part1.*x*",
+    "refresh": 1,
+    "refresh_on_load": true,
+    "type": "query",
+    "current": {
+      "text": "o1",
+      "value": "o1"
+    },
+    "options": [
+      {
+        "text": "o1",
+        "value": "o1"
+      },
+      {
+        "text": "o2",
+        "value": "o2"
+      }
+    ],
+    "regex": "/opt\\^(value)\\^\\w+/"
+  },
+  {
+    "name": "var2",
+    "query": "part1.$var1.part2.*",
+    "refresh": 0,
+    "refresh_on_load": false,
+    "type": "query",
+    "multi": true,
+    "includeAll": true,
+    "allFormat": "glob",
+    "allValue": "test*",
+    "hide": 2
+  },
+  {
+    "name": "var3",
+    "query": "part1.$var1.part2.$var2.*",
+    "refresh": 0,
+    "refresh_on_load": false,
+    "type": "query"
+  }
+]
+
