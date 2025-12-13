@@ -1,32 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 import os
 import sys
+from setuptools import setup
 
-import dynamic_preferences
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
 
-version = dynamic_preferences.__version__
+def read(*paths):
+    with io.open(os.path.join(BASE_DIR, *paths), encoding="utf-8") as f:
+        return f.read()
+
+
+def find_version():
+    version_file = read("dynamic_preferences", "version.py")
+    for line in version_file.splitlines():
+        if line.startswith("__version__"):
+            return line.split("=")[1].strip().strip('"')
+    raise RuntimeError("Unable to find version string.")
+
 
 if sys.argv[-1] == "publish":
     os.system("python setup.py sdist upload")
-    print("You probably want to also tag the version now:")
-    print("  git tag -a %s -m 'version %s'" % (version, version))
-    print("  git push --tags")
     sys.exit()
 
-readme = open("README.rst").read()
 
 setup(
     name="django-dynamic-preferences",
-    version=version,
-    description="""Dynamic global and instance settings for your django project""",
-    long_description=readme,
+    version=find_version(),
+    description="Dynamic global and instance settings for your django project",
+    long_description=read("README.rst"),
+    long_description_content_type="text/x-rst",
     author="Agate Blue",
     author_email="me+github@agate.blue",
     url="https://github.com/agateblue/django-dynamic-preferences",
@@ -45,10 +51,6 @@ setup(
         "Framework :: Django",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
     ],
 )
