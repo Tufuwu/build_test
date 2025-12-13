@@ -21,7 +21,7 @@ INSTALL_REQUIRES = [
     'pandas',
     'matplotlib',
     'seaborn',
-    'mne>=0.20.0',
+    'mne==1.4.2',
     'numba',
     'outdated',
     'antropy',
