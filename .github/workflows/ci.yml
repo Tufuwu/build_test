@@ -9,13 +9,13 @@ jobs:
       matrix:
         include:
           - name: 'Test: Python 3.8'
-            python: "3.8"
+            python: "3.9"
             tox: py38
           - name: 'Lint: flake8'
-            python: "3.8"
+            python: "3.9"
             tox: flake8
           - name: 'Lint: twine check'
-            python: "3.8"
+            python: "3.9"
             tox: twine
 
     name: ${{ matrix.name }}
