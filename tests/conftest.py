@@ -1,62 +1,34 @@
+# -*- coding: UTF-8 -*-
+"""
+Pytest configuration file.
+"""
+from click.testing import CliRunner
 import pytest
 
-from django.core import cache as django_cache
-from django.contrib.auth.models import User
+@pytest.fixture(scope="function")
+def cli_runner(request):
+    """click_ CLI runner to execute click_ commands.
 
+    .. _click: https://click.pocoo.org/
+    """
+    return CliRunner()
 
-@pytest.fixture(autouse=True)
-def cache():
-    django_cache.cache.clear()
-    yield django_cache.cache
+@pytest.fixture(scope="function")
+def cli_runner_isolated(request):
+    """click_ CLI runner that provides an isolated filesystem.
 
+    .. _click: https://click.pocoo.org/
+    """
+    cli_runner = CliRunner()
+    with cli_runner.isolated_filesystem():
+        yield cli_runner
 
-@pytest.fixture
-def assert_redirect():
-    def inner(response, expected):
-        assert response.status_code == 302
-        assert response["Location"] == expected
+@pytest.fixture(scope="function")
+def isolated_filesystem(request):
+    """click_ CLI runner that provides an isolated filesystem.
 
-    return inner
-
-
-@pytest.fixture
-def fake_user(db):
-    return User.objects.create_user(
-        username="test", password="test", email="test@test.com"
-    )
-
-
-@pytest.fixture
-def fake_admin(db):
-    return User.objects.create_user(
-        username="admin",
-        email="admin@admin.com",
-        password="test",
-        is_superuser=True,
-        is_staff=True,
-    )
-
-
-@pytest.fixture
-def admin_client(client, fake_admin):
-    assert client.login(username="admin", password="test") is True
-    return client
-
-
-@pytest.fixture
-def user_client(client, fake_user):
-    assert client.login(username="test", password="test") is True
-    return client
-
-
-@pytest.fixture
-def henri(db):
-    return User.objects.create_user(
-        username="henri", password="test", email="henri@henri.com"
-    )
-
-
-@pytest.fixture
-def henri_client(client, henri):
-    assert client.login(username="henri", password="test") is True
-    return client
+    .. _click: https://click.pocoo.org/
+    """
+    cli_runner = CliRunner()
+    with cli_runner.isolated_filesystem() as _isolated_filesystem:
+        yield _isolated_filesystem

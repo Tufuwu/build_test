@@ -1,0 +1,18 @@
+# ============================================================================
+# PYTHON PACKAGE: DEVELOPMENT REQUIREMENTS
+# ============================================================================
+# REQUIRES: Python >= 2.7
+# DESCRIPTION:
+#    pip install -r <THIS_FILE>
+#
+# ============================================================================
+
+# -- TEST SUPPORT:
+pytest <  5.0; python_version <  '3.0'  # >= 4.2
+pytest >= 5.0; python_version >= '3.0'
+pytest-html >= 1.19.0
+
+# -- USE: click.testing
+click >= 6.6
+
+# MAYBE: scripttest >= 1.3

@@ -1,52 +1,31 @@
-*.py[cod]
+*.bak
+*.egg-info/
+*.log
+*.pyc
+*.pyo
+*.tmp
 
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
-virtualenv
-venv
-
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
+.DS_Store
 .coverage
-.tox
-nosetests.xml
+.coverage.*
+.done.*
 
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
-# Complexity
-output/*.html
-output/*/index.html
-
-# Sphinx
-docs/_build
-
-# example
-
-example/*.sqlite*
+.eggs/
 .idea/
-.python-version
-.cache
-.pytest_cache
+.pytest_cache/
+.tox/
+.venv*/
+.settings/
 
-# coverage
-htmlcov/
+build/
+dist/
+downloads/
+
+__pypackages__/
+__pycache__/
+**/__pycache__/
+
+# -- OWN WORKSPACE: Directory(s), File(s)
+__*/
+__*.txt
+
