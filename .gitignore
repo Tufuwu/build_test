@@ -1,16 +1,15 @@
-build/
-dist/
-*.egg-info/
-*.so
-*.exp
-*.lib
-*.obj
+# Compiled python modules.
 *.pyc
-*.pyd.manifest
-*.pyo
-*.swp
-.cache
-.DS_Store
-.idea
-.project
-.pydevproject
+
+# Swap files
+.*.swp
+
+# Exports for dev mode which should be for local development only
+dev-exports.sh
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+/*.egg

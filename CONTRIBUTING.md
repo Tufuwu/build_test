@@ -1,38 +1,71 @@
-# Contributing to PH5
-Thank you for considering contributing to PH5. Community development from people like you help make PH5 a great data format and software suite.
+# Contributing to Bashhub
+Thanks for contributing to Bashhub! This file outlines several best practices when trying to develop and contribute to the repo.
 
-The goal of this document is to give an overview and basic guidelines for contributing to PH5.
+## Pull Requests
+Simple changes can be submitted directly as PRs against Master. Major pull requests and new features should be submitted against the current development branch. Checkout a copy of the next version which is postfixed with `-dev`.
+The latest development version can be found on https://github.com/rcaloras/bashhub-client/branches.
 
-## Getting Started
-* Create a GitHub account if you do not already have one
-* Install [Git](https://git-scm.com/downloads)
-* Clone and install a development version of PH5 using `python setup.py develop` or `pip install -e .`
+## Dev Environment Setup
+You should be able to develop and execute Bashhub's client locally as well as run its unit tests. This typically involves cloning the repo and setting up a virtualenv to develop with. 
+Bashhub is currently setup as Python 2 project built with setuptools.
 
-## Reporting a Bug or Issue
-If you find a bug or have issues using PH5 please first look through the existing [issues](https://github.com/PIC-IRIS/PH5/issues) to see if the problem you are encountering has already been reported. If it is then you may find a work around has already been found or that someone is currently contributing a fix. We welcome you to contribute to the discussion of the issue to help resolve it. 
+```bash
+# setup and clone our repo locally
+mkdir ~/git/ && cd ~/git
+git clone git@github.com:rcaloras/bashhub-client.git
+cd ~/git/bashhub-client
+```
+Setup a new Python 2 virtualenv to install the project locally to and develop from. This example is with [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/index.html#introduction).
+The project should be converted to Python 3 as part of [Issue #56](https://github.com/rcaloras/bashhub-client/issues/56). 
+```bash
+# setup a virtualenv specifying python 2
+mkvirtualenv -p python2.7 bashhub_dev
+# Install our project locally to develop, execute, and test against.
+pip install -e ".[test]"
+```
 
-If there is no current issue for your particular issue please create a new issue. Make your title short but descriptive and in the description go into as much detail as you can. This will help the community and developers quickly address your issue. If you have already started working on a fix for the issue we thank you! Please still submit an issue and then follow the guidelines for submitting a pull request for your code contribution.
+This should setup the project locally. Output should look something like:
+```bash
+[rcaloras:~/git/bashhub-client] [bashhub_dev] master ± pip install -e ".[test]"
+Obtaining file:///Users/rcaloras/git/bashhub-client
+Collecting requests==1.2.3 (from bashhub===-version-)
+  Using cached requests-1.2.3.tar.gz
+Collecting jsonpickle==0.7.0 (from bashhub===-version-)
+  Using cached jsonpickle-0.7.0.tar.gz
+...
+Successfully built requests jsonpickle npyscreen pyCLI pymongo inflection humanize
+Installing collected packages: requests, jsonpickle, click, npyscreen, six, python-dateutil, pyCLI, pymongo, inflection, humanize, bashhub
+  Running setup.py develop for bashhub
+Successfully installed bashhub click-3.3 humanize-0.5.1 inflection-0.2.1 jsonpickle-0.7.0 npyscreen-4.9.1 pyCLI-2.0.3 pymongo-2.6 python-dateutil-2.4.0 requests-1.2.3 six-1.11.0
+```
+From within this virtualenv `bh` and `bashhub` exectuables should now be wired up for development. You should also be able to run pytest (you may have to start a new terminal session).
 
-## Submitting a Pull Request
+```bash
+# bashhub and bh exectuables point to our current dev env
+[rcaloras:~/git/bashhub-client] [bashhub_dev] master ± which bashhub
+/Users/rcaloras/Envs/bashhub_dev/bin/bashhub
+[rcaloras:~/git/bashhub-client] [bashhub_dev] master ± which bh
+/Users/rcaloras/Envs/bashhub_dev/bin/bh
 
-To contribute to PH5 you need to submit a new pull request. Pull request allow for efficient discussion and review of your contributions. Please follow the guidelines below.
+# pytest should run locally against our repo
+[rcaloras:~/git/bashhub-client] [bashhub_dev] master ± pytest
+============= test session starts =================
+platform darwin -- Python 2.7.10, pytest-3.3.1, py-1.5.2, pluggy-0.6.0
+rootdir: /Users/rcaloras/git/bashhub-client, inifile:
+collected 10 items
 
-If your pull request is related to a current issue or one you have just submitted please note this in the issue.
+tests/test_bashhub.py ..                                                                                                                                                                             [ 20%]
+tests/test_bashhub_globals.py ..                                                                                                                                                                     [ 40%]
+tests/test_command.py ...                                                                                                                                                                            [ 70%]
+tests/test_command_form.py ..                                                                                                                                                                        [ 90%]
+tests/test_shell_utils.py .
 
-1. Clone and install a development version of PH5 from the `ph5:master` branch.
-2. Create a new branch from the `ph5:master` branch.
-3. Add your change to this branch. If you are creating new files please follow [PEP8](https://www.python.org/dev/peps/pep-0008/) conventions.
-4. When editing existing files please update the `PROG_VERSION` string at the top of the file with the current year and day-of-year (e.g: 2017.207)
-5. Create a unit test(s) for your contribution and make sure it passes. If a test module doesn't already exist for the module you are updating, create one in the appropriate test package following the _test\_\<module-name\>_ file-name pattern and then update the PH5/runtests.py script.
-6. Push your branch and then submit a pull request. Again make sure your base branch is `ph5:master`.
-7. Wait for developer and community review. We may suggest changes or improvements to your code. Note that this may be an interactive process and discussion will take place in the pull request.
-8. Once your changes are accepted they will be scheduled to be added to a future release of PH5 or an incremental release in the case of a bug fix.
+```
 
-We ask that you keep file sizes as small as possible, especially when creating tests. Large files create issues in Git.
 
-Please note that by submitting a pull request this implies that you accept that your code will be licensed under the MIT license.
 
-### Thank you again for contributing. Once your contributions are accepted you will be added to the contributers list.
+
+
 
 
 
