@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        python-version: ["3.9"]
+        python-version: ["3.8"]
     name: Python ${{ matrix.python-version }} Test on ${{ matrix.operating-system }}
     steps:
       - name: Checkout
