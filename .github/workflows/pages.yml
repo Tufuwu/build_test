@@ -2,7 +2,7 @@ name: Build documentation and deploy to Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
 # Allow one concurrent deployment
