@@ -1,260 +1,111 @@
-# grafana-dashboard-builder
-
-[![PyPI version](https://badge.fury.io/py/grafana-dashboard-builder.svg)](http://badge.fury.io/py/grafana-dashboard-builder) [![Build Status](https://travis-ci.org/jakubplichta/grafana-dashboard-builder.svg?branch=master)](https://travis-ci.org/jakubplichta/grafana-dashboard-builder) [![Coverage Status](https://coveralls.io/repos/jakubplichta/grafana-dashboard-builder/badge.svg?branch=master)](https://coveralls.io/r/jakubplichta/grafana-dashboard-builder?branch=master)
-
-## Introduction
-
-_grafana-dashboard-builder_ is an open-source tool for easier creation of [Grafana](http://grafana.org/) dashboards.
-It is written in [Python](https://www.python.org/) and uses [YAML](http://yaml.org/) descriptors for dashboard
-templates.
-
-This project has been inspired by [Jenkins Job Builder](https://github.com/openstack-infra/jenkins-job-builder) that
-allows users to describe [Jenkins](https://jenkins-ci.org/) jobs with human-readable format. _grafana-dashboard-builder_
-aims to provide similar simplicity to Grafana dashboard creation and to give users easy way how they can create dashboard
-templates filled with different configuration.
-
-## Installation
-
-To install:
-
-```
-sudo pip install grafana-dashboard-builder
-```
-or
-```
-sudo python setup.py install
-```
-
-## Usage
-
-After installation you'll find `grafana-dashboard-builder` on your path. Help can be printed by `--help` command-line
-option.
-
-```
-usage: grafana-dashboard-builder [-h] -p PATH [PATH ...] [--project PROJECT] [-o OUT] [-c CONFIG]
-                                 [--context CONTEXT] [--plugins PLUGINS [PLUGINS ...]]
-                                 [--exporter EXPORTERS [EXPORTERS ...]]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -p PATH [PATH ...], --path PATH [PATH ...]
-                        List of path to YAML definition files
-  --project PROJECT     (deprecated, use path) Location of the file containing
-                        project definition.
-  -o OUT, --out OUT     (deprecated, use config file and file exporter) Path
-                        to output folder
-  -c CONFIG, --config CONFIG
-                        Configuration file containing fine-tuned setup of
-                        builder's components.
-  --context CONTEXT     YAML structure defining parameters for dashboard
-                        definition. Effectively overrides any parameter
-                        defined on project level.
-  --plugins PLUGINS [PLUGINS ...]
-                        List of external component plugins to load
-  --exporter EXPORTERS [EXPORTERS ...]
-                        List of dashboard exporters
-```
-
-To start you need to create project configuration that needs to be in one YAML document. And some examples with current
-can be found in [sample project](samples/project.yaml):
-
-```bash
-grafana-dashboard-builder -p ./samples/project.yaml --exporter file --config ./samples/config.yaml
-```
-
-## Exporters
-
-_grafana-dashboard-builder_ provides several builtin exporters that can be enabled through `--exporter` option.
-Configuration for all of them is to be provided in configuration file given in `--config` option. Look at
-[sample config](samples/config.yaml).
-
-### File exporter
-
-File exporter is used when you want to store dashboards as JSON files on your local disk.
-
-```yaml
-file:
-  output_folder: /some/directory/on/my/disk
-```
-
-To use file exporter run _grafana-dashboard-builder_ with `--exporter file` option.
-
-### Grafana Elastic Search
-
-_grafana-dashboard-builder_ currently supports persisting dashboards to _Elastic Search_ used by _Grafana_ prior
-to version 2.0
-
-To configure _Elastic Search_ endpoint put following structure to your configuration file:
-
-```yaml
-elastic-search:
-  host: https://this-is-my-domain.com
-  password: my_password
-  username: my_username
-```
-
-With this configuration your dashboard will be uploaded to `https://this-is-my-domain.com/es/grafana-dash/dashboard/dashboard_name`
-
-If you do not want to store your credentials in the configuration file you can use environment variables `ES_PASSWORD`
-and `ES_USERNAME`.
-
-To use elastic search exporter run _grafana-dashboard-builder_ with `--exporter elastic-search` option.
-
-### Grafana API
-
-_grafana-dashboard-builder_ currently supports _Grafana_ version 2.0 API.
-
-To configure _Grafana_ endpoint put following structure to your configuration file:
-
-```yaml
-grafana:
-  host: https://this-is-my-domain.com
-  password: my_password
-  username: my_username
-```
-
-With this configuration your dashboard will be POSTed to `https://this-is-my-domain.com/api/dashboards/db`
-
-If you do not want to store your credentials in the configuration file you can use environment variables
-`GRAFANA_PASSWORD` and `GRAFANA_USERNAME`.
-
-
-You can use Organization API Key to access _Grafana_ API:
-
-Set token in your configuration file:
-```yaml
-grafana:
-  host: https://this-is-my-domain.com
-  token: eyJrIjoiOGNTW...o2b2123kO==
-```
-
-Or in `GRAFANA_TOKEN` environment variable.
-
-Read more about authentication in [_Grafana_ docs](http://docs.grafana.org/http_api/auth/#authentication-api).
-
-
-To use Grafana exporter run _grafana-dashboard-builder_ with `--exporter grafana` option.
-
-## Supported data stores
-
-At this moment _grafana-dashboard-builder_ supports following data stores:
-
-- [Graphite](https://graphiteapp.org/)
-- [Prometheus](https://prometheus.io/)
-- [InfluxDB](https://www.influxdata.com/)
-
-## YAML definition format
-
-Each component follows the same configuration format. Top level must contain 2 fields - name and component type.
-Under component type is wrapped definition of the component.
-
-```yaml
-- name: some-name
-  component-type:
-    component-param1: param-value
-    component-param2: other-value
-```
-
-Components can be defined in multiple source files that are passed through `--path` option. If a path is directory
-it is recursively walked and all files are processed.
-
-### Components
-
-Components define basic building blocks such as rows, graphs and template queries. They can be defined in-place or be
-named and reused within other components and dashboards.
-
-Components can define parameters that can be passed from parent component to its children.
-
-```yaml
-- name: graph-name
-  panels:
-    - graph:
-        target: target
-        y_formats: [bytes, short]
-        span: 4
-```
-
-```yaml
-- name: row-name
-  rows:
-    - row:
-        title: Placeholder row
-        panels:
-            - graph-name
-            - graph:
-                target: target
-                y_formats: [bytes, short]
-                span: 4
-```
-
-Another component is template queries that allow you to define just one query string for hierarchical variables. Each
-query part that starts with $ sign will appear as one variable.
-
-```yaml
-- name: template-name
-  templates:
-    - query:
-        query: '{metric-prefix}.$component.$application'
-```
-
-### Dashboard
-
-Dashboard is top-level object composed of several components.
-
-```yaml
-- name: overview
-  dashboard:
-    title: overview dashboard
-    time_options: [1h]
-    refresh_intervals: [5m]
-    templates:
-      - template-name:
-            metric-prefix: '{metric-prefix}'
-    time:
-      from: now-12h
-      to: now
-    rows:
-      - row-name
-```
-
-### Project
-
-Project is an entry point for builder and defines which dashboards will be generated and provides parameters to them.
-
-```yaml
-- name: Example project
-  project:
-    dashboard-prefix: MyApp
-    metric-prefix: metric.prefix
-    dashboards:
-        - overview
-```
-
-The biggest benefit of _grafana-dashboard-builder_ is that you can generate several dashboards from one dashboard
-template just by defining multiple values for a parameter that is contained in dashboard name. Following project will
-generate 2 dashboards named _prefix1-dashboard_ and _prefix2-dashboard_. 
-
-```yaml
-- name: Example project
-  project:
-    dashboard-prefix:
-      - prefix1
-      - prefix2
-    dashboards:
-      - '{dashboard-prefix}-dashboard'
-```
-
-## External context definition
-
-Thanks to _project_ component you can use one dashboard template and configure it with different parameters. But what
-if you need to use different params based on the _Grafana_ you are uploading dashboards to. That's why you can define
-configuration externally to your projects and dashboard templates.
-
-You can reference configuration stored in YAML with `-config` option or even inline it to `--context` option. External
-configuration file can look like:
-
-```yaml
-context:
-  region: eu
-  default-datacenter: cze
-```
+# The Knights Who Say "Ni"!
+A bot to check if the author of a pull request to a
+[Python project](https://github.com/python) has signed the
+[PSF CLA](https://www.python.org/psf/contrib/contrib-form/).
+
+[![Build Status](https://github.com/python/the-knights-who-say-ni/workflows/ci/badge.svg?branch=master&event=push)](https://github.com/python/the-knights-who-say-ni/actions?query=workflow%3Aci)
+[![codecov.io](https://codecov.io/github/python/the-knights-who-say-ni/coverage.svg?branch=master)](https://codecov.io/github/python/the-knights-who-say-ni?branch=master)
+
+## Why is this project necessary?
+A CLA is necessary to make sure that someone contributing to an
+open source project legally promises that they are only giving code
+to the project which they have the right to give. This means that there
+are no copyrights on the code which prohibits contributing it, nor are
+there patents making the use of the code illegal. This is really
+important for open source projects like Python where the non-profit
+behind the organization -- the
+[Python Software Foundation](https://www.python.org/psf-landing/) in
+Python's case -- do not have the money to pay for a patent license if a
+mistake is made and patented code is contributed. Basically a CLA
+means the Python project has some legal ground to stand on when it says
+it didn't mean to use any code it wasn't meant to have.
+
+But beyond just making sure the PSF is in the legal clear if bad code
+is given to the Python project, it also helps make sure others who
+use code from the Python project are also in the clear. If a company
+wants to use Python code in a commercial fashion, having the Python
+project's code covered by CLAs means they don't have to worry about
+being sued as well.
+
+## Design goals
+A CLA bot breaks down into essentially three components:
+
+1. The server host
+2. The contribution host
+3. The CLA records host
+
+In the case of the Python project and this bot, the server host is
+[Heroku](https://www.heroku.com/), the contribution host is
+[GitHub](https://github.com), and the CLA records host is
+[bugs.python.org](https://bugs.python.org/) (which is an installation
+of [Roundup](http://roundup.sourceforge.net/)). But considering the
+Python project was started back in 1990 and has already changed
+contribution hosts at least three times, a design goal of this
+project is to try and
+**abstract the hosting platforms** so that when the next change to
+the Python project's relevant hosting platform occurs it will not
+require a full rewrite of this project to get CLA enforcement
+working again.
+
+Lastly, the master branch of this project will always strive to be
+**stable and properly tested**. Because there are legal
+ramifications if this project is unable to perform its duties, it is
+imperative that it always function properly.
+
+### Why wasn't some pre-existing CLA bot used?
+There are several other CLA enforcement projects and services
+available, such as [clabot](https://github.com/clabot/clabot),
+[CLA Enforcer](https://github.com/datastax/cla-enforcer),
+[CLAHub](https://github.com/clahub/clahub), and
+[CLA Assistant](https://cla-assistant.io/). The issue with all of
+these project is that they are either unmaintained or they make
+assumptions about where/how CLAs are stored (e.g., they require
+using [DocuSign](https://www.docusign.ca/)). Because of these issues
+and the fact that this is an important project for Python itself, it
+was deemed necessary to create our own CLA enforcement bot which the
+Python project controlled and was able to make sure was maintained.
+
+### Is this project useful to anyone besides the Python project?
+While this project is, strictly speaking, geared towards the needs of
+the Python project, the abstraction design goal should make it
+relatively straight-forward to fork this project and to modify it as
+necessary for your own needs.
+
+## About the project's name
+['The Knights Who Say "Ni!"'](https://www.youtube.com/watch?v=zIV4poUZAQo)
+is a sketch from the film,
+[Monty Python and the Holy Grail](https://en.wikipedia.org/wiki/Monty_Python_and_the_Holy_Grail).
+The knights prevent travelers from passing through their forest
+without a sacrifice (in the case of the film, they demand a
+shrubbery). Since Python is actually named after Monty Python, it
+seemed fitting to have the project named after something originating
+from Monty Python relating to someone preventing something from
+occurring without being given something (in the film it's the knights
+requiring a shrubbery, in real life it's lawyers requiring a signed
+CLA).
+
+## Trusted Users List
+Users in the Trusted Users List will not be checked for CLA.  This can be
+useful if the user is a bot or an app.
+
+## Deployment
+### Running on Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/python/the-knights-who-say-ni)
+
+1. Create Heroku project
+2. Set the `GH_AUTH_TOKEN` environment variable to the GitHub oauth
+   token to be used by the bot
+3. Set up the Heroku project to get the code for the bot
+4. Trusted users can be added to the `CLA_TRUSTED_USERS` environment variable
+   as comma-separated list.
+5. Create the `SENTRY_DSN` environment variable.
+
+### Adding to a GitHub repository (Python-specific instructions)
+1. Add the appropriate labels (`CLA signed` and `CLA not signed`)
+2. Add the `PSF CLA enforcement` team to the project with `write` privileges
+3. Add the webhook
+    1. Add the URL
+    2. Send `application/json` (the default)
+    3. Add the secret
+    4. Specify events to be `pull request` only (default is `push` which is unnecessary)

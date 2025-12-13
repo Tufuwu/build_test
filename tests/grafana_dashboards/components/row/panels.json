@@ -1,9 +1,0 @@
-{
-  "title": "test title",
-  "height": "100px",
-  "showTitle": false,
-  "collapse": false,
-  "panels": [
-    "mocked <class 'grafana_dashboards.components.panels.Panels'>"
-  ]
-}

@@ -1,5 +1,0 @@
-yaxes:
-  - show: true
-    min: 1
-    logBase: 2
-    format: ms

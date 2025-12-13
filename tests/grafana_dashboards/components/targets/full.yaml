@@ -1,3 +1,0 @@
-targets:
-  - graphite-target:
-  - prometheus-target:

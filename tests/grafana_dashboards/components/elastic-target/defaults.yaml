@@ -1,2 +1,0 @@
-elastic-target:
-  query: "(status: 'succeeded')"
