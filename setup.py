@@ -1,51 +1,30 @@
-import re
+import setuptools
 
-from setuptools import find_packages, setup
+desc_file = "README.md"
 
+with open(desc_file, "r") as fh:
+    long_description = fh.read()
 
-def get_version(filename):
-    content = open(filename).read()
-    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", content))
-    return metadata['version']
-
-
-setup(
-    name='Mopidy-AlarmClock',
-    version=get_version('mopidy_alarmclock/__init__.py'),
-    url='https://github.com/DavisNT/mopidy-alarmclock',
-    license='Apache License, Version 2.0',
-    author='Mathieu Xhonneux',
-    author_email='m.xhonneux@gmail.com',
-    maintainer='Davis Mosenkovs',
-    maintainer_email='python-apps@dm.id.lv',
-    description='A Mopidy extension for using it as an alarm clock.',
-    long_description=open('README.rst').read(),
-    packages=find_packages(exclude=['tests', 'tests.*']),
-    zip_safe=False,
-    include_package_data=True,
-    python_requires='>= 3.7',
-    install_requires=[
-        'setuptools',
-        'Mopidy >= 3.0',
-        'Pykka >= 1.1',
-        'monotonic >= 1.4',
-    ],
-    test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'mock >= 1.0',
-    ],
-    entry_points={
-        'mopidy.ext': [
-            'alarmclock = mopidy_alarmclock:Extension',
-        ],
-    },
+setuptools.setup(
+    name="casbin-django-orm-adapter",
+    author="Yang Luo",
+    author_email="hsluoyz@qq.com",
+    description="Django's ORM adapter for PyCasbin",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/pycasbin/django-orm-adapter",
+    keywords=["casbin", "adapter", "storage-driver", "django", "orm", "django-orm", "access-control", "authorization"],
+    packages=setuptools.find_packages(exclude=("tests",)),
+    install_requires=["casbin", "django"],
+    python_requires=">=3.7",
+    license="Apache 2.0",
     classifiers=[
-        'Environment :: No Input/Output (Daemon)',
-        'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Topic :: Multimedia :: Sound/Audio :: Players',
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
     ],
+    data_files=[desc_file],
 )
