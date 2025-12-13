@@ -1,39 +1,58 @@
+import io
+import unittest
 from setuptools import find_packages, setup
 
-from validictory import __version__
+# Package meta-data.
+NAME = "smtm"
+DESCRIPTION = "A algorithm crypto trading system."
+URL = "https://github.com/msaltnet/smtm"
+EMAIL = "salt.jeong@gmail.com"
+AUTHOR = "msalt"
+VERSION = "1.1.1"
 
-with open('README.rst') as f:
-    long_description = f.read()
+# What packages are required for this module to be executed?
+REQUIRED = [
+    "requests",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "mplfinance",
+    "pyjwt",
+    "python-dotenv",
+    "jupyter",
+    "psutil",
+]
 
-setup(name='validictory',
-      version=__version__,
-      description='general purpose python data validator',
-      long_description=long_description,
-      long_description_content_type='text/x-rst',
-      author='James Turk',
-      author_email='james.p.turk@gmail.com',
-      url='http://github.com/jamesturk/validictory',
-      license='MIT',
-      classifiers=["Development Status :: 4 - Beta",
-                   "Intended Audience :: Developers",
-                   "License :: OSI Approved :: MIT License",
-                   "Natural Language :: English",
-                   "Operating System :: OS Independent",
-                   'Programming Language :: Python',
-                   'Programming Language :: Python :: 3.8',
-                   'Programming Language :: Python :: 3.9',
-                   'Programming Language :: Python :: 3.10',
-                   'Programming Language :: Python :: 3.11',
-                   'Programming Language :: Python :: 3.12',
-                   'Programming Language :: Python :: Implementation :: CPython',
-                   'Programming Language :: Python :: Implementation :: PyPy',
-                   "Topic :: Software Development :: Libraries :: Python Modules",
-                   ],
-      packages=find_packages(exclude=['validictory.tests', 'validictory.tests.*']),
-      extras_require={
-          'test': [
-              'pytest',
-              'pytest-cov',
-          ]
-      }
+
+def long_description():
+    with io.open("README-en_us.md", "r", encoding="utf-8") as f:
+        readme = f.read()
+    return readme
+
+
+def smtm_test_suite():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover("tests", pattern="*test.py")
+    return test_suite
+
+
+setup(
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTION,
+    long_description=long_description(),
+    long_description_content_type="text/markdown",
+    url=URL,
+    author=AUTHOR,
+    author_email=EMAIL,
+    license="MIT",
+    packages=["smtm"],
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.6",
+    ],
+    install_requires=REQUIRED,
+    extras_require={"dev": ["coverage"]},
+    test_suite="setup.smtm_test_suite",
+    zip_safe=False,
 )
