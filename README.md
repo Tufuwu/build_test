@@ -1,197 +1,72 @@
-# Apache Airavata Django Portal
+[![CI](https://github.com/TBradley27/FilTar/actions/workflows/ci.yml/badge.svg)](https://github.com/TBradley27/FilTar/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/release/TBradley27/FilTar.svg)](https://GitHub.com/TBradley27/FilTar/releases/)
+[![Snakemake](https://img.shields.io/badge/snakemake-≥8.0.0-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
 
-[![Build Status](https://travis-ci.org/apache/airavata-django-portal.svg?branch=master)](https://travis-ci.org/apache/airavata-django-portal)
-[![Build Status](https://readthedocs.org/projects/apache-airavata-django-portal/badge/?version=latest)](https://apache-airavata-django-portal.readthedocs.io/en/latest/?badge=latest)
+# FilTar
 
-The Airavata Django Portal is a web interface to the
-[Apache Airavata](http://airavata.apache.org/) API implemented using the Django
-web framework. The intention is that the Airavata Django Portal can be used as
-is for a full featured web based science gateway but it can also be customized
-through various plugins to add more domain specific functionality as needed.
+FilTar is a tool to integrate RNA-Seq data to pre-existing miRNA target prediction workflows in order to increase prediction accuracy.
 
-## Getting Started
+It achieves this by:
 
-The following steps will help you quickly get started with running the Airavata
-Django Portal locally. This will allow you to try it out and can also be used as
-a development environment. If you just want to run the Airavata Django Portal
-locally, see the Docker instructions below for a more simplified approach.
+1. Removing transcripts which are not expressed or poorly expressed for a given cell type or tissue
+2. Generating 3'UTR annotations specific to a given cell type or tissue
 
-The Airavata Django Portal works with Python versions 3.6, 3.7, 3.8 and 3.9.
-You'll need one of these versions installed locally.
+It also operates as a fully functional wrapper around the pre-existing TargetScan7 and miRanda target prediction workflows.
 
-You'll also need Node.js and yarn to build the JavaScript frontend code. Please
-install
-[the most recent LTS version of Node.js](https://nodejs.org/en/download/). You
-can also use [nvm](https://github.com/nvm-sh/nvm) to manage the Node.js install.
-If you have nvm installed you can run `nvm install && nvm use` before running
-any yarn commands. See
-[the Yarn package manager](https://classic.yarnpkg.com/lang/en/) for information
-on how to install Yarn 1 (Classic).
+## Installation
 
-1.  Checkout this project and create a virtual environment.
+Instructions on how to install FilTar can be found at the following location: https://tbradley27.github.io/FilTar/
 
-    ```
-    git clone https://github.com/apache/airavata-django-portal.git
-    cd airavata-django-portal
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip setuptools wheel
-    pip install -r requirements.txt
-    ```
+## Basic Usage
 
-    - **macOS note**: to install the MySQL dependencies you need to have the
-      MySQL development headers and libraries installed. Also, on macOS you need
-      to have openssl installed. See the
-      [mysqlclient-python installation notes](https://github.com/PyMySQL/mysqlclient-python#install)
-      for more details.
+FilTar can be used by following 2 steps:
 
-2.  Create a local settings file.
-
-    - Option 1 (**recommended**). The best way to get a local settings file is
-      to download one from an existing Airavata Django Portal instance. If you
-      have Admin access, you can log in, go to _Settings_ and then _Developer
-      Console_ (/admin/developers) and download a `settings_local.py` file for
-      local development. Save it to the `django_airavata/` directory.
-
-    - Option 2. Otherwise, if you know the hostname and ports of an Airavata
-      deployment, you can copy `django_airavata/settings_local.py.sample` to
-      `django_airavata/settings_local.py` and edit the contents to match your
-      Keycloak and Airavata server deployments.
-
-      ```
-      cp django_airavata/settings_local.py.sample django_airavata/settings_local.py
-      ```
-
-3.  Run Django migrations
-
-    ```
-    python manage.py migrate
-    ```
-
-4.  Build the JavaScript sources. There are a few JavaScript packages in the
-    source tree, colocated with the Django apps in which they are used. The
-    `build_js.sh` script will build them all.
-
-    ```
-    ./build_js.sh
-    ```
-
-    - **Window note**: on Windows, run `.\build_js.bat` instead
-
-5.  Load the default Wagtail CMS pages.
-
-    ```
-    python manage.py load_cms_data new_default_theme
-    ```
-
-6.  Run the server
-
-    ```
-    python manage.py runserver
-    ```
-
-7.  Point your browser to http://localhost:8000.
-
-## Docker instructions
-
-To run the Django Portal as a Docker container, you need a `settings_local.py`
-file which you can create from the `settings_local.py.sample` file. Then run the
-following:
-
-1. Build the Docker image.
-
-   ```
-   docker build -t airavata-django-portal .
-   ```
-
-2. Run the Docker container.
-
-   ```
-   docker run -d \
-     -v /path/to/my/settings_local.py:/code/django_airavata/settings_local.py \
-     -p 8000:8000 airavata-django-portal
-   ```
-
-3. Load an initial set of Wagtail pages (theme). You only need to do this when
-   starting the container for the first time.
-
-   ```
-   docker exec CONTAINER_ID python manage.py load_cms_data new_default_theme
-   ```
-
-4. Point your browser to http://localhost:8000.
-
-### Multi-architecture images
-
-To build and push
-[multi-architecture images](https://docs.docker.com/desktop/multi-arch/), first
-create a builder (one time)
-
+1. Specify the options you would like to use to run FilTar by editing `config/basic.yaml`.
+2. Run the following command:
 ```
-docker buildx create --name mybuilder --use
+snakemake --use-conda --cores $N target_predictions.txt
 ```
 
-then run
+After running the command, all target predictions are contained inside `target_predictions.txt`.
 
-```
-docker buildx build --platform linux/amd64,linux/arm64 -t TAG --push .
-```
+The following video presents a concise demonstration of basic FilTar usage:
 
-## Documentation
+https://www.youtube.com/watch?v=Xhl-nsg7_xo
 
-Documentation currently is available at
-https://apache-airavata-django-portal.readthedocs.io/en/latest/ (built from the
-'docs' directory).
+More detailed instructions can be found inside the full documentation: https://tbradley27.github.io/FilTar/
 
-To build the documentation locally, first
-[set up a development environment](#setting-up-development-environment), then
-run the following in the root of the project:
+## CI/CD and Contributing
 
-```
-mkdocs serve
-```
+For details on the automated CI/CD setup, see the [contributing guide](docs/contributing.md).
 
-## Feedback
+This document explains how FilTar uses GitHub Actions for continuous integration and deployment, including environment management, caching, and automated testing. Contributors should review it before making changes to the workflow or dependencies.
 
-Please send feedback to the mailing list at <dev@airavata.apache.org>. If you
-encounter bugs or would like to request a new feature you can do so in the
-[Airavata Jira project](https://issues.apache.org/jira/projects/AIRAVATA) (just
-select the _Django Portal_ component when you make your issue).
+## Publication
 
-## Customization
+The article describing FilTar can be found in Volume 36, Issue 8 (pages 2410-2416) of the *Bioinformatics* journal published by Oxford University Press. An online, open access version of the article is available [here](https://doi.org/10.1093/bioinformatics/btaa007 "FilTar Bioinformatics article").
 
-See the Customization Guide in the
-[documentation](https://apache-airavata-django-portal.readthedocs.io/en/latest/)
-for information on how to customize the Airavata Django Portal user interface.
-To get started we recommend going through the
-[Gateways Tutorial](https://apache-airavata-django-portal.readthedocs.io/en/latest/tutorial/gateways_tutorial/).
-This tutorial covers the different ways that the user interface can be
-customized.
+__DOI:__ [10.1093/bioinformatics/btaa007](https://doi.org/10.1093/bioinformatics/btaa007)
 
-## Contributing
+__PMCID:__ [PMC7178423](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7178423/)
 
-For general information on how to contribute, please see the
-[Get Involved](http://airavata.apache.org/get-involved.html) section of the
-Apache Airavata website.
+__PMID:__ 31930382 
 
-### Setting up development environment
+The default method of citing the article is to use the following:
 
-Run `pip install -r requirements-dev.txt` to install development and testing
-libraries.
+> Thomas Bradley, Simon Moxon, FilTar: using RNA-Seq data to improve microRNA target prediction accuracy in animals, Bioinformatics, Volume 36, Issue 8, 15 April 2020, Pages 2410–2416, https://doi.org/10.1093/bioinformatics/btaa007
 
-Use a code editor that integrates with editorconfig and flake8. I also recommend
-autopep8 for automatically formatting code to follow the PEP8 guidelines.
-Prettier is used for formatting JavaScript and Vue.js code.
+## Getting Help
 
-See the docs for more information on
-[developing the backend](./docs/dev/developing_backend.md) and
-[frontend code](./docs/dev/developing_frontend.md).
+In order to ensure your enquiries are seen by the most people possible who may be sharing your problem, it is best to share the problems that you are having publicly. The first port of call is to post questions on the biostars bioinformatics online forum (https://www.biostars.org/). If using biostars, please make sure to use the 'filtar' tag when asking questions to notify me, so I can answer promptly. 
 
-### Running Django Tests
+If this option doesn't work for whatever reason, I happen to accept correspondence via my academic email address: thomas.bradley@uea.ac.uk
 
-Run `./runtests.py` to run the Django unit tests.
+## Reporting bugs, suggested enhancements or any other issues
 
-## License
+The issues page of this repository is the best place to post this.
 
-The Apache Airavata Django Portal is licensed under the Apache 2.0 license. For
-more information see the [LICENSE](LICENSE) file.
+## Contributions and Acknowledgements
+
+Simox Moxon came up with the original idea and project proposal for FilTar. The FilTar concept was extended and developed further between Simon Moxon and Thomas Bradley through the course of the latter's BBSRC (Biotechnology and Biological Sciences Research Council) PhD Studentship on the Norwich Research Park (NRP) Bioscience Doctoral Training Partnership (DTP) programme, when Thomas Bradley worked under the primary supervision of Simon Moxon initially predominantly at the Earlham Institute, and then later predominantly at the School of Biological Sciences, University of East Anglia.
+
+Full acknowledgements can be found within the preprinted article associated with FilTar.
