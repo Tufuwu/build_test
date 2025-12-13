@@ -1,6 +1,6 @@
 numpy>=1.16.5
 scipy
-pandas
+pandas<2.0
 mne>=0.20
 numba
 outdated
