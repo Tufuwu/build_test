@@ -35,10 +35,6 @@ jobs:
           cd ../build/ && ls && ls html/
           rm -rf doctrees
           touch .nojekyll    
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: ./documentation/build/
 
   # Deploy job
   deploy:
