@@ -12,7 +12,7 @@ setup(
     version=__version__,
     packages=['numpy_ringbuffer'],
 
-    install_requires=["numpy"],
+    install_requires=["numpy<1.20"],
 
     author="Eric Wieser",
     author_email="wieser.eric+numpy@gmail.com",
