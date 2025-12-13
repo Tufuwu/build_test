@@ -1,14 +1,14 @@
 [run]
 branch = True
-source = ni
+source = yasa
+include = yasa/*
+omit =
+    */__init__.py
+    */setup.py
+    */features.py
+    */examples/*
+    */notebooks/*
+    */tests/*
 
 [report]
-exclude_lines =
-    if self.debug:
-    pragma: no cover
-    raise NotImplementedError
-    if __name__ == .__main__.:
-    @abc.abstract*
-ignore_errors = True
-omit =
-    ni/test/*
+show_missing = True

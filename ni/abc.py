@@ -13,11 +13,12 @@ class ResponseExit(Exception):
 
     """Exception to raise when the current request should immediately exit."""
 
-    def __init__(self, *args: Any, status: http.HTTPStatus,
-                 text: str = None) -> None:
-        super().__init__(*args)
-        self.response = web.Response(status=status.value, text=text)
-
+    def __init__(
+        self,
+        *args: Any,
+        status: http.HTTPStatus,
+        text: Optional[str] = None,
+    ) -> None:
         super().__init__(*args)
         self.response = web.Response(status=status.value, text=text)
 
