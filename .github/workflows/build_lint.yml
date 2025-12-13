@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+
     - name: Install dependencies
       run: |
         sudo apt-get install libspatialindex-dev
