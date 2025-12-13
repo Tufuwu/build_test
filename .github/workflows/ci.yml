@@ -10,7 +10,7 @@ jobs:
         include:
           - name: 'Test: Python 3.8'
             python: "3.9"
-            tox: py38
+            tox: py39
           - name: 'Lint: flake8'
             python: "3.9"
             tox: flake8
