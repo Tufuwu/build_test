@@ -8,7 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from lspopt import spectrogram_lspopt
 from matplotlib.colors import Normalize, ListedColormap
-
+import inspect
 __all__ = ['plot_hypnogram', 'plot_spectrogram', 'topoplot']
 
 
@@ -432,10 +432,29 @@ def topoplot(data, montage="standard_1020", vmin=None, vmax=None, mask=None, tit
     # Start the plot
     with sns.axes_style("white"):
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-        im, _ = mne.viz.plot_topomap(
-            data=data.iloc[:, 0][chan], pos=Info, vlim=(vmin, vmax),
-            mask=data.iloc[:, 1][chan], cmap=cmap, show=False, axes=ax,
-            **kwargs)
+        valid_params = inspect.signature(mne.viz.plot_topomap).parameters
+        plot_kwargs = dict(
+            data=data.iloc[:, 0][chan],
+            pos=Info,
+            mask=data.iloc[:, 1][chan],
+            cmap=cmap,
+            axes=ax,
+            show=False,
+        )
+
+        # vlim / vmin-vmax 兼容
+        if "vlim" in valid_params:
+            plot_kwargs["vlim"] = (vmin, vmax)
+        else:
+            plot_kwargs["vmin"] = vmin
+            plot_kwargs["vmax"] = vmax
+
+        # 仅传递 mne 支持的 kwargs
+        for k, v in kwargs.items():
+            if k in valid_params:
+                plot_kwargs[k] = v
+
+        im, _ = mne.viz.plot_topomap(**plot_kwargs)
 
         if title is not None:
             ax.set_title(title)
