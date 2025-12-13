@@ -159,7 +159,7 @@ def subthreshold(double[:] samples, times,
     cdef double[:] out = samples.copy()
     for i in times:
         if samples[i] < v_thresh:
-            print "spike peak at %d is below threshold; skipping"
+            print("spike peak at %d is below threshold; skipping" % i)
             continue
         # iterate back and blank out samples before v or dv cross threshold
         j = 0
