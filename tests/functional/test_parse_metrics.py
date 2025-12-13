@@ -1,4 +1,5 @@
 """Functional tests of metrics parsing."""
+
 from mqtt_exporter import main
 from mqtt_exporter.main import _parse_metrics
 
