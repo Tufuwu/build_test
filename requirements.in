@@ -1,5 +1,0 @@
-pytest
-six
-coverage
-pytest-cov
-pytest-django
