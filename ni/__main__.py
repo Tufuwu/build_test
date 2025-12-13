@@ -16,6 +16,8 @@ from . import ServerHost
 import os
 
 
+import sentry_sdk
+
 sentry_sdk.init(os.environ.get("SENTRY_DSN"))
 
 
