@@ -17,8 +17,8 @@ import os
 
 import sentry_sdk
 
-with sentry_sdk.init(os.environ.get("SENTRY_DSN")):
-    pass
+
+sentry_sdk.init(os.environ.get("SENTRY_DSN"))
 
 def handler(create_client: Callable[[], aiohttp.ClientSession], server: ni_abc.ServerHost,
             cla_records: ni_abc.CLAHost) -> Callable[[web.Request], Awaitable[web.Response]]:
