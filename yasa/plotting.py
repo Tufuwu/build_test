@@ -433,7 +433,7 @@ def topoplot(data, montage="standard_1020", vmin=None, vmax=None, mask=None, tit
     with sns.axes_style("white"):
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         im, _ = mne.viz.plot_topomap(
-            data=data.iloc[:, 0][chan], pos=Info, vmin=vmin, vmax=vmax,
+            data=data.iloc[:, 0][chan], pos=Info, vlim=(vmin, vmax),
             mask=data.iloc[:, 1][chan], cmap=cmap, show=False, axes=ax,
             **kwargs)
 
