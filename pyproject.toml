@@ -2,33 +2,16 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-
-[tool.hatch.build]
-package-dir = { "" = "src" }
-
-
 [tool.hatch.build.targets.wheel]
-packages = ["codemirror2"]
-
-[tool.hatch.build.targets.wheel.package-data]
-codemirror2 = [
-  "static/**/*",
-  "templates/**/*",
-]
-
-
-[tool.hatch.build.targets.sdist]
-include = [
-  "src/codemirror2/static/**/*",
-  "src/codemirror2/templates/**/*",
-]
-
+packages = ["src/codemirror2"]
 
 [project]
-name = "django_codemirror2"
 version = "0.2.1.dev1"
-requires-python = ">=3.5"
-dependencies = ["django<6"]
+name = "django_codemirror2"
+dependencies = [
+    "django<6",
+]
+requires-python = ">= 3.5"
 authors = [
     {name="Alexander Clausen", email="alex@gc-web.de"},
 ]
