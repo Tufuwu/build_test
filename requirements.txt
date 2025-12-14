@@ -1,6 +1,6 @@
 # PostgreSQL
-psycopg2-binary==2.9.9; python_version >= '3.11'
-psycopg2<3; python_version < '3.11'
+psycopg2-binary==2.9.9#; python_version >= '3.11'
+# psycopg2<3; python_version < '3.11'
 
 # Trueskill
 trueskill==0.4.5
