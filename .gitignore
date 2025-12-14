@@ -1,5 +1,8 @@
+*.o
+*.so
 *.pyc
-player_ids.json
-.idea/*
-static/vods/*
-.env
+*.exe
+MANIFEST
+build
+dist
+*.egg-info
