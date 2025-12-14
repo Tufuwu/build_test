@@ -1,198 +1,206 @@
-EasyProcess is an easy to use python subprocess interface.
+# msoffcrypto-tool
 
-Links:
- * home: https://github.com/ponty/EasyProcess
- * PYPI: https://pypi.python.org/pypi/EasyProcess
+[![PyPI](https://img.shields.io/pypi/v/msoffcrypto-tool.svg)](https://pypi.org/project/msoffcrypto-tool/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/msoffcrypto-tool.svg)](https://pypistats.org/packages/msoffcrypto-tool)
+[![Build Status](https://travis-ci.com/nolze/msoffcrypto-tool.svg?branch=master)](https://travis-ci.com/nolze/msoffcrypto-tool)
+[![Coverage Status](https://codecov.io/gh/nolze/msoffcrypto-tool/branch/master/graph/badge.svg)](https://codecov.io/gh/nolze/msoffcrypto-tool)
+[![Documentation Status](https://readthedocs.org/projects/msoffcrypto-tool/badge/?version=latest)](http://msoffcrypto-tool.readthedocs.io/en/latest/?badge=latest)
 
-![workflow](https://github.com/ponty/EasyProcess/actions/workflows/main.yml/badge.svg)
+msoffcrypto-tool (formerly ms-offcrypto-tool) is Python tool and library for decrypting encrypted MS Office files with password, intermediate key, or private key which generated its escrow key.
 
-Features:
- - layer on top of [subprocess](https://docs.python.org/library/subprocess.html) module
- - easy to start, stop programs
- - easy to get standard output/error, return code of programs
- - command can be list (preferred) or string (command string is converted to list using shlex.split)
- - logging
- - timeout
- - shell is not supported
- - pipes are not supported
- - stdout/stderr is set only after the subprocess has finished
- - stop() does not kill whole subprocess tree
- - unicode support
- - supported python versions: 3.7, 3.8, 3.9, 3.10
- - [Method chaining](https://en.wikipedia.org/wiki/Method_chaining)
- 
-Installation:
+## Contents
 
-```console
-$ python3 -m pip install EasyProcess
-```
+* [Install](#install)
+* [Examples](#examples)
+* [Supported encryption methods](#supported-encryption-methods)
+* [Tests](#tests)
+* [Todo](#todo)
+* [Resources](#resources)
+* [Use cases and mentions](#use-cases-and-mentions)
+* [Contributors](#contributors)
 
-Usage
-=====
-
-Examples:
-```py
-# easyprocess/examples/hello.py
-
-from easyprocess import EasyProcess
-
-cmd = ["echo", "hello"]
-s = EasyProcess(cmd).call().stdout
-print(s)
+## Install
 
 ```
-
-Output:
-<!-- embedme doc/gen/python3_-m_easyprocess.examples.hello.txt -->
-
-```console
-$ python3 -m easyprocess.examples.hello
-hello
+pip install msoffcrypto-tool
 ```
 
+## Examples
 
-```py
-# easyprocess/examples/cmd.py
-
-import sys
-
-from easyprocess import EasyProcess
-
-python = sys.executable
-
-print("-- Run program, wait for it to complete, get stdout:")
-s = EasyProcess([python, "-c", "print(3)"]).call().stdout
-print(s)
-
-print("-- Run program, wait for it to complete, get stderr:")
-s = EasyProcess([python, "-c", "import sys;sys.stderr.write('4\\n')"]).call().stderr
-print(s)
-
-print("-- Run program, wait for it to complete, get return code:")
-s = EasyProcess([python, "--version"]).call().return_code
-print(s)
-
-print("-- Run program, wait 1.5 second, stop it, get stdout:")
-prog = """
-import time
-for i in range(10):
-    print(i, flush=True)
-    time.sleep(1)
-"""
-s = EasyProcess([python, "-c", prog]).start().sleep(1.5).stop().stdout
-print(s)
+### As CLI tool (with password)
 
 ```
-
-Output:
-<!-- embedme doc/gen/python3_-m_easyprocess.examples.cmd.txt -->
-
-```console
-$ python3 -m easyprocess.examples.cmd
--- Run program, wait for it to complete, get stdout:
-3
--- Run program, wait for it to complete, get stderr:
-4
--- Run program, wait for it to complete, get return code:
-0
--- Run program, wait 1.5 second, stop it, get stdout:
-0
-1
+msoffcrypto-tool encrypted.docx decrypted.docx -p Passw0rd
 ```
 
-Shell commands
---------------
+Password is prompted if you omit the password argument value:
 
-Shell commands are not supported.
+```bash
+$ msoffcrypto-tool encrypted.docx decrypted.docx -p
+Password:
+```
 
-``echo`` is a shell command on Windows (there is no echo.exe),
-but it is a program on Linux.
+Test if the file is encrypted or not (exit code 0 or 1 is returned):
 
-return_code
------------
+```
+msoffcrypto-tool document.doc --test -v
+```
 
-`EasyProcess.return_code` is None until
-`EasyProcess.stop` or `EasyProcess.wait` is called.
+### As library
 
-With
-----
+Password and more key types are supported with library functions.
 
-By using `with` statement the process is started
-and stopped automatically:
-    
+Basic usage:
+
 ```python
-from easyprocess import EasyProcess
-with EasyProcess('ping 127.0.0.1') as proc: # start()
-    # communicate with proc
-    pass
-# stopped
+import msoffcrypto
+
+encrypted = open("encrypted.docx", "rb")
+file = msoffcrypto.OfficeFile(encrypted)
+
+file.load_key(password="Passw0rd")  # Use password
+
+with open("decrypted.docx", "wb") as f:
+    file.decrypt(f)
+
+encrypted.close()
 ```
 
-Equivalent with:
-    
+Basic usage (in-memory):
+
 ```python
-from easyprocess import EasyProcess
-proc = EasyProcess('ping 127.0.0.1').start()
-try:
-    # communicate with proc
-    pass
-finally:
-    proc.stop()
+import msoffcrypto
+import io
+import pandas as pd
+
+decrypted = io.BytesIO()
+
+with open("encrypted.xlsx", "rb") as f:
+    file = msoffcrypto.OfficeFile(f)
+    file.load_key(password="Passw0rd")  # Use password
+    file.decrypt(decrypted)
+
+df = pd.read_excel(decrypted)
+print(df)
 ```
 
-Timeout
--------
+Advanced usage:
 
-This was implemented with "daemon thread".
+```python
+# Verify password before decryption (default: False)
+# The ECMA-376 Agile/Standard crypto system allows one to know whether the supplied password is correct before actually decrypting the file
+# Currently, the verify_password option is only meaningful for ECMA-376 Agile/Standard Encryption
+file.load_key(password="Passw0rd", verify_password=True)
 
-"The entire Python program exits when only daemon threads are left."
-https://docs.python.org/library/threading.html
+# Use private key
+file.load_key(private_key=open("priv.pem", "rb"))
 
-```py
-# easyprocess/examples/timeout.py
+# Use intermediate key (secretKey)
+file.load_key(secret_key=binascii.unhexlify("AE8C36E68B4BB9EA46E5544A5FDB6693875B2FDE1507CBC65C8BCF99E25C2562"))
 
-import sys
-
-from easyprocess import EasyProcess
-
-python = sys.executable
-
-prog = """
-import time
-for i in range(3):
-    print(i, flush=True)
-    time.sleep(1)
-"""
-
-print("-- no timeout")
-stdout = EasyProcess([python, "-c", prog]).call().stdout
-print(stdout)
-
-print("-- timeout=1.5s")
-stdout = EasyProcess([python, "-c", prog]).call(timeout=1.5).stdout
-print(stdout)
-
-print("-- timeout=50s")
-stdout = EasyProcess([python, "-c", prog]).call(timeout=50).stdout
-print(stdout)
-
+# Check the HMAC of the data payload before decryption (default: False)
+# Currently, the verify_integrity option is only meaningful for ECMA-376 Agile Encryption
+file.decrypt(open("decrypted.docx", "wb"), verify_integrity=True)
 ```
 
-Output:
+## Supported encryption methods
 
-<!-- embedme doc/gen/python3_-m_easyprocess.examples.timeout.txt -->
+### MS-OFFCRYPTO specs
 
-```console
-$ python3 -m easyprocess.examples.timeout
--- no timeout
-0
-1
-2
--- timeout=1.5s
-0
-1
--- timeout=50s
-0
-1
-2
+* [x] ECMA-376 (Agile Encryption/Standard Encryption)
+  * [x] MS-DOCX (OOXML) (Word 2007-2016)
+  * [x] MS-XLSX (OOXML) (Excel 2007-2016)
+  * [x] MS-PPTX (OOXML) (PowerPoint 2007-2016)
+* [x] Office Binary Document RC4 CryptoAPI
+  * [x] MS-DOC (Word 2002, 2003, 2004)
+  * [x] MS-XLS (Excel 2002, 2003, 2004) (experimental)
+  * [x] MS-PPT (PowerPoint 2002, 2003, 2004) (partial, experimental)
+* [x] Office Binary Document RC4
+  * [x] MS-DOC (Word 97, 98, 2000)
+  * [x] MS-XLS (Excel 97, 98, 2000) (experimental)
+* [ ] ECMA-376 (Extensible Encryption)
+* [ ] XOR Obfuscation
+
+### Other
+
+* [ ] Word 95 Encryption (Word 95 and prior)
+* [ ] Excel 95 Encryption (Excel 95 and prior)
+* [ ] PowerPoint 95 Encryption (PowerPoint 95 and prior)
+
+PRs are welcome!
+
+## Tests
+
+With [coverage](https://github.com/nedbat/coveragepy) and [pytest](https://pytest.org/):
+
 ```
+poetry install
+poetry run coverage run -m pytest -v
+```
+
+## Todo
+
+* [x] Add tests
+* [x] Support decryption with passwords
+* [x] Support older encryption schemes
+* [x] Add function-level tests
+* [x] Add API documents
+* [x] Publish to PyPI
+* [x] Add decryption tests for various file formats
+* [x] Integrate with more comprehensive projects handling MS Office files (such as [oletools](https://github.com/decalage2/oletools/)?) if possible
+* [x] Add the password prompt mode for CLI
+* [x] Improve error types (v4.12.0)
+* [ ] Redesign APIs (v6.0.0)
+* [ ] Introduce something like `ctypes.Structure`
+* [ ] Support encryption
+* [ ] Isolate parser
+
+## Resources
+
+* "Backdooring MS Office documents with secret master keys" <http://secuinside.com/archive/2015/2015-1-9.pdf>
+* Technical Documents <https://msdn.microsoft.com/en-us/library/cc313105.aspx>
+  * [MS-OFFCRYPTO] Agile Encryption <https://msdn.microsoft.com/en-us/library/dd949735(v=office.12).aspx>
+* LibreOffice/core <https://github.com/LibreOffice/core>
+* LibreOffice/mso-dumper <https://github.com/LibreOffice/mso-dumper>
+* wvDecrypt <http://www.skynet.ie/~caolan/Packages/wvDecrypt.html>
+* Microsoft Office password protection - Wikipedia <https://en.wikipedia.org/wiki/Microsoft_Office_password_protection#History_of_Microsoft_Encryption_password>
+* office2john.py <https://github.com/magnumripper/JohnTheRipper/blob/bleeding-jumbo/run/office2john.py>
+
+## Alternatives
+
+* herumi/msoffice <https://github.com/herumi/msoffice>
+* DocRecrypt <https://blogs.technet.microsoft.com/office_resource_kit/2013/01/23/now-you-can-reset-or-remove-a-password-from-a-word-excel-or-powerpoint-filewith-office-2013/>
+* Apache POI - the Java API for Microsoft Documents <https://poi.apache.org/>
+
+## Use cases and mentions
+
+### General
+
+* <https://repology.org/project/python:msoffcrypto-tool/versions> (kudos to maintainers!)
+* <https://checkroth.com/unlocking-password-protected-files.html>
+
+### Malware/maldoc analysis
+
+* <https://github.com/jbremer/sflock/commit/3f6a96abe1dbb4405e4fb7fd0d16863f634b09fb>
+* <https://isc.sans.edu/forums/diary/Video+Analyzing+Encrypted+Malicious+Office+Documents/24572/>
+
+### CTF
+
+* <https://github.com/shombo/cyberstakes-writeps-2018/tree/master/word_up>
+* <https://github.com/willi123yao/Cyberthon2020_Writeups/blob/master/csit/Lost_Magic>
+
+### In other languages
+
+* <https://github.com/dtjohnson/xlsx-populate>
+* <https://github.com/opendocument-app/OpenDocument.core/blob/233663b039/src/internal/ooxml/ooxml_crypto.h>
+* <https://github.com/jaydadhania08/PHPDecryptXLSXWithPassword>
+
+### In publications
+
+* [Excel、データ整理＆分析、画像処理の自動化ワザを完全網羅！ 超速Python仕事術大全](https://books.google.co.jp/books?id=TBdVEAAAQBAJ&q=msoffcrypto) (伊沢剛, 2022)
+* ["Analyse de documents malveillants en 2021"](https://twitter.com/decalage2/status/1435255507846053889), MISC Hors-série N° 24, "Reverse engineering : apprenez à analyser des binaires" (Lagadec Philippe, 2021)
+* [シゴトがはかどる Python自動処理の教科書](https://books.google.co.jp/books?id=XEYUEAAAQBAJ&q=msoffcrypto) (クジラ飛行机, 2020)
+
+## Contributors
+
+* <https://github.com/nolze/msoffcrypto-tool/graphs/contributors>
