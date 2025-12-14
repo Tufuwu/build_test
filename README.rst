@@ -1,116 +1,207 @@
-Artist makes beautiful plots
-============================
+Dynamic Serializer Fields for Django REST Framework
+===================================================
 
-.. image:: https://img.shields.io/pypi/v/artist
-   :target: https://pypi.python.org/pypi/artist/
-.. image:: https://img.shields.io/badge/license-GPLv3-blue
-   :target: https://github.com/davidfokkema/artist/blob/master/LICENSE
-.. image:: https://img.shields.io/github/checks-status/davidfokkema/artist/master
-   :target: https://github.com/davidfokkema/artist/actions
+.. image:: https://secure.travis-ci.org/dbrgn/drf-dynamic-fields.png?branch=master
+    :alt: Build status
+    :target: http://travis-ci.org/dbrgn/drf-dynamic-fields
+
+.. image:: https://img.shields.io/pypi/v/drf-dynamic-fields.svg
+    :alt: PyPI Version
+    :target: https://pypi.python.org/pypi/drf-dynamic-fields
+
+.. image:: https://img.shields.io/pypi/dm/drf-dynamic-fields.svg?maxAge=3600
+    :alt: PyPI Downloads
+    :target: https://pypi.python.org/pypi/drf-dynamic-fields
+
+.. image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
+    :alt: License is MIT
+    :target: https://github.com/dbrgn/drf-dynamic-fields/blob/master/LICENSE
+
+This package provides a mixin that allows the user to dynamically select only a
+subset of fields per resource.
+
+Official version support:
+
+- Django 1.11, 2.0, 2.1
+- Supported REST Framework versions: 3.8, 3.9
+- Python 2.7 (deprecated), 3.4+
+
+NOTE: Python 2 support is deprecated and will be removed in version 0.4.
 
 
-In short
---------
+Scope
+-----
 
-Artist is a 2D plotting library for Python.  It's main focus is the
-output.  Artist creates a LaTeX file which can be included in your paper
-or thesis.  The code needs TikZ and PGFPlots to compile and your plots
-will tightly integrate with your main text.  Artist provides an
-easy-to-use and clean Python interface and can compile your plot
-on-the-fly as a stand-alone PDF file.
+This library is about filtering fields based on individual requests. It is
+deliberately kept simple and we do not plan to add new features (including
+support for nested fields). Feel free to contribute improvements, code
+simplifications and bugfixes though! (See also: `#18
+<https://github.com/dbrgn/drf-dynamic-fields/issues/18>`__)
 
-For instance the `cosmic-ray flux spectrum <https://github.com/davidfokkema/artist/blob/master/demo/demo_spectrum.py>`_:
-
-.. image:: https://raw.githubusercontent.com/davidfokkema/artist/master/doc/images/tutorial/spectrum.png
-   :width: 293px
-
-See the `documentation <http://davidfokkema.github.io/artist/>`_ for tutorials.
+If you need more advanced filtering features, maybe `drf-flex-fields
+<https://github.com/rsinger86/drf-flex-fields>`_ could be something for you.
 
 
-Rationale
----------
+Installing
+----------
 
-Artist enables you to visualize the results of your data analysis.  The
-quality of your plots should reflect the quality of your analysis.  With
-most software, this is hardly possible and the term 'publication quality'
-takes on an entirely new meaning.  As a result, many papers and theses
-suffer from inconsistent and generally poor-quality plots.
+::
 
-Fortunately, some solutions are available.  For LaTeX users, one can use
-PGF/TikZ for generating figures and plots.  This ensures a very consistent
-display throughout your document.  PGFPLOTS builds on that to provide a
-user-friendly interface for many kinds of plots and to allow extensive
-customization.
+    pip install drf-dynamic-fields
 
-For many users, however, it is more convenient to use a programmatic
-interface from your favorite programming language.  For Python, such an
-interface is available in Artist.
+What It Does
+------------
 
-Artist can be used in place of other plotting libraries, but the output is
-a LaTeX file requiring PGF/TikZ and PGFPLOTS.  Previewing the output is
-possible by means of a simple method which renders the plot as a PDF.
+Example serializer:
 
-The style of the plots is based on the work of William S. Cleveland.
+.. sourcecode:: python
 
+    class IdentitySerializer(DynamicFieldsMixin, serializers.HyperlinkedModelSerializer):
+        class Meta:
+            model = models.Identity
+            fields = ('id', 'url', 'type', 'data')
+
+A regular request returns all fields:
+
+``GET /identities``
+
+.. sourcecode:: json
+
+    [
+      {
+        "id": 1,
+        "url": "http://localhost:8000/api/identities/1/",
+        "type": 5,
+        "data": "John Doe"
+      },
+      ...
+    ]
+
+A query with the `fields` parameter on the other hand returns only a subset of
+the fields:
+
+``GET /identities/?fields=id,data``
+
+.. sourcecode:: json
+
+    [
+      {
+        "id": 1,
+        "data": "John Doe"
+      },
+      ...
+    ]
+
+And a query with the `omit` parameter excludes specified fields.
+
+``GET /identities/?omit=data``
+
+.. sourcecode:: json
+
+    [
+      {
+        "id": 1,
+        "url": "http://localhost:8000/api/identities/1/",
+        "type": 5
+      },
+      ...
+    ]
+
+You can use both `fields` and `omit` in the same request!
+
+``GET /identities/?omit=data,fields=data,id``
+
+.. sourcecode:: json
+
+    [
+      {
+        "id": 1
+      },
+      ...
+    ]
+
+
+Though why you would want to do something like that is beyond this author.
+
+It also works on single objects!
+
+``GET /identities/1/?fields=id,data``
+
+.. sourcecode:: json
+
+    {
+      "id": 1,
+      "data": "John Doe"
+    }
 
 Usage
 -----
 
-Example script::
+When defining a serializer, use the ``DynamicFieldsMixin``:
 
-    import artist
-    import numpy as np
+.. sourcecode:: python
 
-    plot = artist.Plot()
-    x = np.linspace(0, 10)
-    y = x ** 2
-    plot.plot(x, y)
-    plot.set_xlabel("Number")
-    plot.set_ylabel("Square")
-    plot.save('somefile')           # will save a LaTeX file
-    plot.save_as_pdf('otherfile')   # will directly compile to PDF
+    from drf_dynamic_fields import DynamicFieldsMixin
 
-The LaTeX file can be compiled directly (e.g. using ``pdflatex``) or can be included in your main document like so::
+    class IdentitySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+        class Meta:
+            model = models.Identity
+            fields = ('id', 'url', 'type', 'data')
 
-    \begin{figure}
-    \centering
-    \input{somefile}
-    \caption{A sample figure.}
-    \end{figure}
+The mixin needs access to the ``request`` object. Some DRF classes like the
+``ModelViewSet`` set that by default, but if you handle serializers yourself,
+pass in the request through the context:
 
-This has the advantage that the image will change size if you change the margins of your document and will use the same fonts as your main document. You do need to include all packages used by Artist, as well as the ``standalone`` package. You can see which packages to use by inspecting the preamble of the generated LaTeX file. Including the ``standalone`` package, your preamble should be something like this::
+.. sourcecode:: python
 
-    \usepackage{standalone}
-
-    \usepackage{tikz}
-    \usetikzlibrary{arrows,external}
-    \usepackage{pgfplots}
-    \pgfplotsset{compat=1.10}
-    \usepgfplotslibrary{polar}
-    \usepackage[detect-family]{siunitx}
-    \usepackage[eulergreek]{sansmath}
-    \sisetup{text-sf=\sansmath}
-    \usepackage{relsize}
+    events = Event.objects.all()
+    serializer = EventSerializer(events, many=True, context={'request': request})
 
 
-Developer notes: releasing a new version
-----------------------------------------
+Warnings
+--------
 
-If you're ready to release a new version, make sure to follow these steps:
+If the request context does not have access to the request, a warning is
+emitted::
 
-1. Update the version numbers in both the ``setup.py`` and the ``doc/conf.py`` files
-2. Tag a release version using git, or directly on GitHub
-3. Update the documentation by compiling, committing it to the ``gh-pages`` branch and pushing it to GitHub::
+   UserWarning: Context does not have access to request.
 
-    $ make gh-pages
-    $ git push origin gh-pages
+First, make sure that you are passing the request to the serializer context (see
+"Usage" section).
 
-4. Push a new version to the Python Package Index (PyPI)::
+There are some cases (e.g. nested serializers) where you cannot get rid of the
+warning that way (see `issue 27 <https://github.com/dbrgn/drf-dynamic-fields/issues/27>`_).
+In that case, you can silence the warning through ``settings.py``:
 
-    $ rm -rf dist/
-    $ python setup.py sdist
-    $ twine upload dist/*
+.. sourcecode:: python
 
-   (make sure to have a valid .pypirc file)
+   DRF_DYNAMIC_FIELDS = {
+      'SUPPRESS_CONTEXT_WARNING': True,
+   }
 
-Thanks.
+
+Testing
+-------
+
+To run tests, install Django and DRF and then run ``runtests.py``:
+
+    $ python runtests.py
+
+
+Credits
+-------
+
+- The implementation is based on `this
+  <http://stackoverflow.com/a/23674297/284318>`__ StackOverflow answer. Thanks
+  ``YAtOff``!
+- The GitHub users ``X17`` and ``rawbeans`` provided improvements on `my gist
+  <https://gist.github.com/dbrgn/4e6fc1fe5922598592d6>`__ that were incorporated
+  into this library. Thanks!
+- For other contributors, please see `Github contributor stats
+  <https://github.com/dbrgn/drf-dynamic-fields/graphs/contributors>`__.
+
+
+License
+-------
+
+MIT license, see ``LICENSE`` file.
