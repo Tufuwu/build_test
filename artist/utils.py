@@ -95,4 +95,3 @@ def save_data(data, suffix='', dirname=None):
 
     name = create_graph_name(suffix, dirname) + '.txt'
     np.savetxt(name, data)
-    
