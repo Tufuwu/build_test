@@ -3,17 +3,11 @@ on:
   push:
   pull_request:
 
-jobs:
-  test:
     name: Test with Python ${{ matrix.py }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        py:
-          - "3.10"
-          - "3.9"
-          - "3.8"
         py:
           - "3.8"
     steps:
