@@ -1,100 +1,60 @@
-#!/usr/bin/env python3
+import setuptools
 
-import glob
-import os
-import sys
-from subprocess import check_output, CalledProcessError
-from setuptools import setup, find_packages
-from setuptools.command.build_py import build_py
+setuptools.setup(
+    name='nexradaws',
+    version='2.0.0',
+    packages=['nexradaws','nexradaws.resources'],
+    description= 'Query and download NEXRAD data from AWS S3 storage.',
+    long_description= '''This module is designed to allow you to query and download Nexrad
+radar files from Amazon Web Services S3 Storage. The real-time feed and full historical archive of original
+resolution (Level II) NEXRAD data, from June 1991 to present, is now freely available on Amazon S3 for anyone to use.
+More information can be found here https://aws.amazon.com/public-datasets/nexrad/.
 
+If pyart is installed nexradaws allows you to quickly get pyart objects of downloaded files.
 
-class CustomBuildExtCommand(build_py):
-    """Customized setuptools install command - prints a friendly greeting."""
+nexradaws supports Python 3.8+.
 
-    def buildInkscapeExt(self):
-        os.system("%s %s %s" % (sys.executable,
-                                os.path.join("scripts", "boxes2inkscape"),
-                                "inkex"))
+Github - https://github.com/aarande/nexradaws
 
-    def updatePOT(self):
-        os.system("%s %s %s" % (
-            sys.executable,
-            os.path.join("scripts", "boxes2pot"),
-            "po/boxes.py.pot"))
-        os.system("%s %s" % (
-            "xgettext -L Python -j --from-code=utf-8 -o po/boxes.py.pot",
-            "boxes/*.py scripts/boxesserver scripts/boxes"))
+PyPi - https://pypi.python.org/pypi/nexradaws
 
-    def generate_mo_files(self):
-        pos = glob.glob("po/*.po")
+Docs - http://nexradaws.readthedocs.io/en/latest/
 
-        for po in pos:
-            lang = po.split(os.sep)[1][:-3].replace("-", "_")
-            try:
-                os.makedirs(os.path.join("locale", lang, "LC_MESSAGES"))
-            except FileExistsError:
-                pass
-            os.system("msgfmt %s -o locale/%s/LC_MESSAGES/boxes.py.mo" % (po, lang))
-            self.distribution.data_files.append(
-                (os.path.join("share", "locale", lang, "LC_MESSAGES"),
-                 [os.path.join("locale", lang, "LC_MESSAGES", "boxes.py.mo")]))
+**Required dependencies**
 
-    def run(self):
-        if self.distribution.data_files is None:
-            self.distribution.data_files = []
-        self.execute(self.updatePOT, ())
-        self.execute(self.generate_mo_files, ())
-        self.execute(self.buildInkscapeExt, ())
+* boto3
+* pytz
 
-        if 'CURRENTLY_PACKAGING' in os.environ:
-            # we are most probably building a Debian package
-            # let us define a simple path!
-            path="/usr/share/inkscape/extensions"
-            self.distribution.data_files.append(
-                (path,
-                 [i for i in glob.glob(os.path.join("inkex", "*.inx"))]))
-            self.distribution.data_files.append((path, ['scripts/boxes']))
-        else:
-            # we are surely not building a Debian package
-            # then here is the default behavior:
-            try:
-                path = check_output(["inkscape", "--system-data-directory"]).decode().strip()
-                path = os.path.join(path, "extensions")
-                if not os.access(path, os.W_OK): # Can we install globally
-                    # Not tested on Windows and Mac
-                    path = os.path.expanduser("~/.config/inkscape/extensions")
-                self.distribution.data_files.append(
-                    (path,
-                     [i for i in glob.glob(os.path.join("inkex", "*.inx"))]))
-                self.distribution.data_files.append((path, ['scripts/boxes']))
-            except CalledProcessError:
-                pass # Inkscape is not installed
+**Optional dependencies**
 
-        build_py.run(self)
+* pyart
 
-setup(
-    name='boxes',
-    version='0.9',
-    description='Boxes generator for laser cutters',
-    author='Florian Festi',
-    author_email='florian@festi.info',
-    url='https://github.com/florianfesti/boxes',
-    packages=find_packages(),
-    python_requires='>=3.7',
-    install_requires=['affine>=2.0', 'markdown', 'shapely>=1.8.2'],
-    scripts=['scripts/boxes', 'scripts/boxesserver'],
-    cmdclass={
-        'build_py': CustomBuildExtCommand,
-    },
+**Install with pip**::
+
+    pip install nexradaws
+
+**Version 2.0.0**
+* Drop support for Python 2.7 and remove dependency on six.
+* Bug fix for varying filename extensions over the years (.gz .V06 etc). Thanks Nick Guy for the PR!''',
+    url='https://github.com/aarande/nexradaws',
+    license='MIT',
+    author='Aaron Anderson',
+    author_email='aaron.anderson74@yahoo.com',
+    keywords='weather,radar,nexrad,aws,amazon',
+    download_url='https://github.com/aarande/nexradaws/archive/2.0.0.tar.gz',
+    install_requires=['boto3','pytz'],
+    python_requires='>=3.8',
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Console",
-        "Environment :: Web Environment",
-        "Intended Audience :: Manufacturing",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Programming Language :: Python :: 3",
-        "Topic :: Multimedia :: Graphics :: Editors :: Vector-Based",
-        "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Computer Aided Design",
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Topic :: Scientific/Engineering :: Atmospheric Science',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
-    keywords=["boxes", "box", "generator", "svg", "laser cutter"], )
+)
