@@ -1,25 +1,35 @@
+#!/usr/bin/env python
+
 from setuptools import setup
 
 readme = open('README.rst').read()
 
-setup(name='drf_dynamic_fields',
-      version='0.3.1',
-      description='Dynamically return subset of Django REST Framework serializer fields',
+setup(name='RPLCD',
+      version='1.3.1',
+      description='A Raspberry Pi LCD library for the widely used Hitachi HD44780 controller.',
+      long_description=readme,
       author='Danilo Bargen',
       author_email='mail@dbrgn.ch',
-      url='https://github.com/dbrgn/drf-dynamic-fields',
-      packages=['drf_dynamic_fields'],
-      zip_safe=True,
-      include_package_data=True,
+      url='https://github.com/dbrgn/RPLCD',
       license='MIT',
-      keywords='drf restframework rest_framework django_rest_framework serializers',
-      long_description=readme,
+      keywords='raspberry, raspberry pi, lcd, liquid crystal, hitachi, hd44780',
+      packages=['RPLCD', 'RPLCD.codecs', 'RPLCD_Tests'],
+      entry_points={
+          'console_scripts': ['rplcd-tests=RPLCD_Tests.entrypoint:run'],
+      },
+      platforms=['any'],
+      python_requires='>=3.4',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
+          'Environment :: Other Environment',
+          'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
-          'Programming Language :: Python :: 2',
+          'Operating System :: POSIX',
           'Programming Language :: Python :: 3',
-          'Framework :: Django',
-          'Environment :: Web Environment',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Topic :: System :: Hardware :: Hardware Drivers',
+          'Topic :: Software Development :: Libraries :: Python Modules',
       ],
-)
+    )
