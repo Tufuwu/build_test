@@ -1,2 +1,4 @@
-include README.rst LICENSE CHANGELOG.md
-recursive-exclude * *.pyc
+recursive-include src/commcare_cloud/ansible *
+include src/commcare_cloud/help_cache/*
+include src/commcare_cloud/environmental-defaults/*
+include src/commcare_cloud/.bash_completion

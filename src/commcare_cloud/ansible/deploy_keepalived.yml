@@ -1,0 +1,4 @@
+---
+- name: deploy keepalived
+  roles:
+    - role: keepalived
