@@ -1,8 +1,2 @@
-*.o
-*.so
-*.pyc
-*.exe
-MANIFEST
-build
-dist
-*.egg-info
+__pycache__
+generated
