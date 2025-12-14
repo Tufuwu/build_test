@@ -1,4 +1,0 @@
----
-dependencies:
-  - role: monit
-    when: not skip_monit|default(False)

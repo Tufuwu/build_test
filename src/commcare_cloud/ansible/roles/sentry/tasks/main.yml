@@ -1,7 +1,0 @@
----
-- include: sentry.yml
-  tags: sentry
-- include: clickhouse.yml
-  tags: clickhouse
-- include: snuba.yml
-  tags: snuba

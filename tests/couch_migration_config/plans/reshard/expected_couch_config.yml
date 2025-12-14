@@ -1,9 +1,0 @@
-aliases:
-  couchdb@10.247.164.74: couch3
-  couchdb@10.247.164.75: couch5
-  couchdb@10.247.164.76: couch4
-control_node_ip: 10.247.164.74
-control_node_local_port: 15984
-control_node_port: 15984
-couchdb_version: '3.1.1'
-username: admin

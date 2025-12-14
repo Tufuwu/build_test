@@ -1,5 +1,0 @@
- check process couchdb2 with pidfile {{ couchdb_dir }}/var/run/couchdb2.pid
-   group database
-   group couchdb2
-   restart program = "/bin/systemctl restart couchdb2"
-   if failed host {{ inventory_hostname }} port {{ couchdb2_port }} then restart
