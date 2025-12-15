@@ -12,13 +12,8 @@ VERSION = '25.0.1'
 
 ADD_DATA = []
 
-for fname in ("README.rst", "Readme.rst"):
-    if os.path.exists(fname):
-        with open(fname, "r", encoding="utf-8") as f:
-            long_description = f.read()
-        break
-else:
-    long_description = ""
+with open("Readme.md", "r") as fh:
+    long_description = fh.read()
 
 for dadi, destpath_prefix in [('contrib', 'rmtoo')]:
     for (path, dirs, files) in os.walk(dadi):
@@ -109,23 +104,23 @@ setup(name=PACKAGE, version=VERSION,
           "Topic :: Software Development :: Quality Assurance",
           "Topic :: Scientific/Engineering",
       ],
-        packages=[
-            "rmtoo",
-            "rmtoo.inputs",
-            "rmtoo.lib",
-            "rmtoo.lib.digraph",
-            "rmtoo.lib.vcs",
-            "rmtoo.lib.logging",
-            "rmtoo.lib.analytics",
-            "rmtoo.lib.xmlutils",
-            "rmtoo.lib.main",
-            "rmtoo.lib.configuration",
-            "rmtoo.lib.storagebackend",
-            "rmtoo.lib.storagebackend.txtfile",
-            "rmtoo.outputs",
-            "rmtoo.collection",
-            "rmtoo.collection.constraints",
-        ],
+      packages=[
+          "rmtoo",
+          "rmtoo/inputs",
+          "rmtoo/lib",
+          "rmtoo/lib/digraph",
+          "rmtoo/lib/vcs",
+          "rmtoo/lib/logging",
+          "rmtoo/lib/analytics",
+          "rmtoo/lib/xmlutils",
+          "rmtoo/lib/main",
+          "rmtoo/lib/configuration",
+          "rmtoo/lib/storagebackend",
+          "rmtoo/lib/storagebackend/txtfile",
+          "rmtoo/outputs",
+          "rmtoo/collection",
+          "rmtoo/collection/constraints",
+      ],
       include_package_data=True,
       data_files=ADD_DATA,
       install_requires=[
