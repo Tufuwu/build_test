@@ -1,38 +1,60 @@
-..
-  (c) 2020 by flonatel GmbH & Co. KG
-  
-  SPDX-License-Identifier: GPL-3.0-or-later
+Contributing
+============
 
-  This file is part of rmtoo.
-  
-  rmtoo is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  rmtoo is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with rmtoo.  If not, see <https://www.gnu.org/licenses/>.
+git-multimail is an open-source project, built by volunteers. We would
+welcome your help!
+
+The current maintainers are `Matthieu Moy <http://matthieu-moy.fr>`__ and
+`Michael Haggerty <https://github.com/mhagger>`__.
+
+Please note that although a copy of git-multimail is distributed in
+the "contrib" section of the main Git project, development takes place
+in a separate `git-multimail repository on GitHub`_.
+
+Whenever enough changes to git-multimail have accumulated, a new
+code-drop of git-multimail will be submitted for inclusion in the Git
+project.
+
+We use the GitHub issue tracker to keep track of bugs and feature
+requests, and we use GitHub pull requests to exchange patches (though,
+if you prefer, you can send patches via the Git mailing list with CC
+to the maintainers). Please sign off your patches as per the `Git
+project practice
+<https://github.com/git/git/blob/master/Documentation/SubmittingPatches#L234>`__.
+
+Please vote for issues you would like to be addressed in priority
+(click "add your reaction" and then the "+1" thumbs-up button on the
+GitHub issue).
+
+General discussion of git-multimail can take place on the main `Git
+mailing list`_.
+
+Please CC emails regarding git-multimail to the maintainers so that we
+don't overlook them.
+
+Help needed: testers/maintainer for specific environments/OS
+------------------------------------------------------------
+
+The current maintainer uses and tests git-multimail on Linux with the
+Generic environment. More testers, or better contributors are needed
+to test git-multimail on other real-life setups:
+
+* Mac OS X, Windows: git-multimail is currently not supported on these
+  platforms. But since we have no external dependencies and try to
+  write code as portable as possible, it is possible that
+  git-multimail already runs there and if not, it is likely that it
+  could be ported easily.
+
+  Patches to improve support for Windows and OS X are welcome.
+  Ideally, there would be a sub-maintainer for each OS who would test
+  at least once before each release (around twice a year).
+
+* Gerrit, Stash, Gitolite environments: although the testsuite
+  contains tests for these environments, a tester/maintainer for each
+  environment would be welcome to test and report failure (or success)
+  on real-life environments periodically (here also, feedback before
+  each release would be highly appreciated).
 
 
-How to Contribute
-=================
-
-We'd love to accept your patches and contributions to this
-project. There are just a few small guidelines you need to follow.
-
-Contributor License Agreement
-=============================
-
-When you actively push changes to one of our development platforms,
-e.g. using a pull or merge request, you agree that your contribution
-is placed under GPL3 for the complete project - except the contents of
-the contrib/template_project folder which is placed under Apache 2
-license.
-
-New files must include an appropriate license header - including the
-SPDX license identifier.
+.. _`git-multimail repository on GitHub`: https://github.com/git-multimail/git-multimail
+.. _`Git mailing list`: git@vger.kernel.org

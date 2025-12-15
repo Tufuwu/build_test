@@ -1,0 +1,69 @@
+#! /bin/sh
+
+to=${1}
+
+# This is a simple helper to test various email-sending
+# configurations. It is not fully automated, and actually sends
+# emails.
+#
+# Usage: ./test-email-config Your.Email@example.com
+
+d=$(cd "$(dirname "$0")" && pwd)
+cd "${d}" || exit 1
+SHARNESS_TEST_DIRECTORY=.
+oldHOME=$HOME
+. ./helper-functions.sh || exit 1
+HOME=$oldHOME
+
+# Copy templates (*.in) into config files for local customization.
+for config_in in *.config.in
+do
+    config=${config_in%.in}
+    if [ ! -f "$config" ] || [ "$config_in" -nt "$config" ]
+    then
+	(
+	    pecho "# File generated based on $config_in. Customize locally as needed."
+	    cat "$config_in"
+	) >"$config"
+    fi
+done
+
+if test -z "$to"
+then
+    fatal "Please, set a recipient using $0 user@example.com"
+fi
+
+rm -fr test-repo-email.git
+git init test-repo-email.git
+cd test-repo-email.git
+git config include.path config.email
+git config multimailhook.mailingList "$to"
+pecho >file.txt
+git add .
+git commit -m "initial commit"
+
+run_config () {
+    config=$1
+    log "*** $2 $config ***"
+    cp "$config" .git/config.email
+    pecho "$config" >file.txt
+    git commit -am "$2 $config"
+    ../../git-multimail/git_multimail.py refs/heads/master HEAD^ HEAD
+}
+
+count_args () {
+    echo $#
+}
+
+if test -z "$2"
+then
+    n=$(count_args ../*.config)
+    i=0
+    for config in ../*.config
+    do
+	i=$((i + 1))
+	run_config "$config" "[$i / $n]"
+    done
+else
+    run_config ../"$2"
+fi
