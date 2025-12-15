@@ -4,7 +4,7 @@ Setup for rmToo
 """
 import os
 import sys
-
+from pathlib import Path
 from setuptools import setup
 
 PACKAGE = 'rmtoo'
@@ -12,8 +12,12 @@ VERSION = '25.0.1'
 
 ADD_DATA = []
 
-with open("Readme.md", "r") as fh:
-    long_description = fh.read()
+long_description = ""
+for name in ("README.md", "Readme.md", "README.rst", "Readme.rst"):
+    if Path(name).exists():
+        with open(name, "r", encoding="utf-8") as fh:
+            long_description = fh.read()
+        break
 
 for dadi, destpath_prefix in [('contrib', 'rmtoo')]:
     for (path, dirs, files) in os.walk(dadi):
