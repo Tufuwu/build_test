@@ -1,17 +1,6 @@
-.gitattributes
-
-.DS_Store
-*.DS_Store
-*.swp
-desktop.ini
-
-# opentrons api created folders
-calibrations/
-smoothie/
-*/calibrations/
-*/smoothie/
-*/containers/
-*/logs/
+# Pycharm
+.idea
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -23,9 +12,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-venvs/
-ot2monorepoClone/
-ot1temp/
 build/
 develop-eggs/
 dist/
@@ -37,9 +23,11 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -59,24 +47,9 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 .pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -84,36 +57,23 @@ docs/_build/
 # PyBuilder
 target/
 
-# IPython Notebook
+# Jupyter Notebook
 .ipynb_checkpoints
 
 # pyenv
 .python-version
 
-# celery beat schedule file
-celerybeat-schedule
-
-# dotenv
+# Environments
 .env
-
-# virtualenv
+.venv
+env/
 venv/
 ENV/
-
-# Spyder project settings
-.spyderproject
+env.bak/
+venv.bak/
 
 # Rope project settings
 .ropeproject
 
-releases
-smoketest/*.py
-
-# supplementary protocol bundle files
-protocols/**/supplements
-
-# credentials
-data/salesforce/credentials.json
-
-# vs code
-.vscode
+# mypy
+.mypy_cache/
