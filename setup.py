@@ -21,8 +21,7 @@ setup(
     long_description_content_type='text/markdown',
     license='MIT',
 
-    version_format='{tag}',
-    setup_requires=['setuptools-git-version'],
+    version='1.0.0',
 
     packages=['content_hash'],
 
