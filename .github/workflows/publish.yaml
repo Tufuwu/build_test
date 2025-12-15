@@ -5,9 +5,7 @@ name: Release Package
 # secrets.TESTPYPI_API_TOKEN (See: https://test.pypi.org/help/#apitoken)
 
 on:
-  schedule:
-  - cron: 0 0 * * *
-  workflow_dispatch:
+  push:
 
 jobs:
   release:
@@ -18,7 +16,7 @@ jobs:
       run: pipx install poetry
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: '3.8'
         cache: poetry
     - name: Setup Poetry to publish
       run: |
