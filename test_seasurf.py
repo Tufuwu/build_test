@@ -93,7 +93,7 @@ class SeaSurfTestCase(BaseTestCase):
         with self.app.test_client() as client:
             with client.session_transaction() as sess:
                 sess[self.csrf._csrf_name] = tokenA
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=tokenB)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, tokenB)
 
             rv = client.post('/bar', data=data)
             self.assertEqual(rv.status_code, 403, rv)
@@ -107,7 +107,7 @@ class SeaSurfTestCase(BaseTestCase):
         data = {'_csrf_token': token}
         with self.app.test_client() as client:
             with client.session_transaction() as sess:
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=token)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, token)
                 sess[self.csrf._csrf_name] = token
 
             rv = client.post('/bar', data=data)
@@ -124,7 +124,7 @@ class SeaSurfTestCase(BaseTestCase):
         with self.app.test_client() as client:
             with client.session_transaction() as sess:
                 sess[self.csrf._csrf_name] = tokenA
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=tokenB)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, tokenB)
 
             rv = client.post('/bar', data=data)
             self.assertEqual(rv.status_code, 403, rv)
@@ -134,7 +134,7 @@ class SeaSurfTestCase(BaseTestCase):
             with client.session_transaction() as sess:
                 token = self.csrf._generate_token()
 
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=token)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, token)
                 sess[self.csrf._csrf_name] = token
 
             # once this is reached the session was stored
@@ -154,10 +154,10 @@ class SeaSurfTestCase(BaseTestCase):
 
     def test_https_good_referer(self):
         with self.app.test_client() as client:
-            with client.session_transaction(base_url="https://www.example.com") as sess:
+            with client.session_transaction() as sess:
                 token = self.csrf._generate_token()
 
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=token)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, token)
                 sess[self.csrf._csrf_name] = token
 
             # once this is reached the session was stored
@@ -180,7 +180,7 @@ class SeaSurfTestCase(BaseTestCase):
             with client.session_transaction() as sess:
                 token = self.csrf._generate_token()
 
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=token)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, token)
                 sess[self.csrf._csrf_name] = token
 
             rv = client.post('/bar',
@@ -661,10 +661,10 @@ class SeaSurfTestCaseReferer(BaseTestCase):
 
     def test_https_referer_check_disabled(self):
         with self.app.test_client() as client:
-            with client.session_transaction(base_url="https://www.example.com") as sess:
+            with client.session_transaction() as sess:
                 token = self.csrf._generate_token()
 
-                client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=token)
+                client.set_cookie('www.example.com', self.csrf._csrf_name, token)
                 sess[self.csrf._csrf_name] = token
 
             # once this is reached the session was stored
@@ -741,7 +741,7 @@ class SeaSurfTestCaseSetCookie(BaseTestCase):
                           res3.headers.get('Set-Cookie', ''),
                           'CSRF cookie always be re-set if a token is requested by the template')
 
-            client.delete_cookie(key=self.csrf._csrf_name)
+            client.delete_cookie(self.csrf._csrf_name)
 
             res4 = client.get('/foo')
 
@@ -802,7 +802,7 @@ class SeaSurfTestCaseGenerateNewToken(BaseTestCase):
             client.get('/foo')
             tokenA = self.csrf._get_token()
 
-            client.set_cookie(domain='www.example.com', key=self.csrf._csrf_name, value=tokenA)
+            client.set_cookie('www.example.com', self.csrf._csrf_name, tokenA)
             with client.session_transaction() as sess:
                 sess[self.csrf._csrf_name] = tokenA
 
