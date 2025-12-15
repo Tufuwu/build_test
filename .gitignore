@@ -1,17 +1,31 @@
+.gitattributes
+
+.DS_Store
+*.DS_Store
+*.swp
+desktop.ini
+
+# opentrons api created folders
+calibrations/
+smoothie/
+*/calibrations/
+*/smoothie/
+*/containers/
+*/logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-.idea/
-bin/
-version
-openapi_generator_cli/*.jar
-.DS_Store
+
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+venvs/
+ot2monorepoClone/
+ot1temp/
 build/
 develop-eggs/
 dist/
@@ -23,11 +37,9 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -47,7 +59,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*.cover
+*,cover
 .hypothesis/
 .pytest_cache/
 
@@ -58,7 +70,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
 
 # Flask stuff:
 instance/
@@ -73,7 +84,7 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
+# IPython Notebook
 .ipynb_checkpoints
 
 # pyenv
@@ -82,27 +93,27 @@ target/
 # celery beat schedule file
 celerybeat-schedule
 
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# dotenv
 .env
-.venv
-env/
+
+# virtualenv
 venv/
 ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
-.spyproject
 
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
+releases
+smoketest/*.py
 
-# mypy
-.mypy_cache/
+# supplementary protocol bundle files
+protocols/**/supplements
+
+# credentials
+data/salesforce/credentials.json
+
+# vs code
+.vscode
