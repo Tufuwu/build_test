@@ -18,6 +18,7 @@ jobs:
         run: pip install flake8 yapf pytest
       - name: Install aws-list-all
         run: python setup.py install
+        run: pip install .
       - name: Check that aws-list-all --help works.
         run: aws_list_all --help
       - run: pytest -vvv aws_list_all
