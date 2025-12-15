@@ -1,8 +1,10 @@
 [run]
-branch = True
-source = html5lib
+source = pya
 
-[paths]
-source =
-   html5lib
-   .tox/*/lib/python*/site-packages/html5lib
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
