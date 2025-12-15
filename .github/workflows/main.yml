@@ -33,7 +33,7 @@ jobs:
     - name: Run tests
       run: |
         coverage run --source=./ -m pytest
-
+        coverage report
         
     - name: Upload coverage data to Coveralls
       uses: coverallsapp/github-action@v1.1.2
