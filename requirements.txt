@@ -1,5 +1,4 @@
-Flask==1.1.4
-Werkzeug==1.0.1
-Flask-Babel==1.0.0
+flask==2.2
+Flask-Babel==2.0
 requests
 Pillow
