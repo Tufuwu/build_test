@@ -1,8 +1,11 @@
+from .helper.backend import determine_backend
 import copy
-import time
 import logging
-import numpy as np
+import time
+from typing import Optional, Union
 from warnings import warn
+
+import numpy as np
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,8 +51,9 @@ class Aserver:
         else:
             warn("Aserver:shutdown_default_server: no default_server to shutdown")
 
-    def __init__(self, sr=44100, bs=None, device=None,
-                 channels=2, backend=None, **kwargs):
+    def __init__(self, sr: int = 44100, bs: Optional[int] = None,
+                 device: Optional[int] = None, channels: Optional[int] = None,
+                 backend=None, **kwargs):
         """Aserver manages an pyaudio stream, using its aserver callback
         to feed dispatched signals to output at the right time.
 
@@ -58,9 +62,12 @@ class Aserver:
         sr : int
             Sampling rate (Default value = 44100)
         bs : int
-            block size or buffer size (Default value = 256)
+            Override block size or buffer size set by chosen backend
+        device : int
+            The device index based on pya.device_info(), default is None which will set 
+            the default device from PyAudio
         channels : int
-            number of channel (Default value = 2)
+            number of channel, default is the max output channels of the device
         kwargs : backend parameter
 
         Returns
@@ -70,44 +77,62 @@ class Aserver:
         """
         # TODO check if channels is overwritten by the device.
         self.sr = sr
-        self.bs = bs
-        if backend is None:
-            from .backend.PyAudio import PyAudioBackend
-            self.backend = PyAudioBackend(**kwargs)
-        else:
-            self.backend = backend
-        self.bs = bs if bs is not None else self.backend.bs
-        self.channels = channels
+        self.stream = None
+        self.backend = determine_backend(**kwargs) if backend is None else backend
+        self.bs = bs or self.backend.bs
         # Get audio devices to input_device and output_device
         self.input_devices = []
         self.output_devices = []
         for i in range(self.backend.get_device_count()):
-            if self.backend.get_device_info_by_index(i)['maxInputChannels'] > 0:
+            if int(self.backend.get_device_info_by_index(i)['maxInputChannels']) > 0:
                 self.input_devices.append(self.backend.get_device_info_by_index(i))
-            if self.backend.get_device_info_by_index(i)['maxOutputChannels'] > 0:
+            if int(self.backend.get_device_info_by_index(i)['maxOutputChannels']) > 0:
                 self.output_devices.append(self.backend.get_device_info_by_index(i))
 
-        self._device = 1
-        self.device = device
-
-        # self.device_dict = self.backend.get_device_info_by_index(self.device)
-        # # self.max_out_chn is not that useful: there can be multiple devices having the same mu
-        # self.max_out_chn = self.device_dict['maxOutputChannels']
-        # self.max_in_chn = self.device_dict['maxInputChannels']
+        self._device = self.backend.get_default_output_device_info()['index'] if device is None else device
+        self._channels = channels or self.max_out_chn
 
         self.gain = 1.0
         self.srv_onsets = []
-        self.srv_asigs = []
         self.srv_curpos = []  # start of next frame to deliver
+        self.srv_asigs = []
         self.srv_outs = []  # output channel offset for that asig
-        self.stream = None
-        self.boot_time = None  # time.time() when stream starts
-        self.block_cnt = None  # nr. of callback invocations
+        self.boot_time = 0  # time.time() when stream starts
+        self.block_cnt = 0  # nr. of callback invocations
         self.block_duration = self.bs / self.sr  # nominal time increment per callback
-        self.block_time = None  # estimated time stamp for current block
+        self.block_time = 0  # estimated time stamp for current block
         self._stop = True
-        self.empty_buffer = np.zeros((self.bs, self.channels),
-                                     dtype=self.backend.dtype)
+        self.empty_buffer = np.zeros((self.bs, self.channels), dtype=self.backend.dtype)
+        self._is_active = False
+
+    @property
+    def channels(self):
+        return self._channels
+
+    @channels.setter
+    def channels(self, val: int):
+        """
+        Set the number of channels. Aserver needs reboot.
+        """
+        if val > self.max_out_chn:
+            raise ValueError(f"AServer: channels {val} > max {self.max_out_chn}")
+        self._channels = val
+
+    @property
+    def device_dict(self):
+        return self.backend.get_device_info_by_index(self._device)
+
+    @property
+    def max_out_chn(self) -> int:
+        return int(self.device_dict['maxOutputChannels'])
+
+    @property
+    def max_in_chn(self) -> int:
+        return int(self.device_dict['maxInputChannels'])
+
+    @property
+    def is_active(self) -> bool:
+        return self.stream is not None and self.stream.is_active()
 
     @property
     def device(self):
@@ -116,21 +141,16 @@ class Aserver:
     @device.setter
     def device(self, val):
         self._device = val if val is not None else self.backend.get_default_output_device_info()['index']
-        self.device_dict = self.backend.get_device_info_by_index(self._device)
-        self.max_out_chn = self.device_dict['maxOutputChannels']
         if self.max_out_chn < self.channels:
             warn(f"Aserver: warning: {self.channels}>{self.max_out_chn} channels requested - truncated.")
             self.channels = self.max_out_chn
 
     def __repr__(self):
-        state = False
-        if self.stream:
-            state = self.stream.is_active()
         msg = f"""AServer: sr: {self.sr}, blocksize: {self.bs},
-         Stream Active: {state}, Device: {self.device_dict['name']}, Index: {self.device_dict['index']}"""
+         Stream Active: {self.is_active}, Device: {self.device_dict['name']}, Index: {self.device_dict['index']}"""
         return msg
 
-    def get_devices(self, verbose=False):
+    def get_devices(self, verbose: bool = False):
         """Return (and optionally print) available input and output device"""
         if verbose:
             print("Input Devices: ")
@@ -141,8 +161,9 @@ class Aserver:
              for i in self.output_devices]
         return self.input_devices, self.output_devices
 
-    def set_device(self, idx, reboot=True):
-        """Set audio device
+    def set_device(self, idx: int, reboot: bool = True):
+        """Set audio device, an alternative way is to direct set the device property, i.e. Aserver.device = 1, 
+        but that will not reboot the server.
 
         Parameters
         ----------
@@ -151,7 +172,7 @@ class Aserver:
         reboot : bool
             If true the server will reboot. (Default value = True)
         """
-        self.device = idx
+        self._device = idx
         if reboot:
             try:
                 self.quit()
@@ -164,7 +185,7 @@ class Aserver:
 
     def boot(self):
         """boot Aserver = start stream, setting its callback to this callback."""
-        if self.stream is not None and self.stream.is_active():
+        if self.is_active:
             _LOGGER.info("Aserver already running...")
             return -1
         self.boot_time = time.time()
@@ -175,24 +196,35 @@ class Aserver:
                                         frames_per_buffer=self.bs,
                                         output_device_index=self.device,
                                         stream_callback=self._play_callback)
+        self._is_active = self.stream.is_active()
         _LOGGER.info("Server Booted")
         return self
 
     def quit(self):
         """Aserver quit server: stop stream and terminate pa"""
-        if self.stream is None or not self.stream.is_active():
+        if not self.is_active:
             _LOGGER.info("Stream not active")
             return -1
         try:
-            self.stream.stop_stream()
-            self.stream.close()
-            _LOGGER.info("Aserver stopped.")
+            if self.stream:
+                self.stream.stop_stream()
+                self.stream.close()
+                _LOGGER.info("Aserver stopped.")
         except AttributeError:
             _LOGGER.info("No stream found...")
         self.stream = None
+        return 0
 
-    def play(self, asig, onset=0, out=0, **kwargs):
-        """Dispatch asigs or arrays for given onset."""
+    def play(self, asig, onset: Union[int, float] = 0, out: int = 0, **kwargs):
+        """Dispatch asigs or arrays for given onset.
+
+        asig: pya.Asig
+            An Asig object
+        onset: int or float
+            Time when the sound should play, 0 means asap
+        out: int
+            Output channel
+        """
         self._stop = False
 
         sigid = id(asig)  # for copy check
@@ -272,14 +304,23 @@ class Aserver:
                 dellist.append(i)  # store for deletion
         # clean up lists
         for i in dellist[::-1]:  # traverse backwards!
-            del(self.srv_asigs[i])
-            del(self.srv_onsets[i])
-            del(self.srv_curpos[i])
-            del(self.srv_outs[i])
+            del self.srv_asigs[i]
+            del self.srv_onsets[i]
+            del self.srv_curpos[i]
+            del self.srv_outs[i]
         return self.backend.process_buffer(data * (self.backend.range * self.gain))
 
     def stop(self):
         self._stop = True
 
-    def __del__(self):
+    def __enter__(self):
+        return self.boot()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.quit()
         self.backend.terminate()
+
+    def __del__(self):
+        self.quit()
+        self.backend.terminate()
+

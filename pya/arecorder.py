@@ -1,13 +1,13 @@
 # Arecorder class
-import time
 import logging
 import numbers
-from warnings import warn
+import time
+from typing import Optional, Union
+
 import numpy as np
-import pyaudio
 from . import Asig
 from . import Aserver
-from .helper import dbamp
+from pyamapping import db_to_amp
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,32 +30,33 @@ class Arecorder(Aserver):
     [Asig(''): ... x ... @ 44100Hz = ...
     """
 
-    def __init__(self, sr=44100, bs=256, device=None, channels=None, backend=None, **kwargs):
-        super().__init__(sr=sr, bs=bs, device=device, channels=channels,
+    def __init__(self, sr: int = 44100, bs: int = 256, device: Optional[int] = None,
+                 channels: Optional[int] = None, backend=None, **kwargs):
+        super().__init__(sr=sr, bs=bs, device=device, 
                          backend=backend, **kwargs)
         self.record_buffer = []
         self.recordings = []  # store recorded Asigs, time stamp in label
         self._recording = False
         self._record_all = True
-        self.gains = np.ones(self.channels)
         self.tracks = slice(None)
+        self._device = self.backend.get_default_input_device_info()['index'] if device is None else device
+        self._channels = channels or self.max_in_chn
+        self.gains = np.ones(self._channels)
 
     @property
-    def device(self):
-        return self._device
+    def channels(self):
+        return self._channels
 
-    @device.setter
-    def device(self, val):
-        self._device = val if val is not None else self.backend.get_default_input_device_info()['index']
-        self.device_dict = self.backend.get_device_info_by_index(self._device)
-        self.max_in_chn = self.device_dict['maxInputChannels']
-        if self.channels is None:
-            self.channels = self.max_in_chn
-        if self.max_in_chn < self.channels:
-            warn(f"Aserver: warning: {self.channels}>{self.max_in_chn} channels requested - truncated.")
-            self.channels = self.max_in_chn
+    @channels.setter
+    def channels(self, val: int):
+        """
+        Set the number of channels. Aserver needs reboot.
+        """
+        if val > self.max_in_chn:
+            raise ValueError(f"AServer: channels {val} > max {self.max_in_chn}")
+        self._channels = val
 
-    def set_tracks(self, tracks, gains):
+    def set_tracks(self, tracks: Union[list, np.ndarray], gains: Union[list, np.ndarray]):
         """Define the number of track to be recorded and their gains.
 
         parameters
@@ -71,10 +72,10 @@ class Arecorder(Aserver):
             elif len(tracks) > self.channels or len(gains) > self.channels:
                 raise AttributeError("argument cannot be larger than channels.")
             self.tracks = tracks
-            self.gains = np.array([dbamp(g) for g in gains], dtype="float32")
+            self.gains = np.array([db_to_amp(g) for g in gains], dtype="float32")
         elif isinstance(tracks, numbers.Number) and isinstance(gains, numbers.Number):
             self.tracks = [tracks]
-            self.gains = dbamp(gains)
+            self.gains = db_to_amp(gains)
         else:
             raise TypeError("Arguments need to be both list or both number.")
 
@@ -83,8 +84,6 @@ class Arecorder(Aserver):
         self.gains = np.ones(self.channels)
 
     def boot(self):
-        """boot recorder"""
-        # when input = True, the channels refers to the input channels.
         self.boot_time = time.time()
         self.block_time = self.boot_time
         # self.block_cnt = 0
@@ -108,7 +107,7 @@ class Arecorder(Aserver):
             self.record_buffer.append(data_float)
             # E = 10 * np.log10(np.mean(data_float ** 2)) # energy in dB
             # os.write(1, f"\r{E}    | {self.block_cnt}".encode())
-        return None, pyaudio.paContinue
+        return self.backend.process_buffer(None)
 
     def record(self):
         """Activate recording"""

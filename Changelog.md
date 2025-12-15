@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.2 (Nov 2023)
+* #82, `pyaudio` is now optional: If you plan to use `PyAudioBackend`, install `pya` with `pip install pya[pyaudio]`.
+* Fix audio device bug
+* #77, Improve code type hint
+* #79, Use pyamapping 
+
+## 0.5.1 (Dec 2022)
+* Now support Python3.10
+* Bugfix #67: When the channels argument of Aserver and Arecorder has not been set it was determined by the default device instead of the actual device.
+
+## 0.5.0 (Oct 2022)
+* Make Aserver a context that can wrap play inside. This context will handle boot() and quit() automatically.
+* Move OSX/Linux CI to Github Action from TravisCI.
+* Bump numpy dependency, numpy.linspace usage is updated.
+* Make Asig.play() arguments explicit. 
+* Asig.dur property that returns the duration in seconds of the signal
+
 ## 0.4.3 (March 2021)
 * Add logging helper function.
 * Make sure `pya` runs on Python3.8

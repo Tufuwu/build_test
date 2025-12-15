@@ -39,6 +39,9 @@ class TestAsig(TestCase):
                                                    (self.asine.samples - 1) / self.asine.sr,
                                                    self.asine.samples), self.asine.get_times()))
 
+    def test_dur_property(self):
+        self.assertEqual(self.asine.dur, 1.)
+
     def test_fader(self):
         result = self.asine.fade_in(dur=0.2)
         self.assertIsInstance(result, Asig)
@@ -90,14 +93,20 @@ class TestAsig(TestCase):
         self.assertAlmostEqual(0.6309, np.max(result.sig), places=3)
 
     def test_gain(self):
-        result = self.astereo.gain(amp=0.)
-        self.assertEqual(0, np.max(result.sig))
+        current_max_amplitude = np.max(self.astereo.sig)
+
+        result = self.astereo.gain()  # by default amp=1. nothing change.
+        self.assertEqual(current_max_amplitude, np.max(result.sig), "gain() should not change anything")
+
         result = self.astereo.gain(amp=2.)
         self.assertEqual(2, np.max(result.sig))
+
         result = self.astereo.gain(db=3.)
         with self.assertRaises(AttributeError):
             _ = self.astereo.gain(amp=1, db=3.)
-        result = self.astereo.gain()  # by default amp=1. nothing change.
+
+        result = self.astereo.gain(amp=0.)
+        self.assertEqual(0, np.max(result.sig), "amp 0 should result in 0")
 
     def test_rms(self):
         result = self.asine16ch.rms()
@@ -191,14 +200,14 @@ class TestAsig(TestCase):
     def test_windowing(self):
         asig = Asig(np.ones(10), sr=2)
         asig_windowed = asig.window_op(nperseg=2, stride=1,
-                                       win='hanning', fn='rms', pad='mirror')
+                                       win='hann', fn='rms', pad='mirror')
         self.assertTrue(np.allclose([1., 0.70710677, 0.70710677, 0.70710677,
                                     0.70710677, 0.70710677, 0.70710677,
                                     0.70710677, 0.70710677, 1.],
                                     asig_windowed.sig))
 
         asig2ch = Asig(np.ones((10, 2)), sr=2)
-        asig2ch.window_op(nperseg=2, stride=1, win='hanning', fn='rms', pad='mirror')
+        asig2ch.window_op(nperseg=2, stride=1, win='hann', fn='rms', pad='mirror')
         a = [1., 0.70710677, 0.70710677, 0.70710677,
              0.70710677, 0.70710677, 0.70710677,
              0.70710677, 0.70710677, 1.]
