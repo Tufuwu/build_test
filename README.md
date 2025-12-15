@@ -1,81 +1,157 @@
-# FFX: Fast Function Extraction
+ContentHash for Python
+======================
 
-[![CI](https://github.com/natekupp/ffx/workflows/CI/badge.svg)](https://github.com/natekupp/ffx/actions?query=workflow%3ACI)
-[![Coverage Status](https://coveralls.io/repos/github/natekupp/ffx/badge.svg?branch=master)](https://coveralls.io/github/natekupp/ffx?branch=master)
+[![version][icon-version]][link-pypi]
+[![downloads][icon-downloads]][link-pypi]
+[![license][icon-license]][link-license]
+[![python][icon-python]][link-python]
 
-FFX is a technique for symbolic regression. It is:
+[![build][icon-build]][link-build]
+[![coverage][icon-coverage]][link-coverage]
+[![quality][icon-quality]][link-quality]
 
-- **Fast** - runtime 5-60 seconds, depending on problem size
-- **Scalable** - 1000 input variables, no problem!
-- **Deterministic** - no need to "hope and pray".
+Python implementation of EIP 1577 content hash.
+
+## Description
+
+This is a simple package made for encoding and decoding content hashes has specified in the [EIP 1577][link-eip-1577].
+This package will be useful for every [Ethereum][link-ethereum] developer wanting to interact with [EIP 1577][link-eip-1577] compliant [ENS resolvers][link-resolvers].
+
+For JavaScript implementation, see [`pldespaigne/content-hash`][link-javascript-implementation].
 
 ## Installation
 
-To install from PyPI, simply run:
+### Requirements
 
-```shell
-pip install ffx
+ContentHash requires Python 3.5 or higher.
+
+### From PyPI
+
+The recommended way to install ContentHash is from PyPI with PIP.
+
+```bash
+pip install content-hash
+```
+
+### From Source
+
+Alternatively, you can also install it from the source.
+
+```bash
+git clone https://github.com/filips123/ContentHashPy.git
+cd ContentHashPy
+python setup.py install
 ```
 
 ## Usage
 
-FFX can either be run in stand-alone mode, or within your existing Python code using its own API or a Scikit-learn style API. It installs both a command-line utility `ffx` and the Python module `ffx`.
+### Supported Codecs
 
-**Standalone**
+The following codecs are currently supported:
 
-```shell
-ffx test train_X.csv train_y.csv test_X.csv test_y.csv
+- `swarm-ns`
+- `ipfs-ns`
+- `ipns-ns`
+
+Every other codec supported by [`multicodec`][link-multicodec] will be encoded by default in `utf-8`. You can see the full list of the supported codecs [here][link-supported-codecs].
+
+### Getting Codec
+
+You can use a `get_codec` function to get codec from the content hash.
+
+It takes a content hash as a HEX string and returns the codec name. A content hash can be prefixed with a `0x`, but it's not mandatory.
+
+```py
+import content_hash
+
+chash = 'bc037a716b746c776934666563766f367269'
+codec = content_hash.get_codec(chash)
+
+print(codec) # onion
 ```
 
-Use `ffx help` for more information on using the command-line utility.
+### Decoding
 
-**Python Module (run interface)**
+You can use a `decode` function to decode a content hash.
 
-The FFX Python module exposes a function, `ffx.run()`. The following snippet is a simple example of how to use FFX this way. Note that all arguments are expected to be of type `numpy.ndarray` or `pandas.DataFrame`.
+It takes a content hash as a HEX string and returns the decoded content as a string. A content hash can be prefixed with a `0x`, but it's not mandatory.
 
-```python
-import numpy as np
-import ffx
+```py
+import content_hash
 
-train_X = np.array( [ (1.5,2,3), (4,5,6) ] ).T
-train_y = np.array( [1,2,3])
+chash = 'e3010170122029f2d17be6139079dc48696d1f582a8530eb9805b561eda517e22a892c7e3f1f'
+value = content_hash.decode(chash)
 
-test_X = np.array( [ (5.241,1.23, 3.125), (1.1,0.124,0.391) ] ).T
-test_y = np.array( [3.03,0.9113,1.823])
-
-models = ffx.run(train_X, train_y, test_X, test_y, ["predictor_a", "predictor_b"])
-for model in models:
-    yhat = model.simulate(test_X)
-    print(model)
+print(value) # QmRAQB6YaCyidP37UdDnjFY5vQuiBrcqdyoW1CuDgwxkD4
 ```
 
-**Scikit-Learn interface**
+### Encoding
 
-The FFX Python module also exposes a class, `ffx.FFXRegressor` which provides a Scikit-learn API, in particular `fit(X, y)`, `predict(X)`, and `score(X, y)` methods. In this API, all of the models produced by FFX (the whole Pareto front) are accessible after `fit()`ing as `_models`, but `predict()` and `score()` will use only the model of highest accuracy and highest complexity. Here is an example of usage.
+You can use an `encode` function to encode a content hash.
 
-```python
-import numpy as np
-import ffx
+It takes a supported codec as a string and a value as a string and returns the corresponding content hash as a HEX string. The output will not be prefixed with a `0x`.
 
-# This creates a dataset of 2 predictors
-X = np.random.random((20, 2))
-y = 0.1 * X[:, 0] + 0.5 * X[:, 1]
+```py
+import content_hash
 
-train_X, test_X = X[:10], X[10:]
-train_y, test_y = y[:10], y[10:]
+codec = 'swarm-ns'
+value = 'd1de9994b4d039f6548d191eb26786769f580809256b4685ef316805265ea162'
+chash = content_hash.encode(codec, value)
 
-FFX = ffx.FFXRegressor()
-FFX.fit(train_X, train_y)
-print("Prediction:", FFX.predict(test_X))
-print("Score:", FFX.score(test_X, test_y))
+print(chash) # e40101701b20d1de9994b4d039f6548d191eb26786769f580809256b4685ef316805265ea162
 ```
 
-## Technical details
+## Creating Codecs
 
-- Circuits-oriented description: [Slides](http://trent.st/content/2011-CICC-FFX-slides.ppt) [Paper](http://trent.st/content/2011-CICC-FFX-paper.pdf) (CICC 2011)
-- AI-oriented description [Slides](http://trent.st/content/2011-GPTP-FFX-slides.pdf) [Paper](http://trent.st/content/2011-GPTP-FFX-paper.pdf) (GPTP 2011)
+All supported codec profiles are available in [`content_hash/profiles/__init__.py`][link-profiles-file], in `PROFILES` dictionary. You need to add a new profile there. You only need to add a new profile if your codec encoding and decoding are different from `utf-8`.
 
-## References
+Each profile must have the same name as the corresponding codec in the `multicodec` library.
 
-1. McConaghy, FFX: Fast, Scalable, Deterministic Symbolic Regression Technology, _Genetic Programming Theory and Practice IX_, Edited by R. Riolo, E. Vladislavleva, and J. Moore, Springer, 2011.
-2. McConaghy, High-Dimensional Statistical Modeling and Analysis of Custom Integrated Circuits, _Proc. Custom Integrated Circuits Conference_, Sept. 2011
+A profile must also have decode and encode function. They should be passed as a string containing the name of the module for required decode or encode. All such modules are available in [`content_hash/decodes`][link-decodes-directory] and [`content_hash/encodes`][link-encodes-directory].
+
+Each module name should describe it as much as possible. Its name can only contain valid characters for Python modules.
+
+Each decode module must have a `decode` function. It must be a function that takes a `bytes` input and returns a `str` result.
+
+Each encode module must have an `encode` function. It must be a function that takes a `str` input and returns a `bytes` result.
+
+All inputs and outputs must be the same as in the [JavaScript implementation][link-javascript-implementation]. Multiple profiles can share the same decodes and encodes.
+
+## Versioning
+
+This library uses [SemVer][link-semver] for versioning. For the versions available, see [the tags][link-tags] on this repository.
+
+## License
+
+This library is licensed under the MIT license. See the [LICENSE][link-license-file] file for details.
+
+[icon-version]: https://img.shields.io/pypi/v/content-hash.svg?style=flat-square&label=version
+[icon-downloads]: https://img.shields.io/pypi/dm/content-hash.svg?style=flat-square&label=downloads
+[icon-license]: https://img.shields.io/pypi/l/content-hash.svg?style=flat-square&label=license
+[icon-python]: https://img.shields.io/pypi/pyversions/content-hash?style=flat-square&label=python
+
+[icon-build]: https://img.shields.io/github/actions/workflow/status/filips123/ContentHashPy/main.yml?style=flat-square&label=build
+[icon-coverage]: https://img.shields.io/scrutinizer/coverage/g/filips123/ContentHashPy.svg?style=flat-square&label=coverage
+[icon-quality]: https://img.shields.io/scrutinizer/g/filips123/ContentHashPy.svg?style=flat-square&label=quality
+
+[link-pypi]: https://pypi.org/project/content-hash/
+[link-license]: https://choosealicense.com/licenses/mit/
+[link-python]: https://python.org/
+[link-build]: https://github.com/filips123/ContentHashPy/actions
+[link-coverage]: https://scrutinizer-ci.com/g/filips123/ContentHashPy/code-structure/
+[link-quality]: https://scrutinizer-ci.com/g/filips123/ContentHashPy/
+[link-semver]: https://semver.org/
+
+[link-eip-1577]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1577.md
+[link-ethereum]: https://www.ethereum.org/
+[link-resolvers]: http://docs.ens.domains/en/latest/introduction.html
+[link-multicodec]: https://github.com/multiformats/multicodec/
+[link-supported-codecs]: https://github.com/multiformats/multicodec/blob/master/table.csv
+
+[link-tags]: https://github.com/filips123/ContentHashPy/tags/
+[link-license-file]: https://github.com/filips123/ContentHashPy/blob/master/LICENSE
+[link-profiles-file]: https://github.com/filips123/ContentHashPy/blob/master/content_hash/profiles/__init__.py
+[link-decodes-directory]: https://github.com/filips123/ContentHashPy/tree/master/content_hash/decodes/
+[link-encodes-directory]: https://github.com/filips123/ContentHashPy/tree/master/content_hash/encodes/
+
+[link-javascript-implementation]: https://github.com/pldespaigne/content-hash/
