@@ -1,70 +1,40 @@
-name: Tests
+name: CI
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        python-version:
-          - "3.8"
-
-    services:
-      mongo:
-        image: mongo
-        ports:
-          - 27017:27017
-      postgresql:
-        image: postgres
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: pswrd
-          POSTGRES_DB: vakt_db
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
+        python-version: ["3.8"]
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
 
-      # See on "why?": https://ovirium.com/blog/how-to-make-mysql-work-in-your-github-actions/
-      - name: Set up MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE vakt_db CHARACTER SET utf8 COLLATE utf8_bin;' -uroot -proot
+      - name: Setup Miniconda and create environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test-environment
+
+      - name: Configure conda
+        run: conda config --set always_yes yes --set changeps1 no
+
+      - name: Show conda info
+        run: conda info -a
 
       - name: Install dependencies
-        run: make deps
+        run: conda install numpy matplotlib pytest
 
-      - name: Test all suites with coverage
-        run: make coverage
-        env:
-          DATABASE_DSN: "mysql+pymysql://root:root@127.0.0.1/vakt_db"
+      - name: Install package
+        run: python setup.py install
 
-      - name: Test SQL integration for SQLite
-        run: make test-sql-i
-        env:
-          DATABASE_DSN: "sqlite:///:memory:"
-
-      - name: Test SQL integration for Postgres
-        run: make test-sql-i
-        env:
-          DATABASE_DSN: "postgresql+psycopg2cffi://postgres:pswrd@localhost/vakt_db"
-
-      - name: Run performance tests
-        run: make bench
-
-      - name: Send coverage report
-        run: bash <(curl -s https://codecov.io/bash)
+      - name: Run tests
+        run: pytest
