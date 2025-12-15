@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - python_version: 3.8-bullseye
+            postgres_version: 14
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_VERSION: ${{ matrix.postgres_version }}
+      PYTHON_VERSION: ${{ matrix.python_version }}
+    steps:
+    - name: Build the Docker image
+      uses: actions/checkout@v4 
+
+    - name: Start containers
+      run: docker-compose build
+
+    - name: Run tests
+      run: docker-compose run --entrypoint="pytest tests" nycdb
