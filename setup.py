@@ -1,26 +1,31 @@
-# kasserver - Manage domains hosted on All-Inkl.com through the KAS server API
-# Copyright (c) 2018 Christian Fetzer
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+from setuptools import find_packages, setup
 
-"""Manage domains hosted on All-Inkl.com through the KAS server API"""
-
-from setuptools import setup
-
-setup(setup_requires=["pbr"], pbr=True)
+setup(
+    name='ffx',
+    version='2.0.2',
+    author='Trent McConaghy',
+    author_email='gtrent@gmail.com',
+    maintainer='Nate Kupp',
+    maintainer_email='nathan.kupp@gmail.com',
+    description=(
+        'Fast Function Extraction: A fast, scalable, and deterministic symbolic regression tool.'
+    ),
+    license='See LICENSE',
+    keywords='symbolic regression machine learning',
+    url='https://github.com/natekupp/ffx',
+    packages=find_packages(exclude=['ffx_tests']),
+    entry_points={'console_scripts': ['ffx = ffx.cli:main']},
+    install_requires=['click>=5.0', 'contextlib2>=0.5.4', 'numpy', 'pandas', 'six', 'scikit-learn',],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Topic :: Scientific/Engineering',
+        'License :: Other/Proprietary License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+)
