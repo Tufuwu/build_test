@@ -20,6 +20,8 @@ class FFXRegressor(BaseEstimator, RegressorMixin):
         X, y = check_X_y(X, y, y_numeric=True, multi_output=False)
         # if X is a Pandas DataFrame, we don't have to pass in varnames.
         # otherwise we make up placeholders.
+        self.n_features_in_ = X.shape[1]
+        
         if hasattr(X, 'columns'):
             varnames = None
         else:
