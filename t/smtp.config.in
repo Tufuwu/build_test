@@ -1,3 +1,0 @@
-[multimailhook]
-	mailer = smtp
-	smtpServer = mailhost.imag.fr # Host that works without authentication

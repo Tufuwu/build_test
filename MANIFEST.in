@@ -1,7 +1,10 @@
-include COPYING
-include git-multimail/README
-include git-multimail/CHANGES
-include git-multimail/README.migrate-from-post-receive-email
-include git-multimail/post-receive.example
-include git-multimail/migrate-mailhook-config
-include doc/*.rst
+include LICENSE
+include AUTHORS.rst
+include CHANGES.rst
+include README.rst
+include requirements*.txt
+include .pytest.expect
+include tox.ini
+include pytest.ini
+graft html5lib/tests/testdata
+recursive-include html5lib/tests *.py

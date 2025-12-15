@@ -1,60 +1,60 @@
 Contributing
 ============
 
-git-multimail is an open-source project, built by volunteers. We would
-welcome your help!
+Pull requests are more than welcome — both to the library and to the
+documentation. Some useful information:
 
-The current maintainers are `Matthieu Moy <http://matthieu-moy.fr>`__ and
-`Michael Haggerty <https://github.com/mhagger>`__.
+- We aim to follow PEP 8 in the library, but ignoring the
+  79-character-per-line limit, instead following a soft limit of 99,
+  but allowing lines over this where it is the readable thing to do.
 
-Please note that although a copy of git-multimail is distributed in
-the "contrib" section of the main Git project, development takes place
-in a separate `git-multimail repository on GitHub`_.
+- We aim to follow PEP 257 for all docstrings, and make them properly
+  parseable by Sphinx while generating API documentation.
 
-Whenever enough changes to git-multimail have accumulated, a new
-code-drop of git-multimail will be submitted for inclusion in the Git
-project.
+- We keep ``pyflakes`` reporting no errors or warnings at all times.
 
-We use the GitHub issue tracker to keep track of bugs and feature
-requests, and we use GitHub pull requests to exchange patches (though,
-if you prefer, you can send patches via the Git mailing list with CC
-to the maintainers). Please sign off your patches as per the `Git
-project practice
-<https://github.com/git/git/blob/master/Documentation/SubmittingPatches#L234>`__.
+- We keep the master branch passing all tests at all times on all
+  supported versions.
 
-Please vote for issues you would like to be addressed in priority
-(click "add your reaction" and then the "+1" thumbs-up button on the
-GitHub issue).
+`GitHub Actions <https://github.com/html5lib/html5lib-python/actions>`_ is run
+against all pull requests and should enforce all of the above.
 
-General discussion of git-multimail can take place on the main `Git
-mailing list`_.
-
-Please CC emails regarding git-multimail to the maintainers so that we
-don't overlook them.
-
-Help needed: testers/maintainer for specific environments/OS
-------------------------------------------------------------
-
-The current maintainer uses and tests git-multimail on Linux with the
-Generic environment. More testers, or better contributors are needed
-to test git-multimail on other real-life setups:
-
-* Mac OS X, Windows: git-multimail is currently not supported on these
-  platforms. But since we have no external dependencies and try to
-  write code as portable as possible, it is possible that
-  git-multimail already runs there and if not, it is likely that it
-  could be ported easily.
-
-  Patches to improve support for Windows and OS X are welcome.
-  Ideally, there would be a sub-maintainer for each OS who would test
-  at least once before each release (around twice a year).
-
-* Gerrit, Stash, Gitolite environments: although the testsuite
-  contains tests for these environments, a tester/maintainer for each
-  environment would be welcome to test and report failure (or success)
-  on real-life environments periodically (here also, feedback before
-  each release would be highly appreciated).
+We use `Opera Critic <https://critic.hoppipolla.co.uk/>`_ as an external
+code-review tool, which uses your GitHub login to authenticate.  You'll
+get email notifications for issues raised in the review.
 
 
-.. _`git-multimail repository on GitHub`: https://github.com/git-multimail/git-multimail
-.. _`Git mailing list`: git@vger.kernel.org
+Patch submission guidelines
+---------------------------
+
+- **Create a new Git branch specific to your change.** Do not put
+  multiple fixes/features in the same pull request. If you find an
+  unrelated bug, create a distinct branch and submit a separate pull
+  request for the bugfix. This makes life much easier for maintainers
+  and will speed up merging your patches.
+
+- **Write a test** whenever possible. Following existing tests is often
+  easiest, and a good way to tell whether the feature you're modifying
+  is easily testable.
+
+- **Make sure documentation is updated.** Keep docstrings current, and
+  if necessary, update the Sphinx documentation in ``doc/``.
+
+- **Add a changelog entry** at the top of ``CHANGES.rst`` following
+  existing entries' styles.
+
+- **Run tests with tox** if possible, to make sure your changes are
+  compatible with all supported Python versions.
+
+- **Squash commits** before submitting the pull request so that a single
+  commit contains the entire change, and only that change (see the first
+  bullet).
+
+- **Don't rebase after creating the pull request.** Merge with upstream,
+  if necessary, and use ``git commit --fixup`` for fixing issues raised
+  in a Critic review or by a failing Travis build. The reviewer will
+  squash and rebase your pull request while accepting it. Even though
+  GitHub won't recognize the pull request as accepted, the squashed
+  commits will properly specify you as the author.
+
+- **Attribute yourself** in ``AUTHORS.rst``.
