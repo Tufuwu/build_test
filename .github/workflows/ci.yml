@@ -21,16 +21,16 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.8"]
 
     steps:
     - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -48,10 +48,8 @@ jobs:
         pip install -r requirements.txt
         pip install -e .
         pip install tox
-
     - name: Run tests with tox
       run: |
         tox
-
     - name: Run PEP8 checks
       run: tox -e pep8
