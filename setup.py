@@ -1,46 +1,55 @@
-from codecs import open
-from os import path
+from setuptools import setup, find_packages
+import os
 
-from setuptools import setup
+here = os.path.abspath(os.path.dirname(__file__))
 
-here = path.abspath(path.dirname(__file__))
+def read_file(filename):
+    path = os.path.join(here, filename)
+    return open(path, encoding="utf-8").read() if os.path.exists(path) else ""
 
-# Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+README = read_file("README.rst")
+NEWS = read_file("NEWS.txt")
+
+version = "0.5.0"
+
+install_requires = [
+    "urllib3>=1.7.1",
+    "dnspython>=1.13.0",
+]
+
+extras_require = {
+    "test": [
+        "pytest",
+        "pytest-mock",
+        "pyOpenSSL>=0.14",
+    ]
+}
 
 setup(
-    name='aws_list_all',
-    version='0.8.0',
-    description='List all your AWS resources, all regions, all services.',
-    long_description=long_description,
-    url='https://github.com/JohannesEbke/aws_list_all',
-    author='Johannes Ebke',
-    author_email='johannes@ebke.org',
+    name="python-etcd",
+    version=version,
+    description="A python client for etcd",
+    long_description=README + "\n\n" + NEWS,
+    long_description_content_type="text/x-rst",
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.8',
+        "Topic :: System :: Distributed Computing",
+        "Topic :: Software Development :: Libraries",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Database :: Front-Ends",
     ],
-    keywords='aws boto3 listings resources region services',
-    packages=['aws_list_all'],
-    install_requires = [
-        'boto3>=1.26.5,<1.34.0',
-        'botocore>=1.29.5,<1.34.0',
-        'app_json_file_cache>=0.2.2',
-    ],
-    entry_points={
-        'console_scripts': [
-            'aws_list_all=aws_list_all.__main__:main',
-            'aws-list-all=aws_list_all.__main__:main',
-        ],
-    },
+    keywords="etcd raft distributed log api client",
+    author="Jose Plana",
+    author_email="jplana@gmail.com",
+    url="http://github.com/jplana/python-etcd",
+    license="MIT",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     include_package_data=True,
+    zip_safe=False,
+    install_requires=install_requires,
+
+    # Modern testing: no nose, no test_suite
+    extras_require=extras_require,
 )

@@ -1,3 +1,4 @@
-include LICENSE
-include aws_list_all/endpoint_hosts.json
-include aws_list_all/service_regions.json
+include AUTHORS
+include LICENSE.txt
+include README.rst
+include NEWS.txt
