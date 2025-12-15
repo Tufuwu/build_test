@@ -3,8 +3,9 @@ name: Python CI
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
+    types: [opened]
 
 jobs:
   build:
@@ -12,16 +13,16 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-      
+      uses: actions/checkout@v2
+
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
-        
+        python-version: '3.9'
+
     - name: Install dependencies
       run: |
-        pip freeze | xargs pip uninstall -y
+        if pip freeze | grep -v '^\-e' | grep -v '^\-f' | grep -v '^-e' | grep -v '^-f' | cut -d = -f 1 | xargs pip uninstall -y; then true; fi
         pip install -r requirements.txt
         pip install coveralls
         
