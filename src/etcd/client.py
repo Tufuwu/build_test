@@ -6,6 +6,7 @@
 
 
 """
+
 import logging
 
 try:
@@ -36,7 +37,6 @@ _log = logging.getLogger(__name__)
 
 
 class Client(object):
-
     """
     Client for etcd, the distributed log service using raft.
     """

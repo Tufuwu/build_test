@@ -118,7 +118,6 @@ class EtcdResult(object):
 
 
 class EtcdException(Exception):
-
     """
     Generic Etcd Exception.
     """
