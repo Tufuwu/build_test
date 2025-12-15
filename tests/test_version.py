@@ -1,16 +1,10 @@
-#
-# author: Jungtaek Kim (jtkim@postech.ac.kr)
-# last updated: October 23, 2021
-#
+import vakt
+from vakt import __version__
 
 
-STR_VERSION = '0.1.6'
+def test_version():
+    assert '1.5.0' == __version__
 
 
-def test_version_bayeso():
-    import bayeso_benchmarks
-    assert bayeso_benchmarks.__version__ == STR_VERSION
-
-def test_version_setup():
-    import pkg_resources
-    assert pkg_resources.require('bayeso-benchmarks')[0].version == STR_VERSION
+def test_version_info():
+    assert (1, 5, 0) == vakt.version_info()
