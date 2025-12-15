@@ -1,6 +1,3 @@
-include README.md
-include CHANGELOG.adoc
 include LICENSE
-include MANIFEST.in
-include etc/ldap.conf
-include etc/openssh-lpk.schema
+include aws_list_all/endpoint_hosts.json
+include aws_list_all/service_regions.json
