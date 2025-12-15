@@ -1,259 +1,247 @@
-<p align="center"><img src=".github/images/niaaml_logo.png" alt="NiaAML" title="NiaAML"/></p>
+[//]: # (copyright 2010-2012,2017,2020,2022 by flonatel GmbH & Co. KG / Andreas Florath)
+[//]: # ( )
+[//]: # (SPDX-License-Identifier: GPL-3.0-or-later)
+[//]: # ( )
+[//]: # (This file is part of rmtoo.)
+[//]: # ( )  
+[//]: # (rmtoo is free software: you can redistribute it and/or modify)
+[//]: # (it under the terms of the GNU General Public License as published by)
+[//]: # (the Free Software Foundation, either version 3 of the License, or)
+[//]: # (at your option any later version.)
+[//]: # ( )
+[//]: # (rmtoo is distributed in the hope that it will be useful,)
+[//]: # (but WITHOUT ANY WARRANTY; without even the implied warranty of)
+[//]: # (MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the)
+[//]: # (GNU General Public License for more details.)
+[//]: # ( )  
+[//]: # (You should have received a copy of the GNU General Public License)
+[//]: # (along with rmtoo.  If not, see <https://www.gnu.org/licenses/>.)
 
----
+# rmToo
 
-[![PyPI Version](https://img.shields.io/pypi/v/niaaml.svg)](https://pypi.python.org/pypi/niaaml)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/niaaml.svg)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/niaaml.svg)
-[![Downloads](https://pepy.tech/badge/niaaml)](https://pepy.tech/project/niaaml)
-[![GitHub license](https://img.shields.io/github/license/lukapecnik/niaaml.svg)](https://github.com/lukapecnik/niaaml/blob/master/LICENSE)
-![build](https://github.com/lukapecnik/niaaml/actions/workflows/test.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/lukapecnik/NiaAML/badge.svg?branch=master)](https://coveralls.io/github/lukapecnik/NiaAML?branch=master)
-[![Documentation Status](https://readthedocs.org/projects/niaaml/badge/?version=latest)](https://niaaml.readthedocs.io/en/latest/?badge=latest)
+Open Source Requirements Management Tool
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/w/lukapecnik/niaaml.svg)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lukapecnik/niaaml.svg)](http://isitmaintained.com/project/lukapecnik/niaaml "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/lukapecnik/niaaml.svg)](http://isitmaintained.com/project/lukapecnik/niaaml "Percentage of issues still open")
-![GitHub contributors](https://img.shields.io/github/contributors/lukapecnik/niaaml.svg)
+[![image](https://img.shields.io/github/release/florath/rmtoo.svg)](https://github.com/florath/rmtoo/releases)
+[![Build Status](https://github.com/florath/rmtoo/workflows/CI/badge.svg)](https://github.com/florath/rmtoo/actions)
+[![image](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![image](https://img.shields.io/codecov/c/github/codecov/example-python.svg)](https://codecov.io/gh/florath/rmtoo)
+[![image](https://img.shields.io/github/downloads/florath/rmtoo/total.svg)](http://rmtoo.florath.net)
+[![image](https://img.shields.io/pypi/v/rmtoo.svg)](https://pypi.python.org/pypi/rmtoo)
+[![image](https://img.shields.io/coverity/scan/12488.svg)](https://scan.coverity.com/projects/rmtoo)
+[![Code Climate](https://codeclimate.com/github/florath/rmtoo/badges/gpa.svg)](https://codeclimate.com/github/florath/rmtoo)
+[![Issue Count](https://codeclimate.com/github/florath/rmtoo/badges/issue_count.svg)](https://codeclimate.com/github/florath/rmtoo)
 
-[![DOI](https://zenodo.org/badge/289322337.svg)](https://zenodo.org/badge/latestdoi/289322337)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.02949/status.svg)](https://doi.org/10.21105/joss.02949)
+## Introduction
 
-NiaAML is a framework for Automated Machine Learning based on nature-inspired algorithms for optimization. The framework is written fully in Python. The name NiaAML comes from the Automated Machine Learning method of the same name [[1]](#1). Its goal is to compose the best possible classification pipeline for the given task efficiently using components on the input. The components are divided into three groups: feature selection algorithms, feature transformation algorithms and classifiers. The framework uses nature-inspired algorithms for optimization to choose the best set of components for the classification pipeline, and optimize their hyperparameters. We use the <a href="https://github.com/NiaOrg/NiaPy">NiaPy framework</a> for the optimization process, which is a popular Python collection of nature-inspired algorithms. The NiaAML framework is easy to use and customize or expand to suit your needs.
+This Readme gives a short overview over the available online
+documentation for rmtoo.
 
-The NiaAML framework allows you not only to run full pipeline optimization, but also to separate implemented components such as classifiers, feature selection algorithms, etc. **It supports numerical and categorical features as well as missing values in datasets.**
+## Content
 
-* **Free software:** MIT license,
-* **Documentation:** https://niaaml.readthedocs.io/en/latest/,
-* **Python versions:** 3.6.x, 3.7.x, 3.8.x, 3.9.x,
-* **Dependencies:** [click](CONTRIBUTING.md#development-dependencies),
-* **Tested OS:** Windows, Ubuntu, Fedora, Linux Mint and CentOS. **However, that does not mean it does not work on others.**
+This file contains the following chapters:
 
-![NiaAML Architecture](.github/images/niaaml.png)
+[Conventions](#Conventions)  
+[Operating System Support](#Operating-System-Support)  
+[Preinstalled VMs](#Preinstalled-VMs)  
+[Installation](#Installation)  
+[Installation using virtualenv](#Installation-using-virtualenv)  
+[First Project](#First-Project)  
+[Man Pages](#Man-Pages)  
+[Other Documentation](#Other-Documentation)  
+[Emacs Mode for Editing Requirements](#Emacs-Mode-for-Editing-Requirements)  
+[Footer](#Footer)
+
+## Conventions
+
+`YY`: names the version of rmtoo. You have to replace this with the real
+    version number.
+
+`$ cmd`: This is a command you have to type in. The `$` is a replacement for
+    the shell prompt - do not enter it as a part of the command.
+
+## Operating System Support
+
+rmtoo is fully supported under Linux. Nevertheless, because it is
+written in computer independent programming languages (such as python),
+is also works on other operating systems.
+
+Mac OS X users might want to read `Readme-OS-X.txt`.
+
+Windows users might want to read the `Readme-Windows.txt`.
+
+## Preinstalled VMs
+
+For evaluation proposes and running small projects there is the
+possibility to use Amazon AWS EC2 preinstalled VMs.
+
+More details are available in a dedicated
+[Readme](contrib/vmsetup/Readme.rst).
 
 ## Installation
 
-### pip3
+The following sections assume, that you are using Linux. Please refer to
+the appropriate Readme file for your operating system for more
+information if you do not use Linux.
 
-Install NiaAML with pip3:
+### Dependencies
 
-```sh
-pip3 install niaaml
+To use rmtoo, other software packages must be installed.
+
+rmtoo is written in python. At least version 3.5 of python is needed.
+python 3.8 may work, but there is a problem (bug (fix)?) is python 3.8
+which create different XML elements as the previous versions.
+
+When you want to create LaTeX or PDF documentation, LaTeX is needed.
+
+For the requirements dependency graph, graphviz is used.
+
+For statistics plot gnuplot is used. For the estimation module the
+python-scipy package is needed.
+
+Typically the packages from your distribution will work.
+
+### First Project
+
+The recommended way of starting is to copy the provided template
+project.
+
+The basic steps are:
+
+1)  Copy over the template project to some other directory.
+2)  Set up the environment
+3)  Run `make`
+4)  Check, if everything worked
+5)  Start changing / adapting things to your needs
+
+Note that during this document the project will be called
+\'MyNewProject\'. Please adapt the name for your needs.
+
+## Installation using virtualenv
+
+This is the preferred installation method - it takes care that at least
+the python dependencies are correctly installed.
+
+### Installation
+
+To install `rmtoo` in a virtualenv, execute the following steps:
+
+``` {.bash}
+$ mkdir RMTOO
+$ cd RMTOO
+$ virtualenv venv
+$ source venv/bin/activate
+$ pip install --upgrade pip setuptools wheel
+$ pip install --only-binary=numpy,scipy numpy scipy
+$ pip install rmtoo
 ```
 
-In case you would like to try out the latest pre-release version of the framework, install it using:
+This has only to be done once.
 
-```sh
-pip3 install niaaml --pre
+## First Project
+
+### Installation
+
+Change to a directory where you want to create the new project. This is
+needed only once.
+
+``` {.bash}
+# cd to virtualenv directory - if not already there
+$ cd RMTOO
+$ cp -r venv/rmtoo/contrib/template_project MyNewProject
 ```
 
-### Fedora Linux
+### Usage
 
-To install NiaAML on Fedora, use:
+To create all the artifacts for the template project, execute
 
-```sh
-$ dnf install python-niaaml
+``` {.bash}
+$ cd MyNewProject
+$ source ./setenv.sh VENV
+$ make
+$ ls artifacts
 ```
 
-## Graphical User Interface
+In the artifacts directory there are all the generated files. A typical
+workflow is, to change or add requirements, topics or the configuration
+in the `MyNewProject` directory, run `make` again and check the
+artifacts.
 
-There is a simple Graphical User Interface for the NiaAML package available [here](https://github.com/lukapecnik/NiaAML-GUI).
+## Man Pages
 
-## API
+When using the virtualenv, use
 
-There is a simple API for remote work with NiaAML package available [here](https://github.com/alenrajsp/NiaAML-API).
-
-## Components
-
-[Click here](COMPONENTS.md) for a list of currently implemented components divided into groups: classifiers, feature selection algorithms and feature transformation algorithms. At the end you can also see a list of currently implemented fitness functions for the optimization process, categorical features' encoders, and missing values' imputers. All of the components are passed into the optimization process using their class names. Let's say we want to choose between Adaptive Boosting, Bagging and Multi Layer Perceptron classifiers, Select K Best and Select Percentile feature selection algorithms and Normalizer as the feature transformation algorithm (may not be selected during the optimization process).
-
-```python
-PipelineOptimizer(
-    data=...,
-    classifiers=['AdaBoost', 'Bagging', 'MultiLayerPerceptron'],
-    feature_selection_algorithms=['SelectKBest', 'SelectPercentile'],
-    feature_transform_algorithms=['Normalizer']
-)
+``` {.bash}
+$ man -l venv/rmtoo/share/man/man7/rmtoo.7
 ```
 
-The argument of the PipelineOptimizer `categorical_features_encoder` is `None` by default. If your dataset contains any categorical features, you need to specify an encoder to use. The same goes for `imputer` and features that contain missing values.
+to get an overview over all available man pages. Those other man pages
+you can read also with man. Replace the file name with the appropriate
+manual page, like:
 
-```python
-PipelineOptimizer(
-    data=...,
-    classifiers=['AdaBoost', 'Bagging', 'MultiLayerPerceptron'],
-    feature_selection_algorithms=['SelectKBest', 'SelectPercentile'],
-    feature_transform_algorithms=['Normalizer'],
-    categorical_features_encoder='OneHotEncoder',
-    imputer='SimpleImputer'
-)
+``` {.bash}
+$ man -l venv/rmtoo/share/man/man7/rmtoo-analytics.7
 ```
 
-For a full example see the [Examples section](#examples) or the list of implemented examples [here](examples).
+### Additional Documentation
 
-## Optimization Process And Parameter Tuning
+Additional documentation can be found in the directories
+`RMTOO/venv/rmtoo/doc` (especially the Readme files).
 
-In the modifier version of NiaAML optimization process there are two types of optimization. The goal of the first type is to find an optimal set of components (feature selection algorithm, feature transformation algorithm and classifier). The next step is to find optimal parameters for the selected set of components, and that is the goal of the second type of optimization. Each component has an attribute `_params`, which is a dictionary of parameters and their possible values.
+## Other Documentation
 
-```python
-self._params = dict(
-    n_estimators = ParameterDefinition(MinMax(min=10, max=111), np.uint),
-    algorithm = ParameterDefinition(['SAMME', 'SAMME.R'])
-)
-```
+### FAQ
 
-An individual in the first type of optimization is represented as a real-valued vector that has a size equal to the sum of the number of keys in all three dictionaries (classifier's _params, Feature Transformation algorithm's _params and feature selection algorithm's _params) and the value of each dimension is in the range [0.0, 1.0]. The second type of optimization maps real values from the individual's vector to those parameter definitions in the dictionaries. Each parameter's value can be defined as a range or array of values. In the first case, a value from a vector is mapped from one iterval to another, and in the second case, a value from the vector falls into one of the bins that represent an index of the array that holds possible parameters` values.
+Frequently asked questions A collection of questions which were ask in
+the past - including the answers.
 
-Let's say we have a classifier with 3 parameters, a feature selection algorithm with 2 parameters and feature transformation algorithm with 4 parameters. The size of an individual in the second type of optimization is 9. The size of an individual in the first type of optimization is always 3 (1 classifier, 1 feature selection algorithm and 1 feature transformation algorithm).
+### Presentations
 
-In some cases we may want to tune a parameter that needs additional information for setting its range of values, so we cannot set the range in the initialization method. In that case, we should set its value in the dictionary to None and define it later in the process. The parameter will be a part of the parameter tuning process as soon as we define its possible values. For example, see [Select K Best Feature Selection](niaaml/preprocessing/feature_selection/select_k_best.py) and its parameter `k`.
+There are also two presentations about the design and features of rmtoo.
+Theese presentations can be found in the download section of the
+sourceforge project page. Please visit the projects home page
+<http://rmtoo.florath.net>
 
-**The NiaAML framwork also supports running optimization according to the original method proposed in [[1]](#1) where the components selection and hyperparameter optimization steps are combined into one.**
+### Readme-Overview.txt
 
-## Examples
+Description of the features of rmtoo.
 
-### Example of Usage
+### Readme-Hacking.txt
 
-Load data and try to find the optimal pipeline for the given components. The example below uses the Particle Swarm Algorithm as the optimization algorithm. You can find a list of all available algorithms in the <a href="https://github.com/NiaOrg/NiaPy">NiaPy's repository</a>.
+Small (and yet unfinished) document how to develop functionality and
+modules for rmtoo.
 
-```python
-from niaaml import PipelineOptimizer, Pipeline
-from niaaml.data import BasicDataReader
-import numpy
-import pandas
+### Readme-OS-X.txt
 
-# dummy random data
-data_reader = BasicDataReader(
-    x=numpy.random.uniform(low=0.0, high=15.0, size=(50, 3)),
-    y=numpy.random.choice(['Class 1', 'Class 2'], size=50)
-)
+Hints for Mac Users.
 
-pipeline_optimizer = PipelineOptimizer(
-    data=data_reader,
-    classifiers=['AdaBoost', 'Bagging', 'MultiLayerPerceptron', 'RandomForest', 'ExtremelyRandomizedTrees', 'LinearSVC'],
-    feature_selection_algorithms=['SelectKBest', 'SelectPercentile', 'ParticleSwarmOptimization', 'VarianceThreshold'],
-    feature_transform_algorithms=['Normalizer', 'StandardScaler']
-)
+### Readme-Windows.txt
 
-# run the modified version of optimization
-pipeline1 = pipeline_optimizer.run('Accuracy', 15, 15, 300, 300, 'ParticleSwarmAlgorithm', 'ParticleSwarmAlgorithm')
+Hints for Windows users.
 
-# run the original version
-pipeline2 = pipeline_optimizer.run_v1('Accuracy', 15, 400, 'ParticleSwarmAlgorithm')
-```
+### Readme-RmtooOnRmtoo.txt
 
-You can save a result of the optimization process as an object to a file for later use.
+Run rmtoo to get the documentation for rmtoo itself.
 
-```python
-pipeline1.export('pipeline.ppln')
-```
+### Readme-GitPython.txt
 
-And also load it from a file and use the pipeline.
+Some note about the (internal) use of GitPython.
 
-```python
-loaded_pipeline = Pipeline.load('pipeline.ppln')
+## Emacs Mode for Editing Requirements
 
-# some features (can be loaded using DataReader object instances)
-x = pandas.DataFrame([[0.35, 0.46, 5.32], [0.16, 0.55, 12.5]])
-y = loaded_pipeline.run(x)
-```
+When using the tar package, emacs mode can be loaded in emacs by:
+`M-x load-file` point to `RMTOO/venv/rmtoo/contrib/req-mode.el` All
+files with suffix `.req` will now use the requirements editing mode.
 
-You can also save a user-friendly representation of a pipeline to a text file.
+## Footer
 
-```python
-pipeline1.export_text('pipeline.txt')
-```
+If you have some problems, remarks or feature request, you\'re welcome
+to visit the project home page
 
-This is a very simple example with dummy data. It is only intended to give you a basic idea of how to use the framework.
+<http://rmtoo.florath.net>
 
-### Example of a Pipeline Component's Implementation
+| flonatel GmbH & Co. KG  
+| Andreas Florath  
+| <rmtoo@florath.net>
 
-The NiaAML framework is easily expandable, as you can implement components by overriding the base classes' methods. To implement a classifier you should inherit from the [Classifier](niaaml/classifiers/classifier.py) class, and you can do the same with [FeatureSelectionAlgorithm](niaaml/preprocessing/feature_selection/feature_selection_algorithm.py) and [FeatureTransformAlgorithm](niaaml/preprocessing/feature_transform/feature_transform_algorithm.py) classes. All of the mentioned classes inherit from the [PipelineComponent](niaaml/pipeline_component.py) class.
-
-Take a look at the [Classifier](niaaml/classifiers/classifier.py) class and the implementation of the [AdaBoost](niaaml/classifiers/ada_boost.py) classifier that inherits from it.
-
-### Example of a Fitness Function's Implementation
-
-The NiaAML framework also allows you to implement your own fitness function. All you need to do is implement the [FitnessFunction](niaaml/fitness/fitness_function.py) class.
-
-Take a look at the [Accuracy](niaaml/fitness/accuracy.py) implementation.
-
-### Example of a Feature Encoder's Implementation
-
-The NiaAML framework also allows you to implement your own feature encoder. All you need to do is implement the [FeatureEncoder](niaaml/preprocessing/encoding/feature_encoder.py) class.
-
-Take a look at the [OneHotEncoder](niaaml/preprocessing/encoding/one_hot_encoder.py) implementation.
-
-### Example of an Imputer's Implementation
-
-The NiaAML framework also allows you to implement your own imputer. All you need to do is implement the [Imputer](niaaml/preprocessing/imputation/imputer.py) class.
-
-Take a look at the [SimpleImputer](niaaml/preprocessing/imputation/simple_imputer.py) implementation.
-
-### More
-
-You can find more examples [here](examples).
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/lukapecnik"><img src="https://avatars0.githubusercontent.com/u/23029992?s=460&u=d1c802fd8c82af0a020b1e21af80a34d6e28fb10&v=4?s=100" width="100px;" alt=""/><br /><sub><b>Luka Pečnik</b></sub></a><br /><a href="https://github.com/lukapecnik/NiaAML/commits?author=lukapecnik" title="Code">💻</a> <a href="https://github.com/lukapecnik/NiaAML/commits?author=lukapecnik" title="Documentation">📖</a> <a href="https://github.com/lukapecnik/NiaAML/pulls?q=is%3Apr+reviewed-by%3Alukapecnik" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/lukapecnik/NiaAML/issues?q=author%3Alukapecnik" title="Bug reports">🐛</a> <a href="#example-lukapecnik" title="Examples">💡</a> <a href="https://github.com/lukapecnik/NiaAML/commits?author=lukapecnik" title="Tests">⚠️</a> <a href="#infra-lukapecnik" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-    <td align="center"><a href="https://github.com/firefly-cpp"><img src="https://avatars2.githubusercontent.com/u/1633361?v=4?s=100" width="100px;" alt=""/><br /><sub><b>firefly-cpp</b></sub></a><br /><a href="https://github.com/lukapecnik/NiaAML/commits?author=firefly-cpp" title="Code">💻</a> <a href="https://github.com/lukapecnik/NiaAML/issues?q=author%3Afirefly-cpp" title="Bug reports">🐛</a> <a href="#mentoring-firefly-cpp" title="Mentoring">🧑‍🏫</a> <a href="#research-firefly-cpp" title="Research">🔬</a> <a href="#ideas-firefly-cpp" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/sisco0"><img src="https://avatars0.githubusercontent.com/u/25695302?v=4?s=100" width="100px;" alt=""/><br /><sub><b>sisco0</b></sub></a><br /><a href="#ideas-sisco0" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/zStupan"><img src="https://avatars.githubusercontent.com/u/48752988?v=4?s=100" width="100px;" alt=""/><br /><sub><b>zStupan</b></sub></a><br /><a href="https://github.com/lukapecnik/NiaAML/commits?author=zStupan" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/musicinmybrain"><img src="https://avatars.githubusercontent.com/u/6898909?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ben Beasley</b></sub></a><br /><a href="https://github.com/lukapecnik/NiaAML/commits?author=musicinmybrain" title="Code">💻</a> <a href="#infra-musicinmybrain" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
-
-## Contributing
-
-We encourage you to contribute to NiaAML! Please check out the [Contributing to NiaAML guide](CONTRIBUTING.md) for guidelines about how to proceed.
-
-Everyone interacting in NiaAML's codebases, issue trackers, chat rooms and mailing lists is expected to follow the NiaAML [code of conduct](CODE_OF_CONDUCT.md).
-
-## Support
-
-### Usage Questions
-
-If you have questions about how to use NiaAML, or have an issue that isn’t related to a bug, you can place a question on [StackOverflow](https://stackoverflow.com/).
-
-You can also seek support via [email](mailto:lukapecnik96@gmail.com)
-
-NiaAML is a community supported package, nobody is paid to develop package nor to handle NiaAML support.
-
-**All people answering your questions are doing it with their own time, so please be kind and provide as much information as possible.**
-
-## Issues
-
-Before creating bug reports, please check existing issues list as you might find out that you don't need to create one. When you are creating a bug report, please include as many details as possible in the [issue template](.github/templates/ISSUE_TEMPLATE.md).
-
-## Licence
-
-This package is distributed under the MIT License. This license can be found online at <http://www.opensource.org/licenses/MIT>.
-
-## Disclaimer
-
-This framework is provided as-is, and there are no guarantees that it fits your purposes or that it is bug-free. Use it at your own risk!
-
-## References
-
-<a id="1">[1]</a> Iztok Fister Jr., Milan Zorman, Dušan Fister, Iztok Fister. <a href="https://link.springer.com/chapter/10.1007%2F978-981-15-2133-1_13">Continuous optimizers for automatic design and evaluation of classification pipelines</a>. In: Frontier applications of nature inspired computation. Springer tracts in nature-inspired computing, pp.281-301, 2020.
-
-## Cite us
-
-L. Pečnik, I. Fister Jr. "[NiaAML: AutoML framework based on stochastic population-based nature-inspired algorithms](https://joss.theoj.org/papers/10.21105/joss.02949)." Journal of Open Source Software 6.61 (2021): 2949.
-
-L. Pečnik, Fister, I., Fister, I. Jr. [NiaAML2: An Improved AutoML Using Nature-Inspired Algorithms](https://doi.org/10.1007/978-3-030-78811-7_23). In International Conference on Swarm Intelligence (pp. 243-252). Springer, Cham, 2021.
+\(c\) 2010-2012,2017,2020,2022 by flonatel GmbH & Co. KG  
+For licensing details see COPYING
