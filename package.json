@@ -1,0 +1,38 @@
+{
+  "name": "python-markdown-wiki",
+  "version": "0.1.1",
+  "description": "Wiki that can use Markdown and supports Heroku.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-cli --mode development",
+    "build": "webpack-cli --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jckdotim/python-markdown-wiki.git"
+  },
+  "author": "https://github.com/jckdotim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jckdotim/python-markdown-wiki/issues"
+  },
+  "homepage": "https://github.com/jckdotim/python-markdown-wiki",
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "cloudinary": "^1.14.0",
+    "css-loader": "^5.0.0",
+    "file-loader": "^6.0.0",
+    "github-markdown-css": "^4.0.0",
+    "inline-attachment": "^2.0.3",
+    "jquery": "^3.5.0",
+    "kind-of": ">=6.0.3",
+    "minimist": ">=1.2.6",
+    "popper.js": "^1.15.0",
+    "serialize-javascript": ">=3.1.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^5.0.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.0.1"
+  }
+}
