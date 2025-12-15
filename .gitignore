@@ -1,15 +1,17 @@
-syntax:glob
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
 
-env
-.envrc
+# Distribution / packaging
+env/
+build/
+dist/
+/MANIFEST
+*.egg-info/
+*.egg
+
+# pytest
+.cache/
+
+# Coverage report
 .coverage
-.direnv
-*.pyc
-test.db
-node_modules
-bower_components
-static/bundles/*
-
-.cache/v/cache/lastfailed
-
-.vscode
