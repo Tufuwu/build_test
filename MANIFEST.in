@@ -1,4 +1,2 @@
-include AUTHORS
-include LICENSE.txt
-include README.rst
-include NEWS.txt
+include requirements.txt
+include LICENSE
