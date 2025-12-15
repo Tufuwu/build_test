@@ -2,8 +2,8 @@
 
 Attribute-based access control (ABAC) SDK for Python.
 
-[![Build Status](https://travis-ci.org/kolotaev/vakt.svg?branch=master)](https://travis-ci.org/kolotaev/vakt)
-[![codecov.io](https://codecov.io/github/kolotaev/vakt/coverage.svg?branch=master)](https://codecov.io/github/kolotaev/vakt?branch=master)
+[![CI Status](https://github.com/kolotaev/vakt/workflows/CI/badge.svg?branch=master)](https://github.com/kolotaev/vakt/actions)
+[![codecov.io](https://codecov.io/github/kolotaev/vakt/coverage.svg?branch=master)](https://app.codecov.io/gh/kolotaev/vakt/tree/master)
 [![PyPI version](https://badge.fury.io/py/vakt.svg)](https://badge.fury.io/py/vakt)
 [![Apache 2.0 licensed](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://raw.githubusercontent.com/kolotaev/vakt/master/LICENSE)
 
@@ -55,7 +55,7 @@ toolkit that is based on policies.
 ABAC stands aside of RBAC and ACL models, giving you
 a fine-grained control on definition of the rules that restrict an access to resources and is generally considered a
 "next generation" authorization model.
-In its form Vakt resembles [IAM Policies](https://github.com/awsdocs/iam-user-guide/blob/master/doc_source/access_policies.md), but
+In its form Vakt resembles [IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html), but
 has a way nicer attribute managing.
 
 See [concepts](#concepts) section for more details.
@@ -92,10 +92,10 @@ Vakt allows you to gain:
 
 ### Install
 
-Vakt runs on Python >= 3.4.
+Vakt runs on Python >= 3.6.
 PyPy implementation is supported as well.
 
-For in-memory storage:
+Bare-bones installation with in-memory storage:
 ```bash
 pip install vakt
 ```
@@ -108,7 +108,17 @@ pip install vakt[mongo]
 For SQL storage:
 ```bash
 pip install vakt[sql]
+pip install $ANY_DB_DRIVER_OF_YOUR_CHOICE_SUPPORTED_BY_SQLALCHEMY
 ```
+
+For Redis storage:
+```bash
+pip install vakt[redis]
+```
+Also see [redis-py](https://redis.readthedocs.io/en/stable/index.html) docs.
+For example if `hiredis` is found in the system, it will be used as a faster parser.
+However vakt doesn't enforce this dependency.
+
 
 *[Back to top](#documentation)*
 
@@ -215,7 +225,7 @@ Policy(
     a developer and came from local IP address.
     """,
     actions=[Any()],
-    resources=[{'category': Eq('administration'), 'sub': In(['panel', 'switch'])}],
+    resources=[{'category': Eq('administration'), 'sub': In('panel', 'switch')}],
     subjects=[{'name': Any(), 'role': NotEq('developer')}],
     effect=ALLOW_ACCESS,
     context={'ip': CIDR('127.0.0.1/32')}
@@ -445,6 +455,9 @@ Due to relatively slow performance of regular expressions execution we recommend
 regex syntax only when you really need it, in other cases use simple strings:
 both will work perfectly (and now swiftly!) with RegexChecker.
 
+**NOTE. All regex checks are performed in a case-sensitive way by default.
+Even thought some storages (e.g. MemoryStorage) allow you to specify regex modifiers within the regex string, we do not translate regex modifiers to all storages (e.g. SQLStorage). Also see warning below**
+
 **WARNING. Please note, that storages have varying level of regexp support. For example,
 most SQL databases allow to use POSIX metacharacters whereas python `re` module
 and thus MemoryStorage does not. So, while defining policies you're safe and sound
@@ -555,6 +568,9 @@ When used with the RulesChecker it simply returns all the Policies from the data
 SQL storage is backed by SQLAlchemy, thus it should support any RDBMS available for it:
 MySQL, Postgres, Oracle, MSSQL, Sqlite, etc.
 
+Given that we support various SQL databases via SQLAlchemy, we don't specify any DB-specific drivers in the vakt
+dependencies. It's up to the user to provide a desired one. For example: `psycopg2` or `PyMySQL`.
+
 Example for MySQL.
 
 ```python
@@ -581,14 +597,15 @@ Feel free to report any issues.
 ##### Redis
 Redis storage.
 
-RedisStorate stores all Policies in he hash whose key is the collection name and the hash'es key value pairs are
+RedisStorate stores all Policies in a hash whose key is the collection name and the hash'es key value pairs are
 Policy UID -> serialized Policy representation.
 
 Default collection name is "vakt_policies".
 
 You can use different Serializers. Any custom or one of the vakt's native.
+Just pass it to the `RedisStorage` constructor.
 
-Vakt is shiped with:
+Vakt is shipped with:
 - `JSONSerializer`
 - `PickleSerializer` - the fastest. Used as the default one.
 
@@ -984,12 +1001,12 @@ $ pylint vakt                      # to check code quality with PyLint
 ```
 
 To run only integration tests (for Storage adapters other than `MemoryStorage`):
-Other
 
 ```bash
 $ docker run --rm -d -p 27017:27017 mongo
 $ # run sql and Redis database here as well...
 $ pytest -m integration
+$ pytest -m sql_integration
 ```
 
 Optionally you can use `make` to perform development tasks.

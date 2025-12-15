@@ -2,12 +2,18 @@
 All notable changes to this project will be documented in this file.
 
 
-## [1.6.0-alpha] - Not released
+## [1.6.0] - 2023-04-12
 ### Added
 - [Storage] New `RedisStorage`.
+- Added Python 3.9, 3.10 and 3.11 support.
 
 ### Changed
 - [Storage] `MemoryStorage` `update` method now doesn't add new policy to Storage if it did not exist prior to the call.
+- [Storage] `SQLStorage` regex checks are now performed with `REGEXP` operator instead of a `REGEXP BINARY`. This is 
+done to support MySQL 8. However this change doesn't affect the the expected and previous behavior of the storage.
+
+### Removed
+- Dropped Python 3.4 and 3.5 support. Minimal Python version is 3.6 now.
 
 
 ## [1.5.0] - 2020-07-23
