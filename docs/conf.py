@@ -16,7 +16,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -49,8 +49,8 @@ copyright = u'2011, Max Countryman'
 
 module_path = os.path.join(os.path.dirname(__file__), '..', 'flask_seasurf.py')
 module_path = os.path.abspath(module_path)
-version_line = filter(lambda l: l.startswith('__version_info__'),
-                      open(module_path))[0]
+version_line = [line for line in open(module_path)
+                if line.startswith('__version_info__')][0]
 
 __version__ = '.'.join(eval(version_line.split('__version_info__ = ')[-1]))
 
@@ -99,7 +99,7 @@ pygments_style = 'sphinx'
 
 
 # -- Options for HTML output ---------------------------------------------------
-html_theme_options = {'github_fork': 'maxcountryman/flask-seasurf', 'index_logo': False}
+# html_theme_options = {'github_fork': 'maxcountryman/flask-seasurf', 'index_logo': False}
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

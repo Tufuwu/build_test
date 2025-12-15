@@ -25,11 +25,7 @@ setup(
     test_suite='test_seasurf',
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Flask>=1.1.4,<2.0',
-        'Jinja2>=2.11.3,<3.0',
-        'MarkupSafe<2.1',
-    ],
+    install_requires=['Flask'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
