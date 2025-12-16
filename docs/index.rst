@@ -29,8 +29,9 @@ Tarball Release
 
 If you'd rather install fcache manually:
 
-1. Download the most recent release from `fcache's PyPi page <http://pypi.python.org/pypi/fcache/>`_.
-2. Run ``pip install fcache-X.X.X.tar.gz``
+1.  Download the most recent release from `fcache's PyPi page <http://pypi.python.org/pypi/fcache/>`_.
+2. Unpack the tarball.
+3. From inside the directory ``fcache-XX``, run ``python setup.py install``
 
 This will install fcache in your Python's ``site-packages`` directory.
 
@@ -52,20 +53,19 @@ directory.
 Running the Tests
 ~~~~~~~~~~~~~~~~~
 
-Development on fcache requires `hatch <https://hatch.pypa.io/latest/>`_:
-
-.. code-block:: bash
-
-    $ pip install hatch
-
 Running the tests is easy:
 
 .. code-block:: bash
 
-    $ hatch run test
+    $ python setup.py test
 
-You'll likely see that some environments were skipped. That's okay!
-Those will be tested automatically for pull requests.
+If you want to run the tests using different versions of Python, install and
+run tox:
+
+.. code-block:: bash
+
+    $ pip install tox
+    $ tox
 
 Getting Started
 ---------------
