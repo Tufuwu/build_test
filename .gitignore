@@ -1,9 +1,2 @@
-.idea/
-*.pyc
-*.vscode/
-dist/
-build/
-grill.egg-info/
-docs/build/
-docs/Makefile
-docs/make.bat
+_build
+*pyc
