@@ -44,10 +44,10 @@ jobs:
     - name: Install dependencies
       run: |
         git branch -a
-        git checkout main  # attach this repo
+        git checkout master  # attach this repo
         git submodule init
         git submodule update
-        (cd sphinx; git fetch origin; git checkout main; git reset --hard origin/main; git branch -a)
+        (cd sphinx; git fetch origin; git checkout master; git reset --hard origin/master; git branch -a)
         pip install -U pip setuptools
         pip install -r ./requirements.txt
     - name: Update translations
@@ -55,7 +55,7 @@ jobs:
     - name: After success
       run: |
         git branch -a
-        git checkout main  # attach this repo
+        git checkout master  # attach this repo
         git config --global user.email "sphinx-auto-update"
         git config --global user.name "sphinx-auto-update"
         git add .
