@@ -1,11 +1,11 @@
 fcache
 ======
 
-.. image:: https://badge.fury.io/py/fcache.png
-    :target: http://badge.fury.io/py/fcache
+.. image:: https://badge.fury.io/py/fcache.svg
+    :target: https://pypi.org/project/fcache
 
-.. image:: https://travis-ci.org/tsroten/fcache.png?branch=develop
-    :target: https://travis-ci.org/tsroten/fcache
+.. image:: https://github.com/tsroten/fcache/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/tsroten/fcache/actions/workflows/ci.yml
 
 fcache is a dictionary-like, file-based cache module for Python. It's simple
 to use, has an optional write buffer, and is
@@ -38,14 +38,14 @@ To install fcache, use pip:
 
 .. code:: bash
 
-    $ pip3 install fcache
+    $ pip install fcache
 
 fcache also requires the `appdirs <https://github.com/ActiveState/appdirs>`_ package.
 
 Documentation
 -------------
 
-`fcache's documentation <https://fcache.readthedocs.org/>`_ contains an introduction along with an API overview. For more information on how to get started with fcache, be sure to read the documentation.
+`fcache's documentation <https://tsroten.github.io/fcache/>`_ contains an introduction along with an API overview. For more information on how to get started with fcache, be sure to read the documentation.
 
 Bug/Issues Tracker
 ------------------

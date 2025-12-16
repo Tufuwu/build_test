@@ -8,7 +8,6 @@ reference.
 Installation
 ------------
 
-Installing fcache is easy. fcache supports Python 2.7 and 3.
 fcache also requires the `appdirs <https://github.com/ActiveState/appdirs>`_ package.
 
 Pip
@@ -30,9 +29,8 @@ Tarball Release
 
 If you'd rather install fcache manually:
 
-1.  Download the most recent release from `fcache's PyPi page <http://pypi.python.org/pypi/fcache/>`_.
-2. Unpack the tarball.
-3. From inside the directory ``fcache-XX``, run ``python setup.py install``
+1. Download the most recent release from `fcache's PyPi page <http://pypi.python.org/pypi/fcache/>`_.
+2. Run ``pip install fcache-X.X.X.tar.gz``
 
 This will install fcache in your Python's ``site-packages`` directory.
 
@@ -54,19 +52,20 @@ directory.
 Running the Tests
 ~~~~~~~~~~~~~~~~~
 
+Development on fcache requires `hatch <https://hatch.pypa.io/latest/>`_:
+
+.. code-block:: bash
+
+    $ pip install hatch
+
 Running the tests is easy:
 
 .. code-block:: bash
 
-    $ python setup.py test
+    $ hatch run test
 
-If you want to run the tests using different versions of Python, install and
-run tox:
-
-.. code-block:: bash
-
-    $ pip install tox
-    $ tox
+You'll likely see that some environments were skipped. That's okay!
+Those will be tested automatically for pull requests.
 
 Getting Started
 ---------------
@@ -148,6 +147,10 @@ API
     In addition to the four methods listed above, :class:`FileCache` objects
     also support the following standard :class:`dict` operations and methods:
 
+    .. describe:: list(f)
+
+        Return a list of all the keys used in the :class:`FileCache` *f*.
+
     .. describe:: len(f)
 
         Return the number of items in the :class:`FileCache` *f*.
@@ -177,7 +180,7 @@ API
     .. describe:: iter(f)
 
         Return an iterator over the keys of the cache.  This is a shortcut
-        for ``iter(f.keys())`` (``iterkeys()`` in Python 2).
+        for ``iter(f.keys())``.
 
     .. automethod:: clear()
 
@@ -192,15 +195,10 @@ API
         Return a new view of the cache's items (``(key, value)`` pairs).
         See the :ref:`documentation of view objects <dict-views>`.
 
-        In Python 2, this method returns a copy of the cache's list of
-        ``(key, value)`` pairs.
-
     .. method:: keys()
 
         Return a new view of the cache's keys.  See the :ref:`documentation
         of view objects <dict-views>`.
-
-        In Python 2, this method returns a copy of the cache's list of keys.
 
     .. method:: pop(key[, default])
 
@@ -210,7 +208,7 @@ API
 
     .. method:: popitem()
 
-        Remove and return an arbitrary ``(key, value)`` pair from the cache.
+        Remove and return a ``(key, value)`` pair from the cache.
 
     .. method:: setdefault(key[, default])
 
@@ -227,7 +225,5 @@ API
 
         Return a new view of the cache's values.  See the
         :ref:`documentation of view objects <dict-views>`.
-
-        In Python 2, this method returns a copy of the cache's list of values.
 
 .. include:: ../CHANGES.txt
