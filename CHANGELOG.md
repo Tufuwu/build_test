@@ -1,3 +1,4 @@
+
 # Change Log
 All notable changes to this project will be documented in this file.
 
@@ -5,9 +6,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## 4.1.0
+### Changed
+- Removed JKU validation for XSUAA tokens and replaced it with composing JKU using UAA Domain.
+- Added extra HTTP headers for improved IAS verification key retrieval.
+- Implemented more strict issuer validation for IAS tokens.
+
+## 4.0.1
+### Fixed
+- Bug: fix `aud` validation for IAS tokens
+
 ## 4.0.0
 ### Removed
-- Removed suport for sap_py_jwt.
+- Removed suport for sap_py_jwt
 
 ## 3.3.0
 ### Added
