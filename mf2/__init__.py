@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-
 """
 mf2
 
 A collection of analytical functions with 2 or more available fidelities.
 """
-import pkg_resources
+
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    from importlib_metadata import version, PackageNotFoundError
 
 from .multi_fidelity_function import MultiFidelityFunction, invert
 from .borehole import borehole
@@ -19,13 +22,15 @@ from .forrester import forrester, Forrester
 from .himmelblau import himmelblau
 from .six_hump_camelback import six_hump_camelback
 from .hartmann import hartmann6
-
 import mf2.adjustable
 
 __author__ = 'Sander van Rijn'
 __email__ = 's.j.van.rijn@liacs.leidenuniv.nl'
-__version__ = pkg_resources.get_distribution('mf2').version
 
+try:
+    __version__ = version("mf2")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 bi_fidelity_functions = (
     # 1D
