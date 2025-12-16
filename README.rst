@@ -1,8 +1,8 @@
 跟我一起写Makefile (PDF重制版)
 ##############################
 
-.. image:: https://github.com/seisman/how-to-write-makefile/actions/workflows/deploy.yml/badge.svg
-   :target: https://github.com/seisman/how-to-write-makefile/actions/workflows/deploy.yml
+.. image:: https://travis-ci.org/seisman/how-to-write-makefile.svg?branch=master
+    :target: https://travis-ci.org/seisman/how-to-write-makefile
 
 简介
 ----

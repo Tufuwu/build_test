@@ -112,11 +112,7 @@ strip
 
         $(strip a b c )
 
-  把字串 |abc| 去掉开头和结尾的空格，结果是 ``a b c``。
-
-  .. |abc| raw:: html
-
-     <code class="docutils literal notranslate"><span class="pre">a b c&nbsp;</span></code>
+  把字串 ``a b c `` 去到开头和结尾的空格，结果是 ``a b c`` 。
 
 findstring
 ~~~~~~~~~~

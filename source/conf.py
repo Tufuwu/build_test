@@ -163,10 +163,6 @@ latex_elements = {
     'utf8extra' : '',
     'inputenc'  : '',
     'release' : '',
-    'hyperref': r'''
-        \usepackage{hyperref}
-        \urlstyle{same}
-    ''',
     'maketitle' : '\\maketitle',
     'preamble' : r'''
         \usepackage{ctex}
