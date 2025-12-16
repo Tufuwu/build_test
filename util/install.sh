@@ -82,7 +82,7 @@ if [[ "$ARCH" == "i686" ]]; then
 fi
 
 # Check if the latest Ubuntu LTS is used.
-UBUNTU_RELEASE="20.04"
+UBUNTU_RELEASE="24.04"
 # Truly non-interactive apt-get installation
 INSTALL="sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q install"
 # REMOVE="sudo DEBIAN_FRONTEND=noninteractive apt-get -y -q remove"
