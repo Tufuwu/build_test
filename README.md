@@ -1,149 +1,116 @@
-# MF2: Multi-Fidelity-Functions
+# sphinx-doc.org on the Read The Docs.
+[![Build Status](https://travis-ci.org/sphinx-doc/sphinx-doc-translations.svg?branch=master)](https://travis-ci.org/sphinx-doc/sphinx-doc-translations)
+[![Documentation Status](https://readthedocs.org/projects/sphinx/badge/?version=master)](https://www.sphinx-doc.org/en/master/?badge=master)
 
-| Package Info                                 | Status                                                | Support                            |
-|----------------------------------------------|-------------------------------------------------------|------------------------------------|
-| [![PyPI version][PyPI-badge]][PyPI-url]      | [![Tests status][tests-badge]][actions-page]          | [![Docs Status][docs-badge]][docs] |
-| [![Conda][conda-badge]][conda-url]           | [![Coverage Status][coveralls-badge]][coveralls]      | [![Gitter][gitter-badge]][gitter]  |
-| ![PyPI - Python Version][PyPI-python-badge]  | [![Codacy Badge][codacy-badge]][codacy-url]           |                                    |
-| [![License: GPL v3][license-badge]][license] | [![Project Status: Active][devstate-badge]][devstate] |                                    |
-| [![DOI][Zenodo-badge]][Zenodo-url]           | [![CII Best Practices][cii-badge]][cii-url]           |                                    |
-| [![status][JOSS-badge]][JOSS paper]          |                                                       |                                    |
+This is a project to provide Sphinx official documentation with multiple versions and multiple languages on Read The Docs site.
 
-## Introduction
+Current procedure is bit tricky because Read The Docs doesn't have a way to specify options for sphinx-build command.
+conf.py files for each languages have 'language' and 'locale_dirs' values without having full copy of conf.py of sphinx doc. If we want to specify conf.py file that is out of source directory, we will use '-c' option for sphinx-build command. Unfortunately Read the Docs can't. If there are any better way, please let me know.
 
-The `mf2` package provides consistent, efficient and tested Python
-implementations of a variety of multi-fidelity benchmark functions. The goal is
-to simplify life for numerical optimization researchers by saving time otherwise
-spent reimplementing and debugging the same common functions, and enabling
-direct comparisons with other work using the same definitions, improving
-reproducibility in general.
+## URLs
 
-A multi-fidelity function usually reprensents an objective which should be
-optimized. The term 'multi-fidelity' refers to the fact that multiple versions
-of the objective function exist, which differ in the accuracy to describe the
-real objective. A typical real-world example would be the aerodynamic
-efficiency of an airfoil, e.g., its drag value for a given lift value. The
-different fidelity levels are given by the accuracy of the evaluation method
-used to estimate the efficiency. Lower-fidelity versions of the objective
-function refer to less accurate, but simpler approximations of the objective,
-such as computational fluid dynamic simulations on rather coarse meshes,
-whereas higher fidelity levels refer to more accurate but also much more
-demanding evaluations such as prototype tests in wind tunnels. The hope of
-multi-fildelity optimization approaches is that many of the not-so-accurate but
-simple low-fidelity evaluations can be used to achieve improved results on the
-realistic high-fidelity version of the objective where only very few
-evaluations can be performed.
+* RTD project pages for Sphinx:
 
-The only dependency of the mf2 package is the `numpy` package.
+  * https://readthedocs.org/projects/sphinx/  (Master)
+  * https://readthedocs.org/projects/sphinx-ar/
+  * https://readthedocs.org/projects/sphinx-ca-es/
+  * https://readthedocs.org/projects/sphinx-zh-cn/
+  * https://readthedocs.org/projects/sphinx-fr/
+  * https://readthedocs.org/projects/sphinx-de/
+  * https://readthedocs.org/projects/sphinx-it-it/
+  * https://readthedocs.org/projects/sphinx-ja/
+  * https://readthedocs.org/projects/sphinx-ko/
+  * https://readthedocs.org/projects/sphinx-pl-pl/
+  * https://readthedocs.org/projects/sphinx-pt-br/
+  * https://readthedocs.org/projects/sphinx-doc-ru/ (Other project "sphinx-ru" is already exist.)
+  * https://readthedocs.org/projects/sphinx-sr/
+  * https://readthedocs.org/projects/sphinx-sr-rs/
+  * https://readthedocs.org/projects/sphinx-es/
 
-Documentation is available at [mf2.readthedocs.io][docs]
+* Documentation pages for each languages:
 
-## Installation
+  * http://www.sphinx-doc.org/
+  * http://www.sphinx-doc.org/ar
+  * http://www.sphinx-doc.org/ca_ES
+  * http://www.sphinx-doc.org/zh_CN
+  * http://www.sphinx-doc.org/fr
+  * http://www.sphinx-doc.org/de
+  * http://www.sphinx-doc.org/it_IT
+  * http://www.sphinx-doc.org/ja
+  * http://www.sphinx-doc.org/ko
+  * http://www.sphinx-doc.org/pl_PL
+  * http://www.sphinx-doc.org/pt_BR
+  * http://www.sphinx-doc.org/ru (Other project "sphinx-ru" is already exist.)
+  * http://www.sphinx-doc.org/sr
+  * http://www.sphinx-doc.org/sr_RS
+  * http://www.sphinx-doc.org/es
 
-The recommended way to install `mf2` in your (virtual) environment is with
-Python's `pip`:
-```
-pip install mf2
-```
-or alternatively using `conda`:
-```
-conda install -c conda-forge mf2
-```
+## How to setup a translated documentation project on RTD
 
-For the latest version, you can install directly from source:
-```
-pip install https://github.com/sjvrijn/mf2/archive/main.zip
-```
+Detail is here: https://docs.readthedocs.org/en/latest/localization.html#project-with-multiple-translations
 
-To work in your own version locally, it is best to clone the repository first,
-and additionally create an editable install that includes the dev-requirements:
-```
-git clone https://github.com/sjvrijn/mf2.git
-cd mf2
-pip install -e ".[dev]"
-```
+Points are:
 
-## Example Usage
+* We must have RTD projects for each languages.
+* Each projects must have correct Language setting on "Settings" page.
+* Master project has connections to each translated projects on "translations settings" page.
 
-```python
-import mf2
-import numpy as np
 
-# set numpy random seed for reproducibility
-np.random.seed(42)
-# generate 5 random samples in 2D as matrix
-X = np.random.random((5, 2))
-
-# print high fidelity function values
-print(mf2.branin.high(X))
-# Out: array([36.78994906 34.3332972  50.48149005 43.0569396  35.5268224 ])
-
-# print low fidelity function values
-print(mf2.branin.low(X))
-# Out: array([-5.8762639  -6.66852889  3.84944507 -1.56314141 -6.23242223])
-```
-
-For more usage examples, please refer to the full documentation on
-[readthedocs][docs].
-
-## Contributing
-
-Contributions to this project such as bug reports or benchmark function
-suggestions are more than welcome! Please refer to
-[``CONTRIBUTING.md``][CONTRIBUTING.md] for more details.
-
-## Contact
-
-The [Gitter][gitter] channel is the preferred way to get in touch for any other
-questions, comments or discussions about this package.
-
-## Citation
-
-Was this package useful to you? Great! If this leads to a publication, we'd
-appreciate it if you would cite our [JOSS paper]:
+## How to update po files
 
 ```
-@article{vanRijn2020,
-  doi = {10.21105/joss.02049},
-  url = {https://doi.org/10.21105/joss.02049},
-  year = {2020},
-  publisher = {The Open Journal},
-  volume = {5},
-  number = {52},
-  pages = {2049},
-  author = {Sander van Rijn and Sebastian Schmitt},
-  title = {MF2: A Collection of Multi-Fidelity Benchmark Functions in Python},
-  journal = {Journal of Open Source Software}
-}
+sh ./locale/update.sh
 ```
 
-[PyPI-url]:             https://badge.fury.io/py/mf2
-[conda-url]:            https://anaconda.org/conda-forge/mf2
-[license]:              https://www.gnu.org/licenses/gpl-3.0
-[Zenodo-url]:           https://doi.org/10.5281/zenodo.4540752
-[JOSS paper]:           https://joss.theoj.org/papers/10.21105/joss.02049
+After that, you should commit updated po files.
 
-[actions-page]:         https://github.com/sjvrijn/mf2/actions
-[coveralls]:            https://coveralls.io/github/sjvrijn/mf2?branch=main
-[codacy-url]:           https://www.codacy.com/manual/sjvrijn/mf2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sjvrijn/mf2&amp;utm_campaign=Badge_Grade
-[devstate]:             https://www.repostatus.org/#active
-[cii-url]:              https://bestpractices.coreinfrastructure.org/projects/4231
 
-[docs]:                 https://mf2.readthedocs.io/en/latest/?badge=latest
-[gitter]:               https://gitter.im/pymf2/community
+## How to add a language
 
-[CONTRIBUTING.md]:      https://github.com/sjvrijn/mf2/blob/master/CONTRIBUTING.md
+1. add language to locale/update.sh:
 
-[PyPI-badge]:           https://badge.fury.io/py/mf2.svg
-[conda-badge]:          https://img.shields.io/conda/v/conda-forge/mf2
-[PyPI-python-badge]:    https://img.shields.io/pypi/pyversions/mf2
-[license-badge]:        https://img.shields.io/badge/License-GPLv3-blue.svg
-[Zenodo-badge]:         https://zenodo.org/badge/DOI/10.5281/zenodo.4540752.svg
-[JOSS-badge]:           https://joss.theoj.org/papers/10.21105/joss.02049/status.svg
-[tests-badge]:          https://github.com/sjvrijn/mf2/workflows/tests/badge.svg
-[coveralls-badge]:      https://coveralls.io/repos/github/sjvrijn/mf2/badge.svg?branch=main
-[codacy-badge]:         https://api.codacy.com/project/badge/Grade/54144e7d406b4558a14996b06a89adf8
-[devstate-badge]:       https://www.repostatus.org/badges/latest/active.svg
-[cii-badge]:            https://bestpractices.coreinfrastructure.org/projects/4231/badge
-[docs-badge]:           https://readthedocs.org/projects/mf2/badge/?version=latest
-[gitter-badge]:         https://badges.gitter.im/pymf2/community.svg
+   ```
+   - rm -R es ja
+   - tx pull -l es,ja
+   + rm -R es ja pt_BR
+   + tx pull -l es,ja,pt_BR
+   ```
+
+2. update po files
+
+3. commit them
+
+4. add new project on Read The Docs like:
+
+   https://readthedocs.org/projects/sphinx-pt-br/
+
+5. add translation project to parent project like:
+
+   https://readthedocs.org/dashboard/sphinx/translations/
+
+
+## How to add a new version
+
+1. add tag `1.7`
+
+   ```
+   git tag 1.7
+   ```
+
+2. replace old version `1_7` with `1_8` in:
+
+   - release.sh
+   - .travis.yml
+
+3. commit it and push them:
+
+   ```
+   git add release.sh .travis.yml
+   git commit -m "add new version: 1.8"
+   git push --tags
+   ```
+
+4. enable version 1.7 on RTD:
+
+   https://readthedocs.org/projects/sphinx-ja/versions/
+

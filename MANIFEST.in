@@ -1,2 +1,0 @@
-include LICENSE changelog.txt
-recursive-include docs *.rst
