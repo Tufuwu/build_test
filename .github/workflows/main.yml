@@ -2,12 +2,9 @@ name: update-translations
 
 on:
   push:
-    branches:
-      - main
 
-# on:
-#   schedule:
-#     - cron: "0 0 * * *" #runs at 00:00 UTC everyday
+  schedule:
+    - cron: "0 0 * * *" #runs at 00:00 UTC everyday
 
 jobs:
   ubuntu:
@@ -15,10 +12,10 @@ jobs:
     env:
       SPHINXINTL_TRANSIFEX_PROJECT_NAME: sphinx-doc
       SPHINXINTL_TRANSIFEX_USERNAME: sphinxjp
-      # SPHINXINTL_TRANSIFEX_PASSWORD: ${{ secrets.SPHINXINTL_TRANSIFEX_PASSWORD }}
+      SPHINXINTL_TRANSIFEX_PASSWORD: ${{ secrets.SPHINXINTL_TRANSIFEX_PASSWORD }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
     - name: Get date
       id: get-date
       run: |
@@ -27,16 +24,16 @@ jobs:
       shell: bash
     - name: cache pip
       id: cache-pip
-      uses: actions/checkout@v4
+      uses: actions/cache@v2
       with:
         path: |
           ~/.cache/pip
           ~/.local/
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}-${{ steps.get-date.outputs.yyyymm }}
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Check Python version
       run: python --version
     - name: Install graphviz
