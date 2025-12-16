@@ -21,10 +21,10 @@ jobs:
         uses: styfle/cancel-workflow-action@0.9.1
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2.4.0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: '3.8'
 
@@ -35,15 +35,18 @@ jobs:
         run: make html
 
       - name: Install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v1
+        uses: r-lib/actions/setup-tinytex@v2
 
       - name: Install LaTeX packages
         run: |
-          tlmgr install tabulary latexmk ulem environ trimspaces titlesec \
+          tlmgr update --self
+          tlmgr install --repository http://mirrors.ustc.edu.cn/CTAN/systems/texlive/tlnet/ \
+                      tabulary latexmk ulem environ trimspaces titlesec \
                       varwidth framed threeparttable wrapfig upquote capt-of \
-                      multirow eqparbox needspace fncychap letltxmacro
+                      multirow eqparbox needspace fncychap letltxmacro parskip \
+                      fancyhdr ctex
 
-      - name: Build PDF documentaiton
+      - name: Build PDF documentation
         run: |
           make latexpdf
           cp build/latex/Makefile.pdf build/html/
