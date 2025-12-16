@@ -9,30 +9,42 @@ import contextlib
 from itertools import chain
 
 from pxr import Usd, UsdGeom, Sdf, Plug, Ar, Tf
+import functools
 
-logger = logging.getLogger(__name__)
+# Python 3.8+ 兼容缓存装饰器
+try:
+    cache = functools.cache  # Python 3.9+
+except AttributeError:
+    cache = functools.lru_cache(maxsize=None)  # Python 3.8
 
-
-@functools.cache
+@cache
 def _attr_value_type_names():
-    values = inspect.getmembers(Sdf.ValueTypeNames, lambda v: isinstance(v, Sdf.ValueTypeName) and not v.isArray)
-    return frozenset(chain.from_iterable(obj.aliasesAsStrings for name, obj in values))
+    values = inspect.getmembers(
+        Sdf.ValueTypeNames, 
+        lambda v: isinstance(v, Sdf.ValueTypeName) and not v.isArray
+    )
+    return frozenset(
+        chain.from_iterable(obj.aliasesAsStrings for name, obj in values)
+    )
 
 
-@functools.cache
+@cache
 def _metadata_keys():
     # https://github.com/PixarAnimationStudios/USD/blob/7a5f8c4311fed3ef2271d5e4b51025fb0f513730/pxr/usd/sdf/textFileFormat.yy#L1400-L1409
     keys = {"doc", "subLayers"}
-    keys.update(chain.from_iterable(p.metadata.get('SdfMetadata', {}) for p in Plug.Registry().GetAllPlugins()))
+    keys.update(
+        chain.from_iterable(p.metadata.get('SdfMetadata', {}) for p in Plug.Registry().GetAllPlugins())
+    )
 
-    # TODO: investigate if there's another way of doing this, like via the registry above
     stage = Usd.Stage.CreateInMemory()
     UsdGeom.Scope.Define(stage, "/a").MakeInvisible()
 
     layer = stage.GetRootLayer()
-    layer.Traverse(layer.pseudoRoot.path, lambda path: keys.update(layer.GetObjectAtPath(path).GetMetaDataInfoKeys()))
+    layer.Traverse(
+        layer.pseudoRoot.path,
+        lambda path: keys.update(layer.GetObjectAtPath(path).GetMetaDataInfoKeys())
+    )
     return frozenset(keys)
-
 
 def _pruned_prims(prim_range: Usd.PrimRange, predicate):
     """Convenience generator that prunes a prim range based on the given predicate"""
