@@ -1,17 +1,45 @@
-init:
-	pip install -r requirements.txt
-	pip install -r test_requirements.txt
+# gpodder.net API Client
+# Copyright (C) 2009-2013 Thomas Perl and the gPodder Team
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PACKAGE := mygpoclient
+
+PYTHON ?= python
+FIND ?= find
+PYTEST ?= $(PYTHON) -m pytest
+
+help:
+	@echo ""
+	@echo "$(MAKE) test ......... Run unit tests"
+	@echo "$(MAKE) clean ........ Clean build directory"
+	@echo "$(MAKE) distclean .... $(MAKE) clean + remove 'dist/'"
+	@echo ""
 
 test:
-	pytest --spec -s tests/
+	$(PYTEST)
 
-test-coverage:
-	pytest --spec -s tests/ --cov=./greenswitch --cov-report term-missing
+docs:
+	epydoc -n 'gpodder.net API Client Library' -o docs/ mygpoclient -v --exclude='.*_test'
 
-build:
-	python setup.py sdist bdist_wheel
+clean:
+	$(FIND) . -name '*.pyc' -o -name __pycache__ -exec $(RM) -r '{}' +
+	$(RM) -r build
+	$(RM) .coverage MANIFEST
 
-upload:
-	python -m twine upload dist/*
+distclean: clean
+	$(RM) -r dist
 
-release: build upload
+.PHONY: help test docs clean distclean
+.DEFAULT: help
