@@ -1,40 +1,42 @@
-from setuptools import setup, find_packages
+import os
 
-from codecs import open
-from os import path
+from setuptools import setup
 
-here = path.abspath(path.dirname(__file__))
-
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+this_directory = os.path.dirname(__file__)
+module_path = os.path.join(this_directory, 'flask_bcrypt.py')
+version_line = [line for line in open(module_path)
+                if line.startswith('__version_info__')][0]
+with open(os.path.join(this_directory, 'README.markdown')) as f:
     long_description = f.read()
 
+__version__ = '.'.join(eval(version_line.split('__version_info__ = ')[-1]))
+
 setup(
-    name='simple-pid',
-    version='1.0.1',
-    description='A simple, easy to use PID controller',
+    name='Flask-Bcrypt',
+    version=__version__,
+    url='https://github.com/maxcountryman/flask-bcrypt',
+    license='BSD',
+    author='Max Countryman',
+    author_email='maxc@me.com',
+    description='Brcrypt hashing for Flask.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/m-lundberg/simple-pid',
-    author='Martin Lundberg',
-    license='MIT',
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
-    ],
-    keywords='pid controller control',
-    packages=find_packages(exclude=['tests']),
-    package_data={
-        'simple_pid': ['*.pyi', 'py.typed'],
-    },
-    include_package_data=True,
+    py_modules=['flask_bcrypt'],
     zip_safe=False,
-    extras_require={
-        'docs': ['m2r', 'sphinx-rtd-theme'],
-    },
-    project_urls={
-        'Documentation': 'https://simple-pid.readthedocs.io/',
-    },
+    platforms='any',
+    install_requires=['Flask', 'bcrypt>=3.1.1'],
+    classifiers=[
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    test_suite='test_bcrypt'
 )
