@@ -1,329 +1,111 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+from unittest import TestCase
+from unittest.mock import patch
 
-from nvd3 import lineChart
-from nvd3 import lineWithFocusChart
-from nvd3 import stackedAreaChart
-from nvd3 import multiBarHorizontalChart
-from nvd3 import linePlusBarChart
-from nvd3 import cumulativeLineChart
-from nvd3 import scatterChart
-from nvd3 import discreteBarChart
-from nvd3 import pieChart
-from nvd3 import multiBarChart
-from nvd3 import multiChart
-from nvd3 import bulletChart
-from nvd3.NVD3Chart import stab
-from nvd3.translator import Function, AnonymousFunction, Assignment
-import random
-import unittest
-import datetime
-import time
+from flask_github import GitHub
+
+from pypi_notifier.app import create_app
+from pypi_notifier.extensions import db
+from pypi_notifier.models import User, Repo, Requirement, Package
 
 
-class ChartTest(unittest.TestCase):
+class PyPINotifierTestCase(TestCase):
 
-    def test_chartWithBadName(self):
-        name = "Chart with spaces"
-        chart = lineChart(name=name, date=True, height=350)
-        chart.buildhtml()
-        assert(" " not in chart.name)
-        assert("spaces" in chart.name)
+    def setUp(self):
+        self.app = create_app("testing")
+        self.client = self.app.test_client()
+        self._ctx = self.app.test_request_context()
+        self._ctx.push()
+        db.create_all()
 
-    def test_lineWithFocusChart(self):
-        """Test Line With Focus Chart"""
-        type = "lineWithFocusChart"
-        chart = lineWithFocusChart(name=type, date=True, height=350)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [1365026400000 + x * 100000 for x in xdata]
-        ydata = [i + random.randint(-10, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self._ctx.pop()
 
-    def test_lineChart(self):
-        """Test Line Chart"""
-        type = "lineChart"
-        chart = lineChart(name=type, date=True, height=350)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [1365026400000 + x * 100000 for x in xdata]
-        ydata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
-        # extra tests
-        chart.buildcontent()
-        chart.buildhtmlheader()
+    def test_index(self):
+        rv = self.client.get('/')
+        assert 'Login' in rv.data.decode()
 
-    def test_lineChart_tooltip(self):
-        """Test Line Chart"""
-        type = "lineChart"
-        chart = lineChart(name=type, date=True, height=350)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [1365026400000 + x * 100000 for x in xdata]
-        ydata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
+    def test_login(self):
+        rv = self.client.get('/login')
+        assert rv.status_code == 302
+        assert 'github.com' in rv.headers['Location']
 
-        kwargs1 = {'color': 'green'}
-        kwargs2 = {'color': 'red'}
+    @patch.object(User, 'get_emails_from_github')
+    @patch.object(GitHub, 'get')
+    @patch.object(GitHub, '_handle_response')
+    def test_github_callback(self, handle_response, get, get_emails_from_github):
+        handle_response.return_value = 'asdf'
+        get.return_value = {'id': 1, 'login': 'cenkalti', 'email': 'cenk@x.com'}
+        get_emails_from_github.return_value = [{'email': 'cenk@x.com',
+                                                'primary': True,
+                                                'verified': True}]
 
-        extra_serie = {"tooltip": {"y_start": "There is ", "y_end": " random values"}}
-        chart.add_serie(name="Random X-Axis", y=ydata, x=xdata, extra=extra_serie, **kwargs1)
-        extra_serie = {"tooltip": {"y_start": "", "y_end": " double values"}}
-        chart.add_serie(name="Double X-Axis", y=ydata2, x=xdata, extra=extra_serie, **kwargs2)
+        self.client.get('/github-callback?code=xxxx')
 
-        chart.buildhtml()
+        user = User.query.get(1)
+        assert user
+        assert user.github_token == 'asdf'
 
-        assert(".tickFormat(d3.format(',.02f'));" in chart.htmlcontent)
+    def fixture(self):
+        u1 = User('u1')
+        u1.email = 'test@test'
+        u2 = User('u2')
+        u2.email = 'test@test'
+        r1 = Repo('r1', u1)
+        r2 = Repo('r2', u2)
+        p1 = Package('p1')
+        p2 = Package('p2')
+        req1 = Requirement(r1, p1)
+        req2 = Requirement(r2, p1)
+        req3 = Requirement(r2, p2)
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.add(req1)
+        db.session.add(req2)
+        db.session.add(req3)
+        db.session.commit()
+        return locals()
 
-    def test_linePlusBarChart(self):
-        """Test line Plus Bar Chart"""
-        type = "linePlusBarChart"
-        chart = linePlusBarChart(name=type, date=True, height=350)
-        start_time = int(time.mktime(datetime.datetime(2012, 6, 1).timetuple()) * 1000)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [start_time + x * 1000000000 for x in xdata]
-        ydata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [i + random.randint(1, 10) for i in reversed(list(range(nb_element)))]
-        kwargs = {}
-        kwargs['bar'] = True
-        chart.add_serie(y=ydata, x=xdata, **kwargs)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
+    def test_remove_user(self):
+        """Tests SQLAlchemy relationships.
 
-    def test_stackedAreaChart(self):
-        """Test Stacked Area Chart"""
-        type = "stackedAreaChart"
-        chart = stackedAreaChart(name=type, height=400)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [100 + x for x in xdata]
-        ydata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
+        When a User deletes his account all of the records should be deleted
+        except Packages.
 
-    def test_MultiBarChart(self):
-        """Test Multi Bar Chart"""
-        type = "MultiBarChart"
-        chart = multiBarChart(name=type, height=400)
-        nb_element = 10
-        xdata = list(range(nb_element))
-        ydata = [random.randint(1, 10) for i in range(nb_element)]
-        extra = {"type": "bar", "yaxis": 1}
-        chart.add_serie(y=ydata, x=xdata, extra=extra)
-        chart.buildhtml()
+        """
+        f = self.fixture()
 
-    def test_multiChart(self):
-        """Test Multi (line plus bar) Chart"""
-        type = "multiChart"
-        chart = multiChart(
-            name=type, x_is_date=False, x_axis_format="AM_PM",
-            no_data_message='custom message shows when there is no data',
-            xAxis_staggerLabel=True
-        )
+        db.session.delete(f['u2'])
+        db.session.commit()
 
-        xdata = [1,2,3,4,5,6]
-        ydata = [115.5,160.5,108,145.5,84,70.5]
-        ydata2 = [48624,42944,43439,24194,38440,31651]
-        kwargs1 = {'color': 'brown'}
-        kwargs2 = {'color': '#bada55'}
-        extra_serie = {"tooltip": {"y_start": "There is ", "y_end": " calls"}}
-        chart.add_serie(y=ydata, x=xdata, type='line', yaxis=1, name='visits', extra=extra_serie, **kwargs1)
-        extra_serie = {"tooltip": {"y_start": "", "y_end": " at this point"}}
-        chart.add_serie(y=ydata2, x=xdata, type='bar', yaxis=2,name='spend', extra=extra_serie, **kwargs2)
-        chart.buildhtml()
+        assert User.query.all() == [f['u1']]
+        assert Repo.query.all() == [f['r1']]
+        assert Requirement.query.all() == [f['req1']]
+        assert Package.query.all() == [f['p1'], f['p2']]
 
-        assert("chart.noData('custom message shows when there is no data')" in chart.htmlcontent)
-        assert("function get_am_pm" in chart.htmlcontent)
+    @patch.object(Package, 'get_all_names')
+    def test_update_requirements(self, get_all_names):
+        get_all_names.return_value = {'a': 'a', 'b': 'b'}
 
+        u = User('t')
+        u.email = 'test@test'
+        r = Repo(2, u)
+        db.session.add(r)
+        db.session.commit()
 
-    def test_multiBarHorizontalChart(self):
-        """Test multi Bar Horizontal Chart"""
-        type = "multiBarHorizontalChart"
-        chart = multiBarHorizontalChart(name=type, height=350)
-        nb_element = 10
-        xdata = list(range(nb_element))
-        ydata = [random.randint(-10, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
+        with patch.object(Repo, 'fetch_requirements') as fetch_requirements:
+            fetch_requirements.return_value = "a==1.0\nb==2.1"
+            r.update_requirements()
+            db.session.commit()
 
-    def test_cumulativeLineChart(self):
-        """Test Cumulative Line Chart"""
-        type = "cumulativeLineChart"
-        chart = cumulativeLineChart(name=type, height=400)
-        start_time = int(time.mktime(datetime.datetime(2012, 6, 1).timetuple()) * 1000)
-        nb_element = 100
-        xdata = list(range(nb_element))
-        xdata = [start_time + x * 1000000000 for x in xdata]
-        ydata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.add_serie(y=ydata2, x=xdata)
-        chart.buildhtml()
+        reqs = Requirement.query.all()
+        assert len(reqs) == 2, reqs
+        assert (reqs[0].package.name, reqs[0].required_version) == ('a', '1.0')
+        assert (reqs[1].package.name, reqs[1].required_version) == ('b', '2.1')
 
-    def test_scatterChart(self):
-        """Test Scatter Chart"""
-        type = "scatterChart"
-        chart = scatterChart(name=type, date=True, height=350)
-        nb_element = 100
-        xdata = [i + random.randint(1, 10) for i in range(nb_element)]
-        ydata = [i * random.randint(1, 10) for i in range(nb_element)]
-        ydata2 = [x * 2 for x in ydata]
-        ydata3 = [x * 5 for x in ydata]
-
-        kwargs1 = {'shape': 'circle', 'size': '1'}
-        kwargs2 = {'shape': 'cross', 'size': '10'}
-        kwargs3 = {'shape': 'triangle-up', 'size': '100'}
-        chart.add_serie(y=ydata, x=xdata, **kwargs1)
-        chart.add_serie(y=ydata2, x=xdata, **kwargs2)
-        chart.add_serie(y=ydata3, x=xdata, **kwargs3)
-        chart.buildhtml()
-
-    def test_discreteBarChart(self):
-        """Test discrete Bar Chart"""
-        type = "discreteBarChart"
-        chart = discreteBarChart(name=type, height=350)
-        xdata = ["A", "B", "C", "D", "E", "F", "G"]
-        ydata = [3, 12, -10, 5, 35, -7, 2]
-
-        chart.add_serie(y=ydata, x=xdata)
-        chart.buildhtml()
-
-        # We don't modify the xAxis, so make sure that it's not invoked.
-        assert("chart.xAxis" in chart.htmlcontent)
-        assert("var chart = nv.models.discreteBarChart();" in chart.htmlcontent)
-
-    def test_pieChart(self):
-        """Test Pie Chart"""
-        type = "pieChart"
-        chart = pieChart(name=type, color_category='category20c', height=400, width=400)
-        xdata = ["Orange", "Banana", "Pear", "Kiwi", "Apple", "Strawberry", "Pineapple"]
-        color_list = ['orange', 'yellow', '#C5E946', '#95b43f', 'red', '#FF2259', '#F6A641']
-        extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}, "color_list": color_list}
-        ydata = [3, 4, 0, 1, 5, 7, 3]
-        chart.add_serie(y=ydata, x=xdata, extra=extra_serie)
-        chart.buildhtml()
-
-        assert("tooltip_str =" in chart.htmlcontent)
-
-    def test_donutPieChart(self):
-        """Test Donut Pie Chart"""
-        type = "pieChart"
-        chart = pieChart(name=type, height=400, width=400, donut=True, donutRatio=0.2)
-        xdata = ["Orange", "Banana", "Pear", "Kiwi", "Apple", "Strawberry", "Pineapple"]
-        ydata = [3, 4, 0, 1, 5, 7, 3]
-        chart.add_serie(y=ydata, x=xdata)
-        chart.buildhtml()
-
-    def test_can_create_bulletChart(self):
-        type = 'bulletChart'
-        chart = bulletChart(name=type, height=100, width=500)
-        title = 'Revenue',
-        subtitle = 'US$, in thousands'
-        ranges = [150, 225, 300]
-        measures = [220, 270]
-        markers = [250]
-        chart.add_serie(
-            title=title,
-            subtitle=subtitle,
-            ranges=ranges,
-            measures=measures,
-            markers=markers)
-        chart.buildhtml()
-
-    def test_bulletChart_htmlcontent_correct(self):
-        type = 'bulletChart'
-        chart = bulletChart(name=type, height=100, width=500)
-        title = 'Revenue',
-        subtitle = 'USD, in mill'
-        ranges = [100, 250, 300]
-        measures = [220, 280]
-        markers = [260]
-        chart.add_serie(
-            title=title,
-            subtitle=subtitle,
-            ranges=ranges,
-            measures=measures,
-            markers=markers)
-        chart.buildhtml()
-        assert 'data_bulletchart' in chart.htmlcontent
-        assert '"title": ["Revenue"]'  in chart.htmlcontent
-        assert '"ranges": [100, 250, 300]' in chart.htmlcontent
-        assert 'nv.models.bulletChart();' in chart.htmlcontent
-
-    def test_bulletChart_marker_optional(self):
-        type = 'bulletChart'
-        chart = bulletChart(name=type, height=100, width=500)
-        title = 'Revenue',
-        subtitle = 'USD, in mill'
-        ranges = [100, 250, 300]
-        measures = [220, 280]
-        chart.add_serie(
-            title=title,
-            subtitle=subtitle,
-            ranges=ranges,
-            measures=measures
-            )
-        chart.buildhtml()
-        assert 'data_bulletchart' in chart.htmlcontent
-        assert 'marker' not in chart.htmlcontent
-
-
-    def test_charts_with_extras(self):
-        #  extras="d3.selectAll('#mygraphname text').style('opacity', 0.5)"
-        type_bullet = 'bulletChart'
-        bullet_chart = bulletChart(name=type_bullet, height=100, width=500, extras="d3.selectAll('#mygraphname text').style('opacity', 0.5)")
-        bullet_chart.buildhtml()
-        assert 'data_bulletchart' in bullet_chart.htmlcontent
-        assert "d3.selectAll('#mygraphname text').style('opacity', 0.5)" in bullet_chart.htmlcontent
-
-        type_pie = "pieChart"
-        pie_chart = pieChart(name=type_pie, height=400, width=400, donut=True, donutRatio=0.2, extras="alert('Example of extra not even related to d3!')")
-        pie_chart.buildhtml()
-        assert "alert('Example of extra not even related to d3!')" in pie_chart.htmlcontent
-
-        type_line_plus_bar = "linePlusBarChart"
-        line_plus_bar_chart = linePlusBarChart(name=type_line_plus_bar, date=True, height=350, extras="d3.selectAll('#mygraphname text').style('fill', 'red')")
-        line_plus_bar_chart.buildhtml()
-        assert "d3.selectAll('#mygraphname text').style('fill', 'red')" in line_plus_bar_chart.htmlcontent
-
-class FuncTest(unittest.TestCase):
-
-    def test_stab(self):
-        self.assertEqual("    ", stab(1))
-
-
-class TranslatorTest(unittest.TestCase):
-
-    def test_pieChart(self):
-        func = Function('nv').addGraph(
-            AnonymousFunction('', Assignment(
-                'chart',
-                Function('nv').models.pieChart().x(
-                    AnonymousFunction('d', 'return d.label;')
-                ).y(AnonymousFunction('d', 'return d.value;')
-                    ).showLabels('true')
-                )
-            )
-        )
-        self.assertEqual(str(func),
-                         'nv.addGraph(function() { var chart = '
-                         'nv.models.pieChart().x(function(d) { return d.label; '
-                         '}).y(function(d) { return d.value; }).showLabels(true); })')
-
-
-if __name__ == '__main__':
-    unittest.main()
-
-# Usage
-# python tests.py -v
+    def test_strip_index_url(self):
+        s = "-i http://simple.crate.io/\ndjango\ncelery"
+        from pypi_notifier.models.repo import strip_requirements
+        s = strip_requirements(s)
+        assert s == 'django\ncelery'
