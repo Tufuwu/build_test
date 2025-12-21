@@ -1,35 +1,67 @@
-from setuptools import setup
+#! /usr/bin/env python
+# coding=utf-8
 
-# read in version string
-VERSION_FILE = 'flowio/_version.py'
-__version__ = ''  # to avoid inspection warning and check if __version__ was loaded
-exec(open(VERSION_FILE).read())
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-# empty strings evaluate as False in a boolean context
-if not __version__:
-    raise RuntimeError("__version__ string not found in file %s" % VERSION_FILE)
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
+with open('CHANGELOG.rst') as history_file:
+    history = history_file.read().replace('.. :changelog:', '')
+
+requirements = [
+]
+
+test_requirements = [
+    # TODO: put package test requirements here
+]
 
 setup(
-    name='FlowIO',
-    version=__version__,
-    packages=['flowio'],
-    package_data={'': []},
-    description='FlowIO is a Python library for reading / writing Flow Cytometry Standard (FCS) files',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Scott White',
-    author_email='whitews@gmail.com',
-    license='BSD',
-    license_files=('LICENSE',),
-    url='https://github.com/whitews/flowio',
-    requires=[],
+    name='python-nvd3',
+    version='0.14.2',
+    description="Python NVD3 - Chart Library for d3.js",
+    long_description=readme + '\n\n' + history,
+    keywords='plot, graph, nvd3, d3',
+    author='Belaid Arezqui',
+    author_email='areski@gmail.com',
+    url='http://github.com/areski/python-nvd3',
+    license="MIT",
+    py_modules=['nvd3'],
+    namespace_packages=[],
+    test_suite='tests',
+    packages=[
+        'nvd3',
+    ],
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[
+        'python-slugify>=1.2.5',
+        'Jinja2>=2.8'
+        # -*- Extra requirements: -*-
+    ],
+    entry_points={
+        'console_scripts': [
+            'nvd3 = nvd3.NVD3Chart:_main',
+        ],
+    },
     classifiers=[
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.7'
-    ]
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Multimedia :: Graphics :: Presentation',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
 )
