@@ -1,28 +1,30 @@
-import setuptools
+from platform import python_version
+from setuptools import setup
 
-from tinytuya import __version__
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+def readme():
+    with open('README.md') as readme_file:
+        return readme_file.read()
 
-setuptools.setup(
-    name="tinytuya",
-    version=__version__,
-    author="Jason Cox",
-    author_email="jason@jasonacox.com",
-    description="Python module to interface with Tuya WiFi smart devices",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url='https://github.com/jasonacox/tinytuya',
-    packages=setuptools.find_packages(),
-    install_requires=[
-        'pycryptodome',  # Encryption - AES can also be provided via PyCrypto or pyaes
-        'requests',      # Used for Setup Wizard - Tuya IoT Platform calls
-    ],
+
+setup(
+    name='comment_parser',
+    version='1.2.5',
+    description='Parse comments from various source files.',
     classifiers=[
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        'Development Status :: 5 - Production/Stable',
+        'Programming Language :: Python :: 3',
+        'Topic :: Software Development :: Documentation',
+        'License :: OSI Approved :: MIT License'
     ],
+    url='http://github.com/jeanralphaviles/comment_parser',
+    author='Jean-Ralph Aviles',
+    author_email='jeanralph.aviles+pypi@gmail.com',
+    license='MIT',
+    long_description=readme(),
+    long_description_content_type='text/markdown',
+    packages=['comment_parser', 'comment_parser.parsers'],
+    install_requires=['python-magic>=0.4.27'],
+    zip_safe=False,
+    python_requires='>=3.13',
 )
