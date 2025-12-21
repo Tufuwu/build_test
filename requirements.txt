@@ -1,2 +1,0 @@
-in-toto==1.2.0
-securesystemslib==0.26.0
