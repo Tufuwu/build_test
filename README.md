@@ -1,229 +1,126 @@
-[![Build Status](https://github.com/laowantong/paroxython/actions/workflows/build.yml/badge.svg)](https://github.com/laowantong/paroxython/actions/workflows/build.yml)
-[![codecov](https://img.shields.io/codecov/c/github/laowantong/paroxython/master)](https://codecov.io/gh/laowantong/paroxython)
-[![Checked with mypy](https://img.shields.io/badge/typing-mypy-brightgreen)](http://mypy-lang.org/)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73432ed4c5294326ba6279bbbb0fe2e6)](https://www.codacy.com/manual/laowantong/paroxython)
-[![Updates](https://pyup.io/repos/github/laowantong/paroxython/shield.svg)](https://pyup.io/repos/github/laowantong/paroxython/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/paroxython)
-[![GitHub Release](https://img.shields.io/github/release/laowantong/paroxython.svg?style=flat)]()
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/laowantong/paroxython)
-[![paroxython SLOC](https://img.shields.io/badge/main%20program-~1850%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython)
-[![tests SLOC](https://img.shields.io/badge/tests-~2550%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/tests)
-[![helpers SLOC](https://img.shields.io/badge/helpers-~900%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/helpers)
-[![spec features](https://img.shields.io/badge/spec-173%20features-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md)
-[![taxonomy mappings](https://img.shields.io/badge/taxonomy-282%20mappings-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/taxonomy.tsv)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/y/laowantong/paroxython.svg?style=flat)
-[![Downloads](https://pepy.tech/badge/paroxython/week)](https://pepy.tech/project/paroxython/week)
+# simple-pid
+
+[![Tests](https://github.com/m-lundberg/simple-pid/actions/workflows/run-tests.yml/badge.svg)](https://github.com/m-lundberg/simple-pid/actions?query=workflow%3Atests)
+[![PyPI](https://img.shields.io/pypi/v/simple-pid.svg)](https://pypi.org/project/simple-pid/)
+[![Read the Docs](https://img.shields.io/readthedocs/simple-pid.svg)](https://simple-pid.readthedocs.io/)
+[![License](https://img.shields.io/github/license/m-lundberg/simple-pid.svg)](https://github.com/m-lundberg/simple-pid/blob/master/LICENSE.md)
+[![Downloads](https://pepy.tech/badge/simple-pid)](https://pepy.tech/project/simple-pid)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Band-aid](https://badgen.net/badge/not%C2%A0%C2%A0%F0%9F%85%B3%F0%9F%85%B4%F0%9F%85%B0%F0%9F%85%B3/yet/F3D9C5?labelColor=F3D9C5)](https://youtu.be/QcbR1J_4ICg?t=54)
 
-<p align="center">
-  <a href="https://laowantong.github.io/paroxython/index.html">
-  <img src="docs/resources/logo.png">
-  </a>
-</p>
+A simple and easy to use PID controller in Python. If you want a PID controller without external dependencies that just works, this is for you! The PID was designed to be robust with help from [Brett Beauregards guide](http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/).
 
-## Introduction
-
-Paroxython is a set of command line tools which **tag** and **filter** by algorithmic features your collection of Python programming exercises.
-
-### Audience
-
-You are a teacher, in charge of an introductory programming course in an educational institution. Over the years, you have accumulated many—far too many—programs and code snippets that may be of interest to your students.
-
-Or, as a seasoned developer, you would like to share your knowledge by helping a loved one learn how to code. A cursory search for pedagogical material yields an overwhelming amount of websites and repositories stuffed with Python programs of various levels (e.g.,
-[1](https://github.com/TheAlgorithms/Python),
-[2](http://rosettacode.org/wiki/Category:Python),
-[3](https://www.programming-idioms.org/about#about-block-language-coverage),
-[4](https://github.com/codebasics/py),
-[5](https://github.com/keon/algorithms),
-[6](https://github.com/OmkarPathak/Python-Programs),
-and a lot more from [Awesome Python in Education](https://github.com/quobit/awesome-python-in-education)).
-
-In any case, the Python source codes you have gathered are typically
-**numerous** (hundreds or even thousands),
-**reasonably sized** (anything below 100 lines of code),
-and **educational** in nature (e.g., snippets, examples, quizzes, exercise solutions, classic algorithms).
-The programming concepts you plan to teach remain relatively **low level** (e.g. assignments, nested loops, accumulation patterns, tail recursive functions, etc.).
-
-If all that sounds familiar, keep reading me.
-
-### Main goals
-
-Paroxython aims to help you select, from your collection, the one program that best suits your needs. For instance, it will gladly answer the following questions:
-
-> - How can this concept be illustrated?
-> - What problems use the same algorithmic and data structures as this one?
-> - What homework assignment should I give my students so they can practice the content of the last lesson?
-
-Moreover, since Paroxython knows what your class knows, it can recommend the right program at the right time:
-
-> - What would make a good review exercise?
-> - Which exercises can I give on this exam?
-> - What is the current learning cost of this example?
-
-In the long run, Paroxython may guide you and somehow make you rethink your course outline:
-
-> - What are the prerequisites for the concept of assignment?
-> - Do I have enough material to introduce subroutines before I even talk about conditionals and loops?
-> - Among the loops, which must come first: the most powerful (`while`), or the most useful (`for`)?
-> - How to logically structure this bunch of usual iterative patterns?
-> - What are the _basics_, exactly?
-
-All issues on which the author changed his mind since he started to work on this project!
-
-In an ideal world, Paroxython could even put an end to the deadliest religious wars, with rational, data-driven arguments:
-
-> - Father, is it a sin to exit early?
-> - Should a real byte use a mask?
-
-### How it works
-
-<p align="center">
-  <a href="https://laowantong.github.io/paroxython/developer_manual/index.html">
-  <img src="docs/resources/waterfall.png">
-  </a>
-</p>
-
-Paroxython starts from a given folder of **programs**. Its contents is parsed, and all features that meet the provided **specifications** are labelled and associated with their spans (e.g., `"assignment_lhs_identifier:a": 4, 6, 18` or `"loop_with_late_exit:while": 3-7, 20-29`).
-
-These **labels** constitute only scattered knowledge. The next step is to map them onto a **taxonomy** designed with basic hierarchical constraints in mind (e.g., the fact that the introduction of the concept of early exit must come after that of loop, which itself requires that of control flow, is expressed by the _taxon_ `"flow/loop/exit/early"`).
-
-<p align="center">
-  <a href="https://laowantong.github.io/paroxython/user_manual/index.html#taxonomy">
-  <img src="docs/resources/tree.png" alt="A taxonomy.">
-  </a>
-  <br>
-  <em>Extract of the taxonomy generated from <a href="https://github.com/TheAlgorithms/Python">The Algorithms - Python</a>.<br>Click to jump to its full dynamic version in the user manual.</em>
-</p>
-
-Everything is then persisted in a tag **database**, which can later be filtered through a **pipeline** of commands, for instance:
-
-- _include_ only the programs which feature a recursive function;
-- _exclude_ this or that program you want to set aside for the exam;
-- “_impart_” all programs studied so far, _i.e_, consider that all the notions they implement are acquired.
-
-The result is a list of program **recommendations** ordered by increasing learning cost.
-
-### Example
-
-Suppose that the `programs` directory contains [these simple programs](https://wiki.python.org/moin/SimplePrograms).
-
-First, build [this tag database](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_db.json):
-
-```shell
-> paroxython collect programs
-Labelling 21 programs.
-Mapping taxonomy on 21 programs.
-Writing programs_db.json.
-```
-
-Then, filter it through [this pipeline](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_pipe.py):
-
-```shell
-> paroxython recommend programs
-Processing 5 commands on 21 programs.
-  19 programs remaining after operation 1 (impart).
-  18 programs remaining after operation 2 (exclude).
-  12 programs remaining after operation 3 (exclude).
-  10 programs remaining after operation 4 (include).
-  10 programs remaining after operation 5 (hide).
-Dumped: programs_recommendations.md.
-```
-
-Et voilà, [your recommendation report](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_recommendations.md)!
-
-
-## Installation and test-drive
-
-### Command line
-
-Much to no one's surprise:
-
-```
-python -m pip install paroxython
-```
-
-The following command should print a help message and exit:
-
-```
-paroxython --help
-```
-
-### IPython magic command
-
-If you use Jupyter notebook/lab, you've also just installed a so-called magic command. Load it like this:
+Usage is very simple:
 
 ```python
-%load_ext paroxython
+from simple_pid import PID
+pid = PID(1, 0.1, 0.05, setpoint=1)
+
+# Assume we have a system we want to control in controlled_system
+v = controlled_system.update(0)
+
+while True:
+    # Compute new output from the PID according to the systems current value
+    control = pid(v)
+    
+    # Feed the PID output to the system and get its current value
+    v = controlled_system.update(control)
 ```
 
-This should print `"paroxython 0.7.0 loaded."`. Run it on a cell of Python code:
+Complete API documentation can be found [here](https://simple-pid.readthedocs.io/en/latest/simple_pid.html#module-simple_pid.PID).
+
+## Installation
+To install, run:
+```
+pip install simple-pid
+```
+
+## Usage
+The `PID` class implements `__call__()`, which means that to compute a new output value, you simply call the object like this:
+```python
+output = pid(current_value)
+```
+
+### The basics
+The PID works best when it is updated at regular intervals. To achieve this, set `sample_time` to the amount of time there should be between each update and then call the PID every time in the program loop. A new output will only be calculated when `sample_time` seconds has passed:
+```python
+pid.sample_time = 0.01  # Update every 0.01 seconds
+
+while True:
+    output = pid(current_value)
+```
+
+To set the setpoint, ie. the value that the PID is trying to achieve, simply set it like this:
+```python
+pid.setpoint = 10
+```
+
+The tunings can be changed any time when the PID is running. They can either be set individually or all at once:
+```python
+pid.Ki = 1.0
+pid.tunings = (1.0, 0.2, 0.4)
+```
+
+To use the PID in [reverse mode](http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-direction/), meaning that an increase in the input leads to a decrease in the output (like when cooling for example), you can set the tunings to negative values:
 
 ```python
-%%paroxython                          # Lines
-def fibonacci(n):                     # 2
-    result = []                       # 3
-    (a, b) = (0, 1)                   # 4
-    while a < n:                      # 5
-        result.append(a)              # 6
-        (a, b) = (b, a + b)           # 7
-    return result                     # 8
+pid.tunings = (-1.0, -0.1, 0)
 ```
 
-| Taxon | Lines |
-|:--|:--|
-| `call/subroutine/method/sequence/list/append` | 6 |
-| `condition/inequality` | 5 |
-| `def/subroutine/function/impure` | 2-8 |
-| `def/subroutine/parameter/arg` | 2 |
-| `flow/loop/exit/late` | 5-7 |
-| `flow/loop/while` | 5-7 |
-| `meta/count/program/sloc/8` | 2-8 |
-| `meta/count/subroutine/sloc/7` | 2-8 |
-| `meta/count/variety/3` | 2-8 |
-| `meta/program` | 2-8 |
-| `operator/arithmetic/addition` | 7 |
-| `style/procedural` | 2-8 |
-| `type/number/integer/literal` | 4 |
-| `type/number/integer/literal/zero` | 4 |
-| `type/sequence/list` | 6 |
-| `type/sequence/list/literal/empty` | 3 |
-| `type/sequence/tuple/literal` | 4, 4, 7, 7 |
-| `var/assignment/explicit/parallel` | 4 |
-| `var/assignment/explicit/parallel/slide` | 7 |
-| `var/assignment/explicit/single` | 3 |
-| `var/assignment/implicit/parameter` | 2 |
-| `var/scope/local` | 2-8, 2-8, 2-8, 2-8 |
+Note that all the tunings should have the same sign.
 
-As you can see, in this program, Paroxython identifies among others:
+In order to get output values in a certain range, and also to avoid [integral windup](https://en.wikipedia.org/wiki/Integral_windup) (since the integral term will never be allowed to grow outside of these limits), the output can be limited to a range:
+```python
+pid.output_limits = (0, 10)    # Output value will be between 0 and 10
+pid.output_limits = (0, None)  # Output will always be above 0, but with no upper bound
+```
 
-- the use of the [procedural paradigm](https://en.wikipedia.org/wiki/Procedural_programming) (`style/procedural`);
-- an im[pure function](https://en.wikipedia.org/wiki/Pure_function) (`def/subroutine/function/impure`);
-- a `while` loop (`flow/loop/while`) with a late exit (`flow/loop/exit/late`);
-- a little bit of voodoo on lists (`type/sequence/list/literal/empty` and `call/subroutine/method/sequence/list/append`);
-- a simple [tuple assignment](https://en.wikibooks.org/wiki/Python_Programming/Tuples#Packing_and_Unpacking) (`var/assignment/explicit/parallel`). Note that we distinguish between explicit (with `=`) and implicit (parameters and iteration variables) assignments;
-- a “sliding” tuple assignment (`var/assignment/explicit/parallel/slide`). If the denomination is unique to us, the pattern itself occurs in a number of programs: implementations of [C-finite sequences](https://en.wikipedia.org/wiki/Constant-recursive_sequence) with C greater than 1, [Greatest Common Divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [Quicksort](https://en.wikipedia.org/wiki/Quicksort), etc.
-- four local variables (`var/scope/local`);
-- an estimation of the variety of concepts involved (`meta/count/variety/***`), depending on the number of lines, features and distinct features.
+### Other features
+#### Auto mode
+To disable the PID so that no new values are computed, set auto mode to False:
+```python
+pid.auto_mode = False  # No new values will be computed when pid is called
+pid.auto_mode = True   # pid is enabled again
+```
+When disabling the PID and controlling a system manually, it might be useful to tell the PID controller where to start from when giving back control to it. This can be done by enabling auto mode like this:
+```python
+pid.set_auto_mode(True, last_output=8.0)
+```
+This will set the I-term to the value given to `last_output`, meaning that if the system that is being controlled was stable at that output value the PID will keep the system stable if started from that point, without any big bumps in the output when turning the PID back on.
 
-The magic command `%%paroxython` (corresponding to the subcommand [`tag`](https://laowantong.github.io/paroxython/cli_tag.html)) only scratches the surface of the system. As shown before, to estimate the learning cost of the features and get actionable recommendations, you will need first to construct the tag database with [`collect`](https://laowantong.github.io/paroxython/cli_collect.html), and then call [`recommend`](https://laowantong.github.io/paroxython/cli_recommend.html) on a pipeline of yours.
+#### Observing separate components
+When tuning the PID, it can be useful to see how each of the components contribute to the output. They can be seen like this:
+```python
+p, i, d = pid.components  # The separate terms are now in p, i, d
+```
 
-# Read them
+#### Proportional on measurement
+To eliminate overshoot in certain types of systems, you can calculate the [proportional term directly on the measurement](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) instead of the error. This can be enabled like this:
+```python
+pid.proportional_on_measurement = True
+```
 
-Although this is still a work-in-progress, Paroxython should already be fairly well [documented](https://laowantong.github.io/paroxython/index.html):
+#### Error mapping
+To transform the error value to another domain before doing any computations on it, you can supply an `error_map` callback function to the PID. The callback function should take one argument which is the error from the setpoint. This can be used e.g. to get a degree value error in a yaw angle control with values between [-pi, pi):
+```python
+import math
 
-- [User manual](https://laowantong.github.io/paroxython/user_manual/index.html):
-  - [write a command pipeline to get recommendations](https://laowantong.github.io/paroxython/user_manual/index.html#pipeline-tutorial),
-  - [prepare your program collections for better results](https://laowantong.github.io/paroxython/user_manual/index#preparing-your-program-collection),
-  - [understand and modify the taxonomic classification](https://laowantong.github.io/paroxython/user_manual/index#taxonomy),
-  - and more.
-- [Developer manual](https://laowantong.github.io/paroxython/developer_manual/index.html):
-  - [get a rough idea of the program structure and operations](https://laowantong.github.io/paroxython/developer_manual/index.html#bird-view),
-  - [use the provided helpers to contribute to the code](helper-programs),
-  - and more.
-- [Module reference](https://laowantong.github.io/paroxython/#header-submodules).
-- [Feature specifications](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md): a document mixing prose, tests, regular expressions and SQL queries to describe which algorithmic features are recognized and how.
-- [User types](https://github.com/laowantong/paroxython/blob/master/paroxython/user_types.py): all objects of interest are precisely typed and checked by [mypy](http://mypy-lang.org).
+def pi_clip(angle):
+    if angle > 0:
+        if angle > math.pi:
+            return angle - 2*math.pi
+    else:
+        if angle < -math.pi:
+            return angle + 2*math.pi
+    return angle
 
-Finally, a [battery of examples](https://github.com/laowantong/paroxython/tree/master/examples) and [comprehensive test coverage](https://github.com/laowantong/paroxython/tree/master/tests) should help answer any remaining question.
+pid.error_map = pi_clip
+```
+
+## Tests
+Use the following to run tests:
+```
+tox
+```
+
+## License
+Licensed under the [MIT License](https://github.com/m-lundberg/simple-pid/blob/master/LICENSE.md).
