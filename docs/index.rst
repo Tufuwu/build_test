@@ -1,14 +1,19 @@
-.. include:: ../README.rst
-   :end-before: end-of-readme-intro
+.. complexity documentation master file, created by
+   sphinx-quickstart on Tue Jul  9 22:26:36 2013.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-Table of contents
-=================
+Welcome to drf-tus's documentation!
+=================================================================
+
+Contents:
 
 .. toctree::
-   :includehidden:
    :maxdepth: 2
 
-   overview.rst
-   api.rst
-   resources.rst
-   project.rst
+   readme
+   installation
+   usage
+   contributing
+   authors
+   history

@@ -1,69 +1,112 @@
-Thank you for considering improving `Loguru`, any contribution is much welcome!
+============
+Contributing
+============
 
-.. _minimal reproducible example: https://stackoverflow.com/help/mcve
-.. _open a new issue: https://github.com/Delgan/loguru/issues/new
-.. _open a pull request: https://github.com/Delgan/loguru/compare
-.. _PEP 8: https://www.python.org/dev/peps/pep-0008/
-.. _Loguru: https://github.com/Delgan/loguru
+Contributions are welcome, and they are greatly appreciated! Every
+little bit helps, and credit will always be given.
 
-Asking questions
-----------------
+You can contribute in many ways:
 
-If you have any question about `Loguru`, if you are seeking for help, or if you would like to suggest a new feature, you are encouraged to `open a new issue`_ so we can discuss it. Bringing new ideas and pointing out elements needing clarification allows to make this library always better!
+Types of Contributions
+----------------------
 
+Report Bugs
+~~~~~~~~~~~
 
-Reporting a bug
----------------
+Report bugs at https://github.com/dirkmoors/drf-tus/issues.
 
-If you encountered an unexpected behavior using `Loguru`, please `open a new issue`_ and describe the problem you have spotted. Be as specific as possible in the description of the trouble so we can easily analyse it and quickly fix it.
+If you are reporting a bug, please include:
 
-An ideal bug report includes:
+* Your operating system name and version.
+* Any details about your local setup that might be helpful in troubleshooting.
+* Detailed steps to reproduce the bug.
 
-* The Python version you are using
-* The `Loguru` version you are using (you can find it with ``print(loguru.__version__)``)
-* Your operating system name and version (Linux, MacOS, Windows)
-* Your development environment and local setup (IDE, Terminal, project context, any relevant information that could be useful)
-* Some `minimal reproducible example`_
+Fix Bugs
+~~~~~~~~
 
+Look through the GitHub issues for bugs. Anything tagged with "bug"
+is open to whoever wants to implement it.
 
-Implementing changes
---------------------
+Implement Features
+~~~~~~~~~~~~~~~~~~
 
-If you are willing to enhance `Loguru` by implementing non-trivial changes, please `open a new issue`_ first to keep a reference about why such modifications are made (and potentially avoid unneeded work). Then, the workflow would look as follows:
+Look through the GitHub issues for features. Anything tagged with "feature"
+is open to whoever wants to implement it.
 
-1. Fork the `Loguru`_ project from GitHub
-2. Clone the repository locally::
+Write Documentation
+~~~~~~~~~~~~~~~~~~~
 
-    $ git clone git@github.com:your_name_here/loguru.git
-    $ cd loguru
+drf-tus could always use more documentation, whether as part of the
+official drf-tus docs, in docstrings, or even on the web in blog posts,
+articles, and such.
 
-3. Activate your virtual environment::
+Submit Feedback
+~~~~~~~~~~~~~~~
 
-    $ python -m virtualenv env
-    $ source env/bin/activate
+The best way to send feedback is to file an issue at https://github.com/dirkmoors/drf-tus/issues.
 
-4. Create a new branch from ``master``::
+If you are proposing a feature:
 
-    $ git checkout master
-    $ git branch fix_bug
-    $ git checkout fix_bug
+* Explain in detail how it would work.
+* Keep the scope as narrow as possible, to make it easier to implement.
+* Remember that this is a volunteer-driven project, and that contributions
+  are welcome :)
 
-5. Install `Loguru` in development mode::
+Get Started!
+------------
 
-    $ pip install -e .[dev]
+Ready to contribute? Here's how to set up `drf-tus` for local development.
 
-6. Implement the modifications wished. During the process of development, honor `PEP 8`_ as much as possible.
-7. Add unit tests (don't hesitate to be exhaustive!) and ensure none are failing using::
+1. Fork the `drf-tus` repo on GitHub.
+2. Clone your fork locally::
 
-    $ tox
+    $ git clone git@github.com:your_name_here/drf-tus.git
 
-8. Remember to update documentation if required
-9. Update the ``CHANGELOG.rst`` file with what you improved
-10. ``add`` and ``commit`` your changes, ``rebase`` your branch on ``master``, ``push`` your local project::
+3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+
+    $ mkvirtualenv drf-tus
+    $ cd drf-tus/
+    $ python setup.py develop
+
+4. Create a branch for local development::
+
+    $ git checkout -b name-of-your-bugfix-or-feature
+
+   Now you can make your changes locally.
+
+5. When you're done making changes, check that your changes pass flake8 and the
+   tests, including testing other Python versions with tox::
+
+        $ flake8 rest_framework_tus tests
+        $ python setup.py test
+        $ tox
+
+   To get flake8 and tox, just pip install them into your virtualenv.
+
+6. Commit your changes and push your branch to GitHub::
 
     $ git add .
-    $ git commit -m 'Add succinct explanation of what changed'
-    $ git rebase master
-    $ git push origin fix_bug
+    $ git commit -m "Your detailed description of your changes."
+    $ git push origin name-of-your-bugfix-or-feature
 
-11. Finally, `open a pull request`_ before getting it merged!
+7. Submit a pull request through the GitHub website.
+
+Pull Request Guidelines
+-----------------------
+
+Before you submit a pull request, check that it meets these guidelines:
+
+1. The pull request should include tests.
+2. If the pull request adds functionality, the docs should be updated. Put
+   your new functionality into a function with a docstring, and add the
+   feature to the list in README.rst.
+3. The pull request should work for Python 3.9+, and for PyPy. Check
+   https://github.com/dirkmoors/drf-tus/pulls
+   and make sure that the tests pass for all supported Python versions.
+
+Tips
+----
+
+To run a subset of tests::
+
+    $ python -m unittest tests.test_rest_framework_tus
