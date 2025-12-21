@@ -1,7 +1,8 @@
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
 
 # C extensions
 *.so
@@ -9,6 +10,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
 build/
 develop-eggs/
 dist/
@@ -43,7 +45,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
-.hypothesis/
 
 # Translations
 *.mo
@@ -51,27 +52,9 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
-
-# Flask instance folder
-instance/
 
 # Sphinx documentation
 docs/_build/
 
-# MkDocs documentation
-/site/
-
 # PyBuilder
 target/
-
-# IPython Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Editors
-.idea/
-
-.pytest_cache/
