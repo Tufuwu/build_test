@@ -35,9 +35,8 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Send notification
-      uses: dbrgn/send-notification@v1
-      with:
-        token: ${{ secrets.NOTIFICATION_TOKEN }}
-        message: "CI build completed"
-        email: wolf@physik.uni-bonn.de
+    - name: Send notification email
+      if: failure()
+      run: echo "Build failed" | mail -s "Build Notification" wolf@physik.uni-bonn.de
+      env:
+        MAIL: /usr/sbin/sendmail
