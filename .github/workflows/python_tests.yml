@@ -37,7 +37,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
     - name: Notifications
       uses: rtCamp/action-slack-notify@v2
-      if: ${{ failure() }}
+
       with:
         status: ${{ job.status }}
         color: ${{ job.status == 'failure' && 'bad' || 'good' }}
