@@ -35,7 +35,12 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Send notification
-      uses: r-raphaelvallat/send-notification@v1
+    - name: Notifications
+      uses: rtCamp/action-slack-notify@v2
+      if: ${{ failure() }}
       with:
-        email: raphaelvallat9@gmail.com
+        status: ${{ job.status }}
+        color: ${{ job.status == 'failure' && 'bad' || 'good' }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
