@@ -4,7 +4,8 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+  tag:
 
 jobs:
   build:
@@ -35,8 +36,3 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-    - name: Send notification email
-      if: failure()
-      run: echo "Build failed" | mail -s "Build Notification" wolf@physik.uni-bonn.de
-      env:
-        MAIL: /usr/sbin/sendmail
