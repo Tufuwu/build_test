@@ -31,11 +31,13 @@ jobs:
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
-    - name: Send Slack notification
-      uses: 8398a7/action-slack@v3
+    - name: Notify Slack
+      if: always()
+      uses: slackapi/slack-github-action@v1.24.0
       with:
-        status: ${{ needs.test.result }}
-        fields: repo,commit,author
+        payload: |
+          {
+            "text": "Workflow ${{ github.workflow }} run ${{ github.run_number }} for ${{ github.repository }} on Python ${{ matrix.python-version }} finished with status ${{ job.status }}. See: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
       env:
-        # Set this secret in your repository settings (Settings → Secrets → Actions)
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
