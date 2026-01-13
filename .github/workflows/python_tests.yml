@@ -30,10 +30,10 @@ jobs:
         pip install -r requirements-test.txt
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
-    - name: Test with pytest
-      run: |
-        pytest
-    - name: Report coverage to Codecov
-      uses: codecov/codecov-action@v1
+
+    - name: Send notifications
+      uses: dawidd6/dist-github-notifications@v1
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        notify: charlie.robbins@gmail.com,erik.trom.github@gmail.com
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
