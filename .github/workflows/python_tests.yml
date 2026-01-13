@@ -32,8 +32,13 @@ jobs:
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
     - name: Notify Slack
-      uses: slackapi/slack-github-action@v1.19.0
-      with:
-        payload: '{"text": "Build failed for Python ${{ matrix.python-version }}"}'
-        channel: 'your-slack-channel'
-        slack-token: ${{ secrets.SLACK_TOKEN }}
+
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: general
+        SLACK_USERNAME: Travis CI
+        SLACK_ICON: https://avatars.githubusercontent.com/u/14946106?s=200&v=4
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_TITLE: Job ${{ job.status }} for ${{ github.repository }}
+        SLACK_MESSAGE: Check run ${{ github.run_id }} on ${{ github.ref }}
