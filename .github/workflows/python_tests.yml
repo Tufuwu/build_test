@@ -35,4 +35,4 @@ jobs:
       uses: dorny/irc@v1
       with:
         channel: chat.freenode.net#ua-parser
-        message: "Tests completed on Node.js ${{ matrix.node_js }}"
+        message: "Tests completed on Python ${{ matrix.python-version }}"
