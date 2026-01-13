@@ -31,9 +31,9 @@ jobs:
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
-    - name: Send notifications
-      uses: dawidd6/dist-github-notifications@v1
+    - name: Send email notification
+      uses: envoy/notify@v1
       with:
-        notify: charlie.robbins@gmail.com,erik.trom.github@gmail.com
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        list: kempdogg@gmail.com
+        subject: Node.js CI build result
+        body: 'The build has completed'
