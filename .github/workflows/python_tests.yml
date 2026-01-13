@@ -31,8 +31,11 @@ jobs:
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
-    - name: Slack Notification
-      uses: actions-slack/notify@v1
+    - name: Send notification to Slack
+      uses: slack-dev/slack-notify@v1
       with:
         webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-        message: "Python tests passed for ${{ matrix.python-version }}"
+        message: "CI build completed"
+        channel: "#general"
+        username: "GitHub Actions"
+        icon_emoji: ":ghost:"
