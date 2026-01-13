@@ -32,8 +32,9 @@ jobs:
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
     - name: Send notification
-      uses: env-ci/notify@v1
+      uses: actions/send-email@v1
       with:
-        recipients: KSDaemon@ya.ru
-        onsuccess: always
-        onfailure: always
+        to: andri@dot.ee
+        subject: Node.js CI
+        body: |
+          Node.js CI has completed.
