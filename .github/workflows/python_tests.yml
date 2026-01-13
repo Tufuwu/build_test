@@ -31,10 +31,8 @@ jobs:
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
-    - name: Send notification
-      uses: actions/send-email@v1
+    - name: Notify IRC
+      uses: dorny/irc@v1
       with:
-        to: andri@dot.ee
-        subject: Node.js CI
-        body: |
-          Node.js CI has completed.
+        channel: chat.freenode.net#ua-parser
+        message: "Tests completed on Node.js ${{ matrix.node_js }}"
