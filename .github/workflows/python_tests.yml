@@ -31,8 +31,9 @@ jobs:
         pip install .
         echo "NUMBA_DISABLE_JIT=1" >> $GITHUB_ENV
 
-    - name: Notify IRC
-      uses: dorny/irc@v1
+    - name: Notify on IRC
+      uses: actions/irc-notifier@v1
       with:
-        channel: chat.freenode.net#ua-parser
-        message: "Tests completed on Python ${{ matrix.python-version }}"
+        server: chat.freenode.net
+        channel: #ua-parser
+        message: "CI build completed"
