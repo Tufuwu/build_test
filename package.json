@@ -1,50 +1,54 @@
 {
-  "name": "transportation",
-  "version": "1.2.35",
-  "description": "Import GTFS into a semantic model",
-  "main": "index.js",
-  "bin": {
-    "transportation": "bin/transportation"
-  },
-  "scripts": {
-    "standard": "standard && standard ./bin/*",
-    "tap": "tap --no-check-coverage ./test",
-    "test": "npm run standard && npm run tap && npm run test-cli",
-    "test-cli": "./bin/transportation --version && ./bin/transportation positions ./test/import/gtfs/data/generic"
-  },
-  "keywords": [
-    "GTFS",
-    "gtfs",
-    "transportation",
-    "transit",
-    "GeoJSON",
-    "geojson"
-  ],
-  "author": "Falco Nogatz <fnogatz@gmail.com>",
-  "license": "MIT",
+  "name": "protocol-buffers",
+  "version": "4.2.0",
+  "description": "Protocol Buffers for Node.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/fnogatz/transportation"
+    "url": "https://github.com/mafintosh/protocol-buffers"
   },
   "dependencies": {
-    "@turf/distance": "^6.3.0",
-    "@turf/length": "^6.3.0",
-    "@turf/nearest-point-on-line": "^6.3.0",
-    "async": "^3.0.1",
-    "char-spinner": "^1.0.1",
-    "commander": "^8.2.0",
-    "concat-stream": "^2.0.0",
-    "csv": "^5.5.0",
-    "geobuf": "^3.0.2",
-    "moment": "^2.29.1",
-    "require-all": "^3.0.0",
-    "tconsole": "^1.0.0",
-    "turf-featurecollection": "^1.0.1",
-    "turf-linestring": "^1.0.2",
-    "turf-point": "^2.0.0"
+    "generate-function": "^2.0.0",
+    "generate-object-property": "^1.2.0",
+    "protocol-buffers-encodings": "^1.1.0",
+    "protocol-buffers-schema": "^3.1.1",
+    "signed-varint": "^2.0.0",
+    "varint": "^5.0.0"
   },
   "devDependencies": {
-    "standard": "^16.0.3",
-    "tap": "^15.0.6"
-  }
+    "standard": "^10.0.3",
+    "tape": "^4.8.0"
+  },
+  "bin": {
+    "protocol-buffers": "./bin.js"
+  },
+  "scripts": {
+    "test": "standard && npm run test-generated && npm run test-compiled",
+    "test-generated": "tape test/*.js",
+    "test-compiled": "./bin.js test/test.proto -o test/helpers/compiled.js && COMPILED=true tape test/*.js",
+    "bench": "node bench"
+  },
+  "bugs": {
+    "url": "https://github.com/mafintosh/protocol-buffers/issues"
+  },
+  "homepage": "https://github.com/mafintosh/protocol-buffers",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "protobuf",
+    "protocol",
+    "buffers",
+    "protocolbuffers",
+    "encode",
+    "decode",
+    "google",
+    "serialize",
+    "parse",
+    "levelup",
+    "encodings",
+    "encoding"
+  ],
+  "author": "Mathias Buus",
+  "license": "MIT"
 }
