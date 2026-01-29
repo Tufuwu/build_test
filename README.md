@@ -1,103 +1,68 @@
-Cloudinary Node SDK
-=========================
-## About
-The Cloudinary Node SDK allows you to quickly and easily integrate your application with Cloudinary.
-Effortlessly optimize, transform, upload and manage your cloud's assets.
+# transportation
 
+Import [GTFS](https://developers.google.com/transit/gtfs/reference) data into a semantic model
 
-#### Note
-This Readme provides basic installation and usage information. 
-For the complete documentation, see the [Node SDK Guide](https://cloudinary.com/documentation/node_integration).
-
-## Table of Contents
-- [Key Features](#key-features)
-- [Version Support](#Version-Support)
-- [Installation](#installation)
-- [Usage](#usage)
-    - [Setup](#Setup)
-    - [Transform and Optimize Assets](#Transform-and-Optimize-Assets)
-    - [Generate Image and HTML Tags](#Generate-Image-and-Video-HTML-Tags)
-
-
-## Key Features
-- [Transform](https://cloudinary.com/documentation/node_video_manipulation#video_transformation_examples) and
- [optimize](https://cloudinary.com/documentation/node_image_manipulation#image_optimizations) assets.
-- Generate [image](https://cloudinary.com/documentation/node_image_manipulation#deliver_and_transform_images) and
- [video](https://cloudinary.com/documentation/node_video_manipulation#video_element) tags.
-- [Asset Management](https://cloudinary.com/documentation/node_asset_administration).
-- [Secure URLs](https://cloudinary.com/documentation/video_manipulation_and_delivery#generating_secure_https_urls_using_sdks).
-
-
-
-## Version Support
-| SDK Version | Node version |
-|-------------|--------------|
-| 1.x.x       | Node@6 & up  |
-| 2.x.x       | Node@9 & up  |
+![Screenshot](screenshot.png)
 
 ## Installation
-```bash
-npm install cloudinary
+
+```sh
+npm install transportation
 ```
 
-# Usage
-### Setup
-```js
-// Require the Cloudinary library
-const cloudinary = require('cloudinary').v2
+## Usage
+
+```
+var Transit = require('transportation')
+var transit = new Transit()
+
+// import GTFS data
+transit.importGTFS('/path/to/gtfs/dir', function (err) {
+  // have a look at the Transit instance
+  console.log(transit)
+})
 ```
 
-### Transform and Optimize Assets
-- [See full documentation](https://cloudinary.com/documentation/node_image_manipulation).
+transportation provides a replacement for node's `console` by using [tconsole](https://www.npmjs.com/package/tconsole), so you can inspect the objects in the node.js REPL by using `require('transportation/console')`:
 
-```js
-cloudinary.url("sample.jpg", {width: 100, height: 150, crop: "fill", fetch_format: "auto"})
+```
+> var konsole = require('transportation/console')
+> konsole(transit)
+┌────────────┬─────┐
+│ Agencies   │ SWU │
+├────────────┼─────┤
+│ # Stops    │ 773 │
+├────────────┼─────┤
+│ # Services │ 14  │
+├────────────┼─────┤
+│ # Shapes   │ 65  │
+└────────────┴─────┘
+> konsole(transit.agencies.SWU.routes)
+┌───────┬────────────┬───────────────────────────────────────────────┬─────────┐
+│ ID    │ Short Name │ Long Name                                     │ # Trips │
+├───────┼────────────┼───────────────────────────────────────────────┼─────────┤
+│ 87001 │ 1          │ Söflingen–Böfingen                            │ 613     │
+├───────┼────────────┼───────────────────────────────────────────────┼─────────┤
+│ 87003 │ 3          │ Wiblingen (Alte Siedlung)–Wissenschaftsstadt  │ 649     │
+├───────┼────────────┼───────────────────────────────────────────────┼─────────┤
+│ 87004 │ 4          │ Grimmelfingen–Kuhberg–Böfingen Süd            │ 590     │
+└───────┴────────────┴───────────────────────────────────────────────┴─────────┘
 ```
 
-### Upload
-- [See full documentation](https://cloudinary.com/documentation/node_image_and_video_upload).
-- [Learn more about configuring your uploads with upload presets](https://cloudinary.com/documentation/upload_presets). 
-```js
-cloudinary.v2.uploader.upload("/home/my_image.jpg", {upload_preset: "my_preset"}, (error, result)=>{
-  console.log(result, error);
-});
+## Command Line
+
+```sh
+npm install -g transportation
 ```
-### Large/Chunked Upload
-- [See full documentation](https://cloudinary.com/documentation/node_image_and_video_upload#node_js_video_upload).
-```js
-   cloudinary.v2.uploader.upload_large(LARGE_RAW_FILE, {
-          chunk_size: 7000000
-        }, (error, result) => {console.log(error)});
+
+transportation provides a binary `transportation`. It supports the following commands.
+
+### Export Vehicles' Positions as GeoJSON
+
+Prints all vehicles' positions of a specific date as GeoJSON linestrings with time components:
+
+```sh
+transportation positions /path/to/gtfs/dir
 ```
-### Security options
-- [See full documentation](https://cloudinary.com/documentation/solution_overview#security).
 
-## Contributions
-- Ensure tests run locally (add test command)
-- Open a PR and ensure Travis tests pass
-
-
-## Get Help
-If you run into an issue or have a question, you can either:
-- Issues related to the SDK: [Open a Github issue](https://github.com/cloudinary/cloudinary_npm/issues).
-- Issues related to your account: [Open a support ticket](https://cloudinary.com/contact)
-
-
-## About Cloudinary
-Cloudinary is a powerful media API for websites and mobile apps alike, Cloudinary enables developers to efficiently manage, transform, optimize, and deliver images and videos through multiple CDNs. Ultimately, viewers enjoy responsive and personalized visual-media experiences—irrespective of the viewing device.
-
-
-## Additional Resources
-- [Cloudinary Transformation and REST API References](https://cloudinary.com/documentation/cloudinary_references): Comprehensive references, including syntax and examples for all SDKs.
-- [MediaJams.dev](https://mediajams.dev/): Bite-size use-case tutorials written by and for Cloudinary Developers
-- [DevJams](https://www.youtube.com/playlist?list=PL8dVGjLA2oMr09amgERARsZyrOz_sPvqw): Cloudinary developer podcasts on YouTube.
-- [Cloudinary Academy](https://training.cloudinary.com/): Free self-paced courses, instructor-led virtual courses, and on-site courses.
-- [Code Explorers and Feature Demos](https://cloudinary.com/documentation/code_explorers_demos_index): A one-stop shop for all code explorers, Postman collections, and feature demos found in the docs.
-- [Cloudinary Roadmap](https://cloudinary.com/roadmap): Your chance to follow, vote, or suggest what Cloudinary should develop next. 
-- [Cloudinary Facebook Community](https://www.facebook.com/groups/CloudinaryCommunity): Learn from and offer help to other Cloudinary developers.
-- [Cloudinary Account Registration](https://cloudinary.com/users/register/free): Free Cloudinary account registration.
-- [Cloudinary Website](https://cloudinary.com): Learn about Cloudinary's products, partners, customers, pricing, and more.
-
-
-## Licence
-Released under the MIT license.
+By default multiple trips are simply newline-separated GeoJSON to support streaming. If you want to return a single JSON array use the `--array` flag. Additional options are available via `transportation positions --help`. The generated GeoJSON LineString has its `time` property set as an array of timestamps and is therefore compatible with tools like [LeafletPlayback](https://github.com/hallahan/LeafletPlayback) and [others](https://github.com/fnogatz/zeitpunkt#compatible-tools).

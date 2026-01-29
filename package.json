@@ -1,60 +1,50 @@
 {
-  "author": "Cloudinary <info@cloudinary.com>",
-  "name": "cloudinary",
-  "description": "Cloudinary NPM for node.js integration",
-  "version": "2.7.0",
-  "homepage": "https://cloudinary.com",
+  "name": "transportation",
+  "version": "1.2.35",
+  "description": "Import GTFS into a semantic model",
+  "main": "index.js",
+  "bin": {
+    "transportation": "bin/transportation"
+  },
+  "scripts": {
+    "standard": "standard && standard ./bin/*",
+    "tap": "tap --no-check-coverage ./test",
+    "test": "npm run standard && npm run tap && npm run test-cli",
+    "test-cli": "./bin/transportation --version && ./bin/transportation positions ./test/import/gtfs/data/generic"
+  },
+  "keywords": [
+    "GTFS",
+    "gtfs",
+    "transportation",
+    "transit",
+    "GeoJSON",
+    "geojson"
+  ],
+  "author": "Falco Nogatz <fnogatz@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cloudinary/cloudinary_npm.git"
+    "url": "git://github.com/fnogatz/transportation"
   },
-  "main": "cloudinary.js",
   "dependencies": {
-    "lodash": "^4.17.21",
-    "q": "^1.5.1"
+    "@turf/distance": "^6.3.0",
+    "@turf/length": "^6.3.0",
+    "@turf/nearest-point-on-line": "^6.3.0",
+    "async": "^3.0.1",
+    "char-spinner": "^1.0.1",
+    "commander": "^8.2.0",
+    "concat-stream": "^2.0.0",
+    "csv": "^5.5.0",
+    "geobuf": "^3.0.2",
+    "moment": "^2.29.1",
+    "require-all": "^3.0.0",
+    "tconsole": "^1.0.0",
+    "turf-featurecollection": "^1.0.1",
+    "turf-linestring": "^1.0.2",
+    "turf-point": "^2.0.0"
   },
   "devDependencies": {
-    "@types/expect.js": "^0.3.29",
-    "@types/mocha": "^7.0.2",
-    "@types/node": "^13.5.0",
-    "date-fns": "^2.16.1",
-    "dotenv": "4.x",
-    "dtslint": "^0.9.1",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.20.2",
-    "expect.js": "0.3.x",
-    "glob": "^7.1.6",
-    "jsdoc": "^4.0.4",
-    "jsdom": "^9.12.0",
-    "jsdom-global": "2.1.1",
-    "mocha": "^6.2.3",
-    "nyc": "^14.1.1",
-    "rimraf": "^3.0.0",
-    "sinon": "^6.1.4",
-    "typescript": "^3.7.5",
-    "webpack-cli": "^3.2.1"
-  },
-  "files": [
-    "lib/**/*",
-    "cloudinary.js",
-    "babel.config.js",
-    "package.json",
-    "types/index.d.ts"
-  ],
-  "types": "types",
-  "scripts": {
-    "test": "tools/scripts/test.sh",
-    "test:unit": "tools/scripts/test.es6.unit.sh",
-    "test-with-temp-cloud": "tools/scripts/tests-with-temp-cloud.sh",
-    "dtslint": "tools/scripts/ditslint.sh",
-    "lint": "tools/scripts/lint.sh",
-    "coverage": "tools/scripts/test.es6.sh --coverage",
-    "test-es6": "tools/scripts/test.es6.sh",
-    "docs": "tools/scripts/docs.sh"
-  },
-  "engines": {
-    "node": ">=9"
+    "standard": "^16.0.3",
+    "tap": "^15.0.6"
   }
 }
