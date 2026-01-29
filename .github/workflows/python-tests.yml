@@ -31,4 +31,3 @@ jobs:
       run: |
         coveralls
 
-|End-of-Code|
