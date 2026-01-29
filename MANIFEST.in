@@ -1,9 +1,8 @@
-include LICENSE
-include AUTHORS
-graft tests
-prune tests/htmlcov
-prune tests/regressiontests/outputs
-exclude tests/.coverage
-exclude tests/coverage.lcov
-global-exclude *.pyc
-global-exclude .DS_Store
+include Apache-2.0
+include BSD
+include COPYING
+include GOALS
+include HACKING
+include MANIFEST.in
+include Makefile
+include NEWS
