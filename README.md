@@ -1,151 +1,57 @@
-# serve-index
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/openui5-worklist-app)](https://api.reuse.software/info/github.com/SAP/openui5-worklist-app)
+[![Build Status](https://github.com/SAP/openui5-worklist-app/actions/workflows/github-ci.yml/badge.svg)](https://github.com/SAP/openui5-worklist-app/actions/workflows/github-ci.yml)
+![OpenUI5 logo](http://openui5.org/images/OpenUI5_new_big_side.png)
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Linux Build Status][ci-image]][ci-url]
-[![Windows Build][appveyor-image]][appveyor-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
+# openui5-worklist-app
+OpenUI5 worklist app using the UI5 Build and Development Tooling.
 
-  Serves pages that contain directory listings for a given path.
+This template implements a typical worklist floorplan, one of the design patterns that is specified by the SAP Fiori Design Guidelines. 
+It includes generic application functionality and tests that can be easily extended.
 
-## Install
 
-This is a [Node.js](https://nodejs.org/en/) module available through the
-[npm registry](https://www.npmjs.com/). Installation is done using the
-[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
+## More information
+* [Live Demo](http://sap.github.io/openui5-worklist-app/test/mockServer.html)
+* [Documentation](https://help.sap.com/docs/SAP_FIORI_tools/17d50220bcd848aa854c9c182d65b699/dcd9f97aa8de4adab8270315550f2b23.html)
+* [SAP Fiori Design Guidelines](https://experience.sap.com/fiori-design/)
+* [UI5 Tooling](https://github.com/SAP/ui5-tooling). 
+* [OpenUI5](https://github.com/SAP/openui5)
 
-```sh
-$ npm install serve-index
-```
+## Prerequisites
+The **UI5 build and development tooling command line interface (UI5 CLI)** has to be installed.
+For installation instructions please see [Installing the UI5 CLI](https://github.com/SAP/ui5-tooling#installing-the-ui5-cli).
 
-## API
+## Setup
+1. Clone the repository and navigate into it
+    ```sh
+    git clone https://github.com/SAP/openui5-worklist-app.git
+    cd openui5-worklist-app
+    ```
+1. Install all dependencies
+    ```sh
+    npm install
+    ```
 
-```js
-var serveIndex = require('serve-index')
-```
+1. Start a local server and run the application (http://localhost:8080/index.html)
+    ```sh
+    ui5 serve -o /index.html
+    ```
 
-### serveIndex(path, options)
+## Testing
+* Run ESLint code validation
+    ```sh
+    npm run lint
+    ```
+* Start a local server and execute the tests automatically after every change
+    ```sh
+    npm run watch
+    ```
+* Run ESLint, start a local server and run the tests in CI mode
+    ```sh
+    npm test
+    ```
 
-Returns middlware that serves an index of the directory in the given `path`.
+For more build and development options please see: [UI5 Build and Development Tooling](https://github.com/SAP/ui5-tooling)
 
-The `path` is based off the `req.url` value, so a `req.url` of `'/some/dir`
-with a `path` of `'public'` will look at `'public/some/dir'`. If you are using
-something like `express`, you can change the URL "base" with `app.use` (see
-the express example).
-
-#### Options
-
-Serve index accepts these properties in the options object.
-
-##### filter
-
-Apply this filter function to files. Defaults to `false`. The `filter` function
-is called for each file, with the signature `filter(filename, index, files, dir)`
-where `filename` is the name of the file, `index` is the array index, `files` is
-the array of files and `dir` is the absolute path the file is located (and thus,
-the directory the listing is for).
-
-##### hidden
-
-Display hidden (dot) files. Defaults to `false`.
-
-##### icons
-
-Display icons. Defaults to `false`.
-
-##### stylesheet
-
-Optional path to a CSS stylesheet. Defaults to a built-in stylesheet.
-
-##### template
-
-Optional path to an HTML template or a function that will render a HTML
-string. Defaults to a built-in template.
-
-When given a string, the string is used as a file path to load and then the
-following tokens are replaced in templates:
-
-  * `{directory}` with the name of the directory.
-  * `{files}` with the HTML of an unordered list of file links.
-  * `{linked-path}` with the HTML of a link to the directory.
-  * `{style}` with the specified stylesheet and embedded images.
-
-When given as a function, the function is called as `template(locals, callback)`
-and it needs to invoke `callback(error, htmlString)`. The following are the
-provided locals:
-
-  * `directory` is the directory being displayed (where `/` is the root).
-  * `displayIcons` is a Boolean for if icons should be rendered or not.
-  * `fileList` is a sorted array of files in the directory. The array contains
-    objects with the following properties:
-    - `name` is the relative name for the file.
-    - `stat` is a `fs.Stats` object for the file.
-  * `path` is the full filesystem path to `directory`.
-  * `style` is the default stylesheet or the contents of the `stylesheet` option.
-  * `viewName` is the view name provided by the `view` option.
-
-##### view
-
-Display mode. `tiles` and `details` are available. Defaults to `tiles`.
-
-## Examples
-
-### Serve directory indexes with vanilla node.js http server
-
-```js
-var finalhandler = require('finalhandler')
-var http = require('http')
-var serveIndex = require('serve-index')
-var serveStatic = require('serve-static')
-
-// Serve directory indexes for public/ftp folder (with icons)
-var index = serveIndex('public/ftp', {'icons': true})
-
-// Serve up public/ftp folder files
-var serve = serveStatic('public/ftp')
-
-// Create server
-var server = http.createServer(function onRequest(req, res){
-  var done = finalhandler(req, res)
-  serve(req, res, function onNext(err) {
-    if (err) return done(err)
-    index(req, res, done)
-  })
-})
-
-// Listen
-server.listen(3000)
-```
-
-### Serve directory indexes with express
-
-```js
-var express    = require('express')
-var serveIndex = require('serve-index')
-
-var app = express()
-
-// Serve URLs like /ftp/thing as public/ftp/thing
-// The express.static serves the file contents
-// The serveIndex is this module serving the directory
-app.use('/ftp', express.static('public/ftp'), serveIndex('public/ftp', {'icons': true}))
-
-// Listen
-app.listen(3000)
-```
-
-## License
-
-[MIT](LICENSE). The [Silk](http://www.famfamfam.com/lab/icons/silk/) icons
-are created by/copyright of [FAMFAMFAM](http://www.famfamfam.com/).
-
-[appveyor-image]: https://img.shields.io/appveyor/ci/dougwilson/serve-index/master.svg?label=windows
-[appveyor-url]: https://ci.appveyor.com/project/dougwilson/serve-index
-[ci-image]: https://badgen.net/github/checks/expressjs/serve-index/master?label=ci
-[ci-url]: https://github.com/expressjs/serve-index/actions/workflows/ci.yml
-[coveralls-image]: https://img.shields.io/coveralls/expressjs/serve-index/master.svg
-[coveralls-url]: https://coveralls.io/r/expressjs/serve-index?branch=master
-[downloads-image]: https://img.shields.io/npm/dm/serve-index.svg
-[downloads-url]: https://npmjs.org/package/serve-index
-[npm-image]: https://img.shields.io/npm/v/serve-index.svg
-[npm-url]: https://npmjs.org/package/serve-index
+## Support
+This repository is based on the [OpenUI5 template demo apps](https://sdk.openui5.org/demoapps) and updated regularly with our latest recommendations. 
+If you found a bug, please create an [OpenUI5 issue](https://github.com/sap/openui5/issues). Thank you!
