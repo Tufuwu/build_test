@@ -1,117 +1,123 @@
-.. image:: https://travis-ci.org/fetzerch/kasserver.svg?branch=master
-    :target: https://travis-ci.org/fetzerch/kasserver
-    :alt: Travis CI Status
+===================
+pytest-deadfixtures
+===================
 
-.. image:: https://coveralls.io/repos/github/fetzerch/kasserver/badge.svg?branch=master
-    :target: https://coveralls.io/github/fetzerch/kasserver?branch=master
-    :alt: Coveralls Status
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/python/black
+    :alt: Black
 
-.. image:: https://img.shields.io/pypi/v/kasserver.svg
-    :target: https://pypi.org/project/kasserver
-    :alt: PyPI Version
+.. image:: https://travis-ci.org/jllorencetti/pytest-deadfixtures.svg?branch=main
+    :target: https://travis-ci.org/jllorencetti/pytest-deadfixtures
+    :alt: See Build Status on Travis CI
 
-kasserver - Manage domains hosted on All-Inkl.com through the KAS server API
-============================================================================
+A simple plugin to list unused or duplicated fixtures in a pytest suite.
 
-This project consists of the Python library *kasserver* and a few
-command line utilities to manage domains of the German webhoster
-`All-Inkl.com`_ through their `KAS server API`_.
+----
 
-At the moment the main focus is managing DNS record as this allows to
-automate the creation of `Let’s Encrypt`_ (wildcard) certificates with
-the `ACME DNS-01 challenge`_.
+Features
+--------
+
+* List unused fixtures in your tests
+* List duplicated fixtures
+
 
 Installation
 ------------
 
-*kasserver* (and its dependencies) can be installed from PyPI with:
-``pip3 install kasserver``
+You can install "pytest-deadfixtures" via `pip`_ from `PyPI`_::
 
-Authentication
---------------
+    $ pip install pytest-deadfixtures
 
-Both library and command line utilities require access to the KAS
-credentials. Username and password are read from the ``KASSERVER_USER``
-and ``KASSERVER_PASSWORD`` environment variables or from the
-``~/.netrc`` file:
+Usage
+-----
 
-.. code:: console
+Important
+*********
 
-   machine kasapi.kasserver.com
-   login USERNAME
-   password PASSWORD
+The `--dead-fixtures` option will not run your tests and it's also sensible for errors in the pytest collection step.
+If you are using as part of you CI process the recommended way is to run it after the default test run. For example::
 
-The file must be accessible only by your user account:
-``chmod 600 ~/.netrc``.
+    script:
+      - pytest
+      - pytest --dead-fixtures
 
-Scripts
--------
 
-``kasserver-dns``
-~~~~~~~~~~~~~~~~~
+Listing unused fixtures
+***********************
 
-A generic program to manage DNS records.
+Just run 'pytest' with an extra option '--dead-fixtures'::
 
-DNS records can be listed with:
+    $ pytest --dead-fixtures
+    ============================= test session starts ==============================
+    (hidden for brevity)
 
-.. code:: console
+    Hey there, I believe the following fixture(s) are not being used:
+    Fixture name: some_fixture, location: test_write_docs_when_verbose.py:5
 
-   $ kasserver-dns list example.com
-   ID C Zone        Name Type  Data               Aux
-    1 Y example.com      A     X.X.X.X            0
-    0 N example.com      NS    ns5.kasserver.com. 0
-    0 N example.com      NS    ns6.kasserver.com. 0
-    0 N example.com www  CNAME example.com        0
+    ========================= no tests ran in 0.00 seconds =========================
 
-A new DNS record is added with:
+Using some level of verbosity will also print the docstring of each fixture::
 
-.. code:: console
+    $ pytest --dead-fixtures -v
+    ============================= test session starts ==============================
+    (hidden for brevity)
 
-   kasserver-dns add test.example.com CNAME example.com
+    Hey there, I believe the following fixture(s) are not being used:
+    Fixture name: some_fixture, location: test_write_docs_when_verbose.py:5
+        Blabla fixture docs
 
-An existing DNS record is removed with:
+    ========================= no tests ran in 0.00 seconds =========================
 
-.. code:: console
+Listing repeated fixtures
+*************************
 
-   kasserver-dns remove test.example.com CNAME
+Now that you removed every unused fixture of your test suite, what if you want to go an extra mile?
 
-``kasserver-dns-*``
-~~~~~~~~~~~~~~~~~~~
+An important note about this is that it uses the fixture return value to verify if two or more fixtures are equal.
 
-The following programs are designed to be used together with ACME
-clients to automate DNS record creation/removal as it is required by a
-Let’s Encryt `ACME DNS-01 challenge`_ for automatic certificate renewal.
+This means **fixtures without a truthy return value will be skipped**.
 
-``kasserver-dns-certbot``
-^^^^^^^^^^^^^^^^^^^^^^^^^
+You should use this as a hint only, verify that the functionality provided by both fixtures are really repeated before deleting one of them.
 
-This program is designed to be used with `Certbot`_:
+Just run 'pytest' with an extra option '--dup-fixtures', unlike the '--dead-fixtures' option, it'll normally run you tests::
 
-.. code:: console
+    $ pytest --dup-fixtures
+    ======================================================================================================================== test session starts ========================================================================================================================
+    (hidden for brevity)
 
-   certbot certonly -d foo.exmaple.com --preferred-challenges dns \
-                    --manual --manual-auth-hook kasserver-dns-certbot \
-                             --manual-cleanup-hook kasserver-dns-certbot \
-                    -m invalid@example.com
+    tests/test_deadfixtures.py ........
 
-``kasserver-dns-lego``
-^^^^^^^^^^^^^^^^^^^^^^
+    You may have some duplicate fixtures:
+    Fixture name: someclass_fixture, location: test_repeated_fixtures.py:12
+    Fixture name: someclass_samefixture, location: test_repeated_fixtures.py:17
 
-This program is designed to be used with `lego`_:
 
-.. code:: console
+Projects using it
+-----------------
 
-   EXEC_PATH=kasserver-dns-lego lego --dns exec \
-       --domains foo.example.com --email invalid@example.com run
+- `wemake-django-template`_
+
+Contributing
+------------
+Contributions are very welcome. Tests can be run with `tox`_, please ensure
+the coverage at least stays the same before you submit a pull request.
 
 License
 -------
 
-This projected is licensed under the terms of the MIT license.
+Distributed under the terms of the `MIT`_ license, 'pytest-deadfixtures' is free and open source software
 
-.. _All-Inkl.com: https://all-inkl.com/
-.. _KAS server API: https://kasapi.kasserver.com/
-.. _Let’s Encrypt: https://letsencrypt.org
-.. _ACME DNS-01 challenge: https://www.eff.org/de/deeplinks/2018/02/technical-deep-dive-securing-automation-acme-dns-challenge-validation
-.. _Certbot: https://certbot.eff.org
-.. _lego: https://github.com/xenolf/lego
+
+Issues
+------
+
+If you encounter any problems, please `file an issue`_ along with a detailed description.
+
+.. _`@jllorencetti`: https://github.com/jllorencetti
+.. _`MIT`: http://opensource.org/licenses/MIT
+.. _`file an issue`: https://github.com/jllorencetti/pytest-deadfixtures/issues
+.. _`pytest`: https://github.com/pytest-dev/pytest
+.. _`tox`: https://tox.readthedocs.io/en/latest/
+.. _`pip`: https://pypi.python.org/pypi/pip/
+.. _`PyPI`: https://pypi.python.org/pypi
+.. _`wemake-django-template`: https://github.com/wemake-services/wemake-django-template

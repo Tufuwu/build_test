@@ -1,26 +1,75 @@
-# kasserver - Manage domains hosted on All-Inkl.com through the KAS server API
-# Copyright (c) 2018 Christian Fetzer
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+import codecs
+import os
+import re
 
-"""Manage domains hosted on All-Inkl.com through the KAS server API"""
+from setuptools import Command, setup
 
-from setuptools import setup
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
-setup(setup_requires=["pbr"], pbr=True)
+
+def read(fname):
+    file_path = os.path.join(os.path.dirname(__file__), fname)
+    return codecs.open(file_path, encoding="utf-8").read()
+
+
+def get_version():
+    changes_path = os.path.join(BASE_PATH, "CHANGES.rst")
+    regex = r"^#*\s*(?P<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$"
+    with codecs.open(changes_path, encoding="utf-8") as changes_file:
+        for line in changes_file:
+            res = re.match(regex, line)
+            if res:
+                return res.group("version")
+    return "0.0.0"
+
+
+version = get_version()
+
+
+class VersionCommand(Command):
+    description = "print current library version"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        print(version)
+
+
+setup(
+    name="pytest-deadfixtures",
+    version=version,
+    author="João Luiz Lorencetti",
+    author_email="me@dirtycoder.net",
+    maintainer="João Luiz Lorencetti",
+    maintainer_email="me@dirtycoder.net",
+    license="MIT",
+    url="https://github.com/jllorencetti/pytest-deadfixtures",
+    description="A simple plugin to list unused fixtures in pytest",
+    long_description=read("README.rst"),
+    py_modules=["pytest_deadfixtures"],
+    install_requires=["pytest>=3.0.0"],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Framework :: Pytest",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Testing",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: MIT License",
+    ],
+    cmdclass={"version": VersionCommand},
+    entry_points={"pytest11": ["deadfixtures = pytest_deadfixtures"]},
+)
