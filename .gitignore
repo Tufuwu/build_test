@@ -1,24 +1,47 @@
-/node_modules
-*.log
-*.pid
-test/child
-*.iml
-.idea/**
-*.heapsnapshot
-*.cpuprofile
-.cache-require-paths.json
-dist/
-*.deb
-*.rpm
-.DS_Store
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Npm
+package.json
+
+# Bower
+bower_components
+.bowerrc
+bower.json
+bower_components
+
+archive
+env
+
+htmlcov
+test_*.html
+#[vim]
 *.swp
-*.swo
-currentTagChangelog.md
-joblog-X
-test/fixtures/path-check*.txt
-yarn.lock
-*.tar.gz
-e2e_time
-unit_time
-*.heapprofile
-a.out
