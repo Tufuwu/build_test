@@ -1,5 +1,5 @@
-/examples/dist
-/node_modules
-/test/compiled
+.nyc_output/
+coverage
+node_modules
+npm-debug.log
 package-lock.json
-yarn.lock
