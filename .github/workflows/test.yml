@@ -1,24 +1,23 @@
-name: Node.js CI
-
+name: Tufuwu/test2
 on:
   push:
-    branches: [ main ]
+    branches:
+    - "**/*"
   pull_request:
-    branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, node]
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-node@v4.0.0
       with:
-        node-version: ${{ matrix.node-version }}
+        cache: npm
     - run: npm install
     - run: npm test
+    strategy:
+      matrix:
+        node_js:
+        - '10'
+        - node
