@@ -1,165 +1,236 @@
-# protocol-buffers
+# flat [![Build Status](https://github.com/hughsk/flat/actions/workflows/main.yml/badge.svg)](https://github.com/hughsk/flat/actions/workflows/main.yml)
 
-[Protocol Buffers](https://developers.google.com/protocol-buffers/) for Node.js
+Take a nested Javascript object and flatten it, or unflatten an object with
+delimited keys.
 
-```
-npm install protocol-buffers
-```
+## Installation
 
-[![build status](https://github.com/mafintosh/protocol-buffers/actions/workflows/test.yml/badge.svg)](https://github.com/mafintosh/protocol-buffers/actions/workflows/test.yml)
-![dat](http://img.shields.io/badge/Development%20sponsored%20by-dat-green.svg?style=flat)
-
-## Usage
-
-Assuming the following `test.proto` file exists
-
-```proto
-enum FOO {
-  BAR = 1;
-}
-
-message Test {
-  required float num  = 1;
-  required string payload = 2;
-}
-
-message AnotherOne {
-  repeated FOO list = 1;
-}
+``` bash
+$ npm install flat
 ```
 
-Use the above proto file to encode/decode messages by doing
+## Methods
 
-``` js
-var protobuf = require('protocol-buffers')
+### flatten(original, options)
 
-// pass a proto file as a buffer/string or pass a parsed protobuf-schema object
-var messages = protobuf(fs.readFileSync('test.proto'))
+Flattens the object - it'll return an object one level deep, regardless of how
+nested the original object was:
 
-var buf = messages.Test.encode({
-  num: 42,
-  payload: 'hello world'
+``` javascript
+var flatten = require('flat')
+
+flatten({
+    key1: {
+        keyA: 'valueI'
+    },
+    key2: {
+        keyB: 'valueII'
+    },
+    key3: { a: { b: { c: 2 } } }
 })
 
-console.log(buf) // should print a buffer
+// {
+//   'key1.keyA': 'valueI',
+//   'key2.keyB': 'valueII',
+//   'key3.a.b.c': 2
+// }
 ```
 
-To decode a message use `Test.decode`
+### unflatten(original, options)
 
-``` js
-var obj = messages.Test.decode(buf)
-console.log(obj) // should print an object similar to above
-```
+Flattening is reversible too, you can call `flatten.unflatten()` on an object:
 
-Enums are accessed in the same way as messages
+``` javascript
+var unflatten = require('flat').unflatten
 
-``` js
-var buf = messages.AnotherOne.encode({
-  list: [
-    messages.FOO.BAR
-  ]
+unflatten({
+    'three.levels.deep': 42,
+    'three.levels': {
+        nested: true
+    }
 })
+
+// {
+//     three: {
+//         levels: {
+//             deep: 42,
+//             nested: true
+//         }
+//     }
+// }
 ```
 
-Nested emums are accessed as properties on the corresponding message
+## Options
 
-``` js
-var buf = message.SomeMessage.encode({
-  list: [
-    messages.SomeMessage.NESTED_ENUM.VALUE
-  ]
+### delimiter
+
+Use a custom delimiter for (un)flattening your objects, instead of `.`.
+
+### safe
+
+When enabled, both `flat` and `unflatten` will preserve arrays and their
+contents. This is disabled by default.
+
+``` javascript
+var flatten = require('flat')
+
+flatten({
+    this: [
+        { contains: 'arrays' },
+        { preserving: {
+              them: 'for you'
+        }}
+    ]
+}, {
+    safe: true
 })
+
+// {
+//     'this': [
+//         { contains: 'arrays' },
+//         { preserving: {
+//             them: 'for you'
+//         }}
+//     ]
+// }
 ```
 
-See the [Google Protocol Buffers docs](https://developers.google.com/protocol-buffers/) for more information about the
-available types etc.
+### object
 
-## Compile to a file
+When enabled, arrays will not be created automatically when calling unflatten, like so:
 
-Since v4 you can now compile your schemas to a JavaScript file you can require from Node.
-This means you do not have runtime parse the schemas, which is useful if using in the browser or on embedded devices.
-It also makes the dependency footprint a lot smaller.
+``` javascript
+unflatten({
+    'hello.you.0': 'ipsum',
+    'hello.you.1': 'lorem',
+    'hello.other.world': 'foo'
+}, { object: true })
 
-``` sh
-# first install the cli tool
-npm install -g protocol-buffers
-
-# compile the schema
-protocol-buffers test.proto -o messages.js
-
-# then install the runtime dependency in the project
-npm install --save protocol-buffers-encodings
+// hello: {
+//     you: {
+//         0: 'ipsum',
+//         1: 'lorem',
+//     },
+//     other: { world: 'foo' }
+// }
 ```
 
-That's it! Then in your application you can simply do
+### overwrite
 
-``` js
-var messages = require('./messages')
+When enabled, existing keys in the unflattened object may be overwritten if they cannot hold a newly encountered nested value:
 
-var buf = messages.Test.encode({
-  num: 42
+```javascript
+unflatten({
+    'TRAVIS': 'true',
+    'TRAVIS.DIR': '/home/travis/build/kvz/environmental'
+}, { overwrite: true })
+
+// TRAVIS: {
+//     DIR: '/home/travis/build/kvz/environmental'
+// }
+```
+
+Without `overwrite` set to `true`, the `TRAVIS` key would already have been set to a string, thus could not accept the nested `DIR` element.
+
+This only makes sense on ordered arrays, and since we're overwriting data, should be used with care.
+
+
+### maxDepth
+
+Maximum number of nested objects to flatten.
+
+``` javascript
+var flatten = require('flat')
+
+flatten({
+    key1: {
+        keyA: 'valueI'
+    },
+    key2: {
+        keyB: 'valueII'
+    },
+    key3: { a: { b: { c: 2 } } }
+}, { maxDepth: 2 })
+
+// {
+//   'key1.keyA': 'valueI',
+//   'key2.keyB': 'valueII',
+//   'key3.a': { b: { c: 2 } }
+// }
+```
+
+### transformKey
+
+Transform each part of a flat key before and after flattening.
+
+```javascript
+var flatten = require('flat')
+var unflatten = require('flat').unflatten
+
+flatten({
+    key1: {
+        keyA: 'valueI'
+    },
+    key2: {
+        keyB: 'valueII'
+    },
+    key3: { a: { b: { c: 2 } } }
+}, {
+    transformKey: function(key){
+      return '__' + key + '__';
+    }
 })
-```
 
-The compilation functionality is also available as a JavaScript API for programmatic use:
+// {
+//   '__key1__.__keyA__': 'valueI',
+//   '__key2__.__keyB__': 'valueII',
+//   '__key3__.__a__.__b__.__c__': 2
+// }
 
-``` js
-var protobuf = require('protocol-buffers')
-
-// protobuf.toJS() takes the same arguments as protobuf()
-var js = protobuf.toJS(fs.readFileSync('test.proto'))
-fs.writeFileSync('messages.js', js)
-```
-
-## Performance
-
-This module is fast.
-
-It uses code generation to build as fast as possible encoders/decoders for the protobuf schema.
-You can run the benchmarks yourself by doing `npm run bench`.
-
-On my Macbook Air it gives the following results
-
-```
-Benchmarking JSON (baseline)
-  Running object encoding benchmark...
-  Encoded 1000000 objects in 2142 ms (466853 enc/s)
-
-  Running object decoding benchmark...
-  Decoded 1000000 objects in 970 ms (1030928 dec/s)
-
-  Running object encoding+decoding benchmark...
-  Encoded+decoded 1000000 objects in 3131 ms (319387 enc+dec/s)
-
-Benchmarking protocol-buffers
-  Running object encoding benchmark...
-  Encoded 1000000 objects in 2089 ms (478698 enc/s)
-
-  Running object decoding benchmark...
-  Decoded 1000000 objects in 735 ms (1360544 dec/s)
-
-  Running object encoding+decoding benchmark...
-  Encoded+decoded 1000000 objects in 2826 ms (353857 enc+dec/s)
-```
-
-Note that JSON parsing/serialization in node is a native function that is *really* fast.
-
-## Leveldb encoding compatibility
-
-Compiled protocol buffers messages are valid levelup encodings.
-This means you can pass them as `valueEncoding` and `keyEncoding`.
-
-``` js
-var level = require('level')
-var db = level('db')
-
-db.put('hello', {payload:'world'}, {valueEncoding:messages.Test}, function(err) {
-  db.get('hello', {valueEncoding:messages.Test}, function(err, message) {
-    console.log(message)
-  })
+unflatten({
+      '__key1__.__keyA__': 'valueI',
+      '__key2__.__keyB__': 'valueII',
+      '__key3__.__a__.__b__.__c__': 2
+}, {
+    transformKey: function(key){
+      return key.substring(2, key.length - 2)
+    }
 })
+
+// {
+//     key1: {
+//         keyA: 'valueI'
+//     },
+//     key2: {
+//         keyB: 'valueII'
+//     },
+//     key3: { a: { b: { c: 2 } } }
+// }
 ```
 
-## License
+## Command Line Usage
 
-MIT
+`flat` is also available as a command line tool. You can run it with 
+[`npx`](https://ghub.io/npx):
+
+```sh
+npx flat foo.json
+```
+
+Or install the `flat` command globally:
+ 
+```sh
+npm i -g flat && flat foo.json
+```
+
+Accepts a filename as an argument:
+
+```sh
+flat foo.json
+```
+
+Also accepts JSON on stdin:
+
+```sh
+cat foo.json | flat
+```
