@@ -1,57 +1,63 @@
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP/openui5-worklist-app)](https://api.reuse.software/info/github.com/SAP/openui5-worklist-app)
-[![Build Status](https://github.com/SAP/openui5-worklist-app/actions/workflows/github-ci.yml/badge.svg)](https://github.com/SAP/openui5-worklist-app/actions/workflows/github-ci.yml)
-![OpenUI5 logo](http://openui5.org/images/OpenUI5_new_big_side.png)
-
-# openui5-worklist-app
-OpenUI5 worklist app using the UI5 Build and Development Tooling.
-
-This template implements a typical worklist floorplan, one of the design patterns that is specified by the SAP Fiori Design Guidelines. 
-It includes generic application functionality and tests that can be easily extended.
+![PyTeal logo](https://github.com/algorand/pyteal/blob/master/docs/pyteal.png?raw=true)
 
 
-## More information
-* [Live Demo](http://sap.github.io/openui5-worklist-app/test/mockServer.html)
-* [Documentation](https://help.sap.com/docs/SAP_FIORI_tools/17d50220bcd848aa854c9c182d65b699/dcd9f97aa8de4adab8270315550f2b23.html)
-* [SAP Fiori Design Guidelines](https://experience.sap.com/fiori-design/)
-* [UI5 Tooling](https://github.com/SAP/ui5-tooling). 
-* [OpenUI5](https://github.com/SAP/openui5)
+# PyTeal: Algorand Smart Contracts in Python
 
-## Prerequisites
-The **UI5 build and development tooling command line interface (UI5 CLI)** has to be installed.
-For installation instructions please see [Installing the UI5 CLI](https://github.com/SAP/ui5-tooling#installing-the-ui5-cli).
+[![Build Status](https://travis-ci.com/algorand/pyteal.svg?branch=master)](https://travis-ci.com/algorand/pyteal)
+[![PyPI version](https://badge.fury.io/py/pyteal.svg)](https://badge.fury.io/py/pyteal)
+[![Documentation Status](https://readthedocs.org/projects/pyteal/badge/?version=latest)](https://pyteal.readthedocs.io/en/latest/?badge=latest)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## Setup
-1. Clone the repository and navigate into it
-    ```sh
-    git clone https://github.com/SAP/openui5-worklist-app.git
-    cd openui5-worklist-app
-    ```
-1. Install all dependencies
-    ```sh
-    npm install
-    ```
+PyTeal is a Python language binding for [Algorand Smart Contracts (ASC1s)](https://developer.algorand.org/docs/features/asc1/). 
 
-1. Start a local server and run the application (http://localhost:8080/index.html)
-    ```sh
-    ui5 serve -o /index.html
-    ```
+Algorand Smart Contracts are implemented using a new language that is stack-based, 
+called [Transaction Execution Approval Language (TEAL)](https://developer.algorand.org/docs/features/asc1/teal/). 
 
-## Testing
-* Run ESLint code validation
-    ```sh
-    npm run lint
-    ```
-* Start a local server and execute the tests automatically after every change
-    ```sh
-    npm run watch
-    ```
-* Run ESLint, start a local server and run the tests in CI mode
-    ```sh
-    npm test
-    ```
+However, TEAL is essentially an assembly language. With PyTeal, developers can express smart contract logic purely using Python. 
+PyTeal provides high level, functional programming style abstractions over TEAL and does type checking at construction time.
 
-For more build and development options please see: [UI5 Build and Development Tooling](https://github.com/SAP/ui5-tooling)
+### Install 
 
-## Support
-This repository is based on the [OpenUI5 template demo apps](https://sdk.openui5.org/demoapps) and updated regularly with our latest recommendations. 
-If you found a bug, please create an [OpenUI5 issue](https://github.com/sap/openui5/issues). Thank you!
+PyTeal requires Python version >= 3.6.
+
+#### Recommended: Install from PyPi
+
+Install the latest official release from PyPi:
+
+* `pip install pyteal`
+
+#### Install Latest Commit
+
+If needed, it's possible to install directly from the latest commit on master to use unreleased features:
+
+> **WARNING:** Unreleased code is experimental and may not be backwards compatible or function properly. Use extreme caution when installing PyTeal this way.
+
+* `pip install git+https://github.com/algorand/pyteal`
+
+### Documentation
+
+[PyTeal Docs](https://pyteal.readthedocs.io/)
+
+### Development Setup
+
+Setup venv (one time):
+ * `python3 -m venv venv`
+
+Active venv:
+ * `. venv/bin/activate` (if your shell is bash/zsh)
+ * `. venv/bin/activate.fish` (if your shell is fish)
+
+Pip install PyTeal in editable state
+ * `pip install -e .`
+
+Install dependencies:
+* `pip install -r requirements.txt`
+ 
+Type checking using mypy:
+* `mypy pyteal`
+
+Run tests:
+* `pytest`
+
+Format code:
+* `black .`
