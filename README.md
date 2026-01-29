@@ -1,216 +1,245 @@
-# SerMon: Service Monitor
-
-A GNOME Shell extension for monitoring and managing systemd services, cron jobs, docker and poman containers.
-
-You can configure it to show only the information you are interested in (e.g. only systemd services and/or docker containers).
-
-Published at: https://extensions.gnome.org/extension/1804/sermon/
-
-[![Build Status: GitHub Actions](https://github.com/rovellipaolo/gnome-shell-extension-sermon/actions/workflows/ci.yml/badge.svg)](https://github.com/rovellipaolo/gnome-shell-extension-sermon/actions)
-[![Language Grade: LGTM.com](https://img.shields.io/lgtm/grade/javascript/g/rovellipaolo/gnome-shell-extension-sermon.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rovellipaolo/gnome-shell-extension-sermon/context:javascript)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://img.shields.io/badge/License-GPL%20v2-blue.svg)
-
-[![Get it on GNOME Extensions](docs/images/get-it-on-ego.png)](https://extensions.gnome.org/extension/1804/sermon/)
-
-![Menu](docs/images/sermon.png "Screenshot of SerMon in Ubuntu")
-
-![Menu_Docker](docs/images/sermon_podman.png "Screenshot of SerMon in Fedora with only Podman section")
-![Menu_Systemd_Cron](docs/images/sermon_systemd_cron.png "Screenshot of SerMon in openSUSE with only Systemd and Cron sections")
+<div align="center">
+  <br/>
+  <a href="http://pm2.keymetrics.io/" title="PM2 Keymetrics link">
+    <img width=710px src="https://raw.githubusercontent.com/Unitech/pm2/master/pres/pm2-v4.png" alt="pm2 logo">
+  </a>
+  <br/>
+<br/>
+<b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
+  <i>Runtime Edition</i>
+<br/><br/>
 
 
-## Branches and GNOME Shell versions
+<a title="PM2 Downloads">
+  <img src="https://img.shields.io/npm/dm/pm2" alt="Downloads per Month"/>
+</a>
 
-The `master` branch includes all stable features and currently supports GNOME Shell _3.34_, _3.36_, _3.38_, _40_, _41_ and _42_.
-Among others, these versions of GNOME Shell are used in the following Linux distributions:
-* Debian 11 (Bullseye)
-* Fedora 31, 32, 33, 34, 35 and 36
-* Mageia 8
-* Manjaro 19.0, 20.0 to 20.2 and 21.0 to 21.2
-* openSUSE Leap 15.2 and 15.3
-* Red Hat Enterprise Linux 9 (Plow)
-* SUSE Linux Enterprise Desktop 15 SP2 and SP3
-* Ubuntu 19.10 (Eoan Ermine), 20.04 LTS (Focal Fossa), 20.10 (Groovy Gorilla), 21.04 (Hirsute Hippo), 21.10 (Impish Indri) and 22.04 LTS (Jammy Jellyfish)
+<a title="PM2 Downloads">
+  <img src="https://img.shields.io/npm/dy/pm2" alt="Downloads per Year"/>
+</a>
 
-The `gnome-shell-3-32` branch is a discontinued backport to GNOME Shell _3.32_.
-Among others, this version of GNOME Shell is used in the following Linux distributions:
-* Fedora 30
-* Mageia 7 and 7.1
-* Red Hat Enterprise Linux 8.1 to 8.6 (Ootpa)
-* Ubuntu 19.04 (Disco Dingo)
+<a href="https://badge.fury.io/js/pm2" title="NPM Version Badge">
+   <img src="https://badge.fury.io/js/pm2.svg" alt="npm version">
+</a>
 
-The `gnome-shell-3-28` branch is a discontinued backport to GNOME Shell _3.26_, _3.28_ and _3.30_.
-Among others, these versions of GNOME Shell are used in the following Linux distributions:
-* Debian 10 (Buster)
-* Fedora 27, 28 and 29
-* openSUSE Leap 15.0 and 15.1
-* Red Hat Enterprise Linux 7.5 to 7.9 (Maipo) and 8.0 (Ootpa)
-* SUSE Linux Enterprise Desktop 15 and 15 SP1
-* Ubuntu 18.04 LTS (Bionic Beaver) and 18.10 (Cosmic Cuttlefish)
+<a href="https://travis-ci.com/github/Unitech/pm2" title="PM2 Tests">
+  <img src="https://travis-ci.org/Unitech/pm2.svg?branch=master" alt="Build Status"/>
+</a>
+
+<br/>
+<br/>
+<br/>
+</div>
 
 
-## Building and Installing
+PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
 
-To clone the repository execute:
-```shell
-$ git clone https://github.com/rovellipaolo/gnome-shell-extension-sermon
-$ cd gnome-shell-extension-sermon
+Starting an application in production mode is as easy as:
+
+```bash
+$ pm2 start app.js
 ```
 
-To build the extension execute:
-```shell
-$ make build
-```
-**NOTE:** This will create a zip archive named `sermon@rovellipaolo-gmail.com.shell-extension.zip`.
+PM2 is constantly assailed by [more than 1800 tests](https://app.travis-ci.com/github/Unitech/pm2/branches).
 
-To install the extension execute:
-```shell
-$ make install
-```
-**NOTE:** This will unzip the previously builded zip archive into `~/.local/share/gnome-shell/extensions/sermon@rovellipaolo-gmail.com`.
+Official website: [https://pm2.keymetrics.io/](https://pm2.keymetrics.io/)
 
-Afterwards, restart GNOME Shell: press `Alt`+`F2`, type `r` and press enter.
+Works on Linux (stable) & macOS (stable) & Windows (stable). All Node.js versions are supported starting Node.js 12.X.
 
-Finally, if not already done, enable the extension at: [https://extensions.gnome.org](https://extensions.gnome.org/local)
-Or, alternatively, to enable the extension execute:
-```shell
-$ make enable
-```
-While to disable the extension execute:
-```shell
-$ make disable
+
+### Installing PM2
+
+With NPM:
+
+```bash
+$ npm install pm2 -g
 ```
 
-## Configuring
+You can install Node.js easily with [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) or [ASDF](https://blog.natterstefan.me/how-to-use-multiple-node-version-with-asdf).
 
-See existing settings at: https://extensions.gnome.org/local/
+### Start an application
 
-![Settings](docs/images/sermon_settings.png "Screenshot of SerMon settings")
+You can start any application (Node.js, Python, Ruby, binaries in $PATH...) like that:
 
-To change the settings go to: `org.gnome.shell.extensions.sermon.gschema.xml`
-And then execute:
-```shell
-$ make build-settings
+```bash
+$ pm2 start app.js
 ```
 
-## Running Checkstyle & Tests
+Your app is now daemonized, monitored and kept alive forever.
 
-To run the checkstyle execute:
-```shell
-$ make checkstyle
+### Managing Applications
+
+Once applications are started you can manage them easily:
+
+![Process listing](https://github.com/Unitech/pm2/raw/master/pres/pm2-ls-v2.png)
+
+To list all running applications:
+
+```bash
+$ pm2 list
 ```
-**NOTE:** This is using [`eslint`](https://github.com/eslint/eslint) and [`prettier`](https://github.com/prettier/prettier) under-the-hood.
 
-You can also run the checkstyle automatically at every git commit by launching the following command:
+Managing apps is straightforward:
+
+```bash
+$ pm2 stop     <app_name|namespace|id|'all'|json_conf>
+$ pm2 restart  <app_name|namespace|id|'all'|json_conf>
+$ pm2 delete   <app_name|namespace|id|'all'|json_conf>
 ```
-$ make install-githooks
+
+To have more details on a specific application:
+
+```bash
+$ pm2 describe <id|app_name>
 ```
 
-To run the tests execute:
-```shell
-$ make test
+To monitor logs, custom metrics, application information:
 
-...
-
-Container.isInstalled()
-  ✔ when container engine is found, returns true
-  ✔ when container engine is not found, returns false
-
-Container.getContainers()
-  ✔ when retrieving the containers, container engine ps command is executed
-
-Container.parseContainers()
-  ✔ when pasing command execution result with containers, returns a list of containers
-  ✔ when pasing command execution result without containers, returns an empty list
-
-Container.filterContainers()
-  ✔ returns the list of containers ordered by status
-  ✔ when no container is passed, returns an empty list
-
-Container.startContainer()
-  ✔ when starting a container, container engine start command is executed
-
-Container.stopContainer()
-  ✔ when stopping a Docker container, container engine stop command is executed
-
-Container.restartContainer()
-  ✔ when restarting a Docker container, container engine restart command is executed
-
-Container.removeContainer()
-  ✔ when removing a Docker container, container engine rm command is executed
-
-...
-
-MenuPresenter()
-  ✔ when initialized, there is no event in the menu
-  ✔ when initialized, there is no section in the menu
-  ✔ when initialized, the active sections are retrieved
-  ✔ when initialized, the icon in shown in the menu
-
-MenuPresenter.onClick()
-  ✔ when clicking on the menu and this is already open, no operation is performed
-  ✔ when clicking on the menu and this opens, the active sections are refreshed
-  ✔ when clicking on the menu and this opens, the menu is cleared and then shown again
-
-MenuPresenter.setupEvents()
-  ✔ when setting up the menu events, a click event is added to the menu
-
-MenuPresenter.setupView()
-  ✔ when setting up the menu, this is cleared and then shown
-  ✔ when setting up the menu, the section container is shown in the menu
-  ✔ when setting up the menu and Systemd is not enabled, its section is not shown
-  ✔ when setting up the menu and Systemd is enabled, its section is shown in first position
-  ✔ when setting up the menu and Cron is not enabled, its section is not shown
-  ✔ when setting up the menu and both Systemd and Cron are enabled, Cron section is shown in the menu in second position
-  ✔ when setting up the menu and only Cron is enabled, Cron section is shown in the menu in first position
-  ✔ when setting up the menu and Docker is not enabled, its section is not shown
-  ✔ when setting up the menu and all sections are enabled, Docker section is shown in the menu in third position
-  ✔ when setting up the menu and both Systemd and Docker are enabled, Docker section is shown in the menu in second position
-  ✔ when setting up the menu and only Docker is enabled, Docker section is shown in the menu in first position
-
-MenuPresenter.onDestroy()
-  ✔ when destroyed and without events, no operation is performed
-  ✔ when destroyed and with events, all events are removed from the menu
-  ✔ when destroyed and without views, no operation is performed
-  ✔ when destroyed and with views, all views are removed from the menu
-
-...
-
-✔ 668 completed
+```bash
+$ pm2 monit
 ```
-**NOTE:** This is using [`gjsunit`](https://github.com/philipphoffmann/gjsunit) under-the-hood.
 
+[More about Process Management](https://pm2.keymetrics.io/docs/usage/process-management/)
 
-## Debugging
+### Cluster Mode: Node.js Load Balancing & Zero Downtime Reload
 
-To show GNOME Shell logs execute:
-```shell
-$ make show-logs
+The Cluster mode is a special mode when starting a Node.js application, it starts multiple processes and load-balance HTTP/TCP/UDP queries between them. This increase overall performance (by a factor of x10 on 16 cores machines) and reliability (faster socket re-balancing in case of unhandled errors).
 
-[SerMon] DEBUG (MenuPresenter) On click menu
-[SerMon] DEBUG (MenuPresenter) Refreshing menu...
-[SerMon] DEBUG (MenuPresenter) Rendering menu...
-[SerMon] DEBUG (CommandLine) Executing: "systemctl list-units --type=service --all"
-[SerMon] DEBUG (CommandLine) Output: ...
-[SerMon] INFO (SectionContainerPresenter) Add section: "Systemd"
-[SerMon] DEBUG (CommandLine) Executing: "crontab -l"
-[SerMon] DEBUG (CommandLine) Output: ...
-[SerMon] INFO (SectionContainerPresenter) Add section: "Cron"
-[SerMon] DEBUG (CommandLine) Executing: "docker ps -a --format '{{.ID}} | {{.Status}} | {{.Names}}'"
-[SerMon] DEBUG (CommandLine) Output: ...
-[SerMon] INFO (SectionContainerPresenter) Add section: "Docker"
-[SerMon] DEBUG (CommandLine) Executing: "docker ps -a --format '{{.ID}} | {{.Image}} | {{.Status}} | {{.Names}}'"
-[SerMon] DEBUG (CommandLine) Output: ...
-[SerMon] INFO (SectionPresenter) Add item: "cron"
-[SerMon] INFO (SectionPresenter) Add item: "docker"
-[SerMon] INFO (SectionPresenter) Add item: "memcached"
-[SerMon] INFO (SectionPresenter) Add item: "mysql"
-[SerMon] INFO (SectionPresenter) Add item: "..."
-[SerMon] INFO (SectionPresenter) Add item: "0 * * * * /usr/local/bin/my_cron_script"
-[SerMon] INFO (SectionPresenter) Add item: "0 12 * * * (cd \"/opt/my_cron_repo\"; HOME= git pull)"
-[SerMon] INFO (SectionPresenter) Add item: "my_docker (123456789abc)"
-[SerMon] DEBUG (ClickableSectionItemPresenter) On mouse over: "my_docker (123456789abc)"
-[SerMon] DEBUG (ClickableSectionItemPresenter) On click: "my_docker (123456789abc)"
-[SerMon] DEBUG (CommandLine) Executing: "docker stop 123456789abc"
-[SerMon] INFO (DockerRepository) Docker container "123456789abc" stopped correctly!
-[SerMon] DEBUG (MenuPresenter) Rendering menu...
+![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/cluster.png)
+
+Starting a Node.js application in cluster mode that will leverage all CPUs available:
+
+```bash
+$ pm2 start api.js -i <processes>
 ```
+
+`<processes>` can be `'max'`, `-1` (all cpu minus 1) or a specified number of instances to start.
+
+**Zero Downtime Reload**
+
+Hot Reload allows to update an application without any downtime:
+
+```bash
+$ pm2 reload all
+```
+
+[More informations about how PM2 make clustering easy](https://pm2.keymetrics.io/docs/usage/cluster-mode/)
+
+### Container Support
+
+With the drop-in replacement command for `node`, called `pm2-runtime`, run your Node.js application in a hardened production environment.
+Using it is seamless:
+
+```
+RUN npm install pm2 -g
+CMD [ "pm2-runtime", "npm", "--", "start" ]
+```
+
+[Read More about the dedicated integration](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/)
+
+### Host monitoring speedbar
+
+PM2 allows to monitor your host/server vitals with a monitoring speedbar.
+
+To enable host monitoring:
+
+```bash
+$ pm2 set pm2:sysmonit true
+$ pm2 update
+```
+
+![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/vitals.png)
+
+### Terminal Based Monitoring
+
+![Monit](https://github.com/Unitech/pm2/raw/master/pres/pm2-monit.png)
+
+Monitor all processes launched straight from the command line:
+
+```bash
+$ pm2 monit
+```
+
+### Log Management
+
+To consult logs just type the command:
+
+```bash
+$ pm2 logs
+```
+
+Standard, Raw, JSON and formated output are available.
+
+Examples:
+
+```bash
+$ pm2 logs APP-NAME       # Display APP-NAME logs
+$ pm2 logs --json         # JSON output
+$ pm2 logs --format       # Formated output
+
+$ pm2 flush               # Flush all logs
+$ pm2 reloadLogs          # Reload all logs
+```
+
+To enable log rotation install the following module
+
+```bash
+$ pm2 install pm2-logrotate
+```
+
+[More about log management](https://pm2.keymetrics.io/docs/usage/log-management/)
+
+### Startup Scripts Generation
+
+PM2 can generate and configure a Startup Script to keep PM2 and your processes alive at every server restart.
+
+Init Systems Supported: **systemd**, **upstart**, **launchd**, **rc.d**
+
+```bash
+# Generate Startup Script
+$ pm2 startup
+
+# Freeze your process list across server restart
+$ pm2 save
+
+# Remove Startup Script
+$ pm2 unstartup
+```
+
+[More about Startup Scripts Generation](https://pm2.keymetrics.io/docs/usage/startup/)
+
+### Updating PM2
+
+```bash
+# Install latest PM2 version
+$ npm install pm2@latest -g
+# Save process list, exit old PM2 & restore all processes
+$ pm2 update
+```
+
+*PM2 updates are seamless*
+
+## PM2+ Monitoring
+
+If you manage your apps with PM2, PM2+ makes it easy to monitor and manage apps across servers.
+
+![https://app.pm2.io/](https://pm2.io/img/app-overview.png)
+
+Feel free to try it:
+
+[Discover the monitoring dashboard for PM2](https://app.pm2.io/)
+
+Thanks in advance and we hope that you like PM2!
+
+## CHANGELOG
+
+[CHANGELOG](https://github.com/Unitech/PM2/blob/master/CHANGELOG.md)
+
+## Contributors
+
+[Contributors](http://pm2.keymetrics.io/hall-of-fame/)
+
+## License
+
+PM2 is made available under the terms of the GNU Affero General Public License 3.0 (AGPL 3.0).
+For other licenses [contact us](mailto:contact@keymetrics.io).
