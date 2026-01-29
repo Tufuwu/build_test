@@ -1,0 +1,30 @@
+env:
+  es6: true
+extends:
+  - "eslint:recommended"
+  - "prettier"
+rules:
+  eqeqeq: error
+  new-cap: [error, { newIsCap: true, capIsNew: false }]
+  no-empty: [error, { allowEmptyCatch: true }]
+  no-implicit-coercion: [error, { allow: ['!!'] }]
+  no-undef: [warn, { typeof: true }]
+  no-unused-vars: [error, { vars: all, args: after-used, ignoreRestSiblings: false, argsIgnorePattern: "^_+$", varsIgnorePattern: "^_+$" }]
+  prefer-template: error
+  quotes: [error, double, { avoidEscape: true, allowTemplateLiterals: false }]
+  semi: [error, always]
+  strict: [error, global]
+overrides:
+  - files: ["*[Test|UnitTest|IntegrationTest|IT].js"]
+    rules:
+      no-undef: off
+      no-unused-vars: [error, { vars: all, args: after-used, ignoreRestSiblings: false, argsIgnorePattern: "^_+$|^sut$", varsIgnorePattern: "^_+$|^sut$" }]
+      semi: off
+      strict: off
+globals:
+  imports: false
+  log: false
+  print: false
+  window: false
+parserOptions:
+  ecmaVersion: 2017

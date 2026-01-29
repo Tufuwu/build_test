@@ -1,18 +1,34 @@
-name: Deploy
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 8
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '8'
-      - run: npm install
-      - run: npm run deploy
+          node-version: 'latest'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -qy gjs libgjs-dev
+
+      - name: Install checkstyle
+        run: make install-checkstyle
+
+      - name: Run checkstyle
+        run: make checkstyle
+
+      - name: Run tests
+        run: make test

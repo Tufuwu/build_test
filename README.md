@@ -1,110 +1,216 @@
-# definitelytyped.github.io [![Build Status](https://travis-ci.org/DefinitelyTyped/definitelytyped.github.io.svg?branch=source)](https://travis-ci.org/DefinitelyTyped/definitelytyped.github.io)
+# SerMon: Service Monitor
 
-> Website content for [definitelytyped.org](http://definitelytyped.org).
+A GNOME Shell extension for monitoring and managing systemd services, cron jobs, docker and poman containers.
 
-The [master](https://github.com/DefinitelyTyped/definitelytyped.github.io/tree/master) branch holds live github.io content generated from the [source](https://github.com/DefinitelyTyped/definitelytyped.github.io/tree/source) branch.
+You can configure it to show only the information you are interested in (e.g. only systemd services and/or docker containers).
 
-The site build with [Grunt](http://www.gruntjs.com) and generated using [docpad](http://docpad.org), a static site generator complete with watch tasks, development server with LiveReload and [many plugins](http://docpad.org/docs/plugins). Publishing happens using [grunt-gh-pages](https://github.com/tschaub/grunt-gh-pages).
+Published at: https://extensions.gnome.org/extension/1804/sermon/
 
+[![Build Status: GitHub Actions](https://github.com/rovellipaolo/gnome-shell-extension-sermon/actions/workflows/ci.yml/badge.svg)](https://github.com/rovellipaolo/gnome-shell-extension-sermon/actions)
+[![Language Grade: LGTM.com](https://img.shields.io/lgtm/grade/javascript/g/rovellipaolo/gnome-shell-extension-sermon.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rovellipaolo/gnome-shell-extension-sermon/context:javascript)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://img.shields.io/badge/License-GPL%20v2-blue.svg)
 
-## Edit online
+[![Get it on GNOME Extensions](docs/images/get-it-on-ego.png)](https://extensions.gnome.org/extension/1804/sermon/)
 
-1. Use the github web interface to quickly make text edits like updating the [guides](/guides.html) and the [directory](/directory.html). Github will create a fork and you can modify content without leaving your browser.
+![Menu](docs/images/sermon.png "Screenshot of SerMon in Ubuntu")
 
-1. The content is saved as markdown and located in `./src/documents`.
-
-
-## Bulk editing
-
-If you like to use your own tools you can follow these steps:
-
-1. Fork the repository.
-
-1. Checkout the `source` branch.
-
-1. If you already have a checkout make sure you pull the latest revision. 
-
-1. Locate the content your want to change in `./src/documents`. Most of the editable content is in markdown format (some with a `.eco` template filter).
-
-1. Make your edits and commit your changes. A flat commit with sensible commit-note is appreciated.
-
-1. Push to your changes to your fork.
-
-1. Send a pull request to the `source` branch.
-
-1. After review a committer will merge and Travis-CI will republish the site.
-
-1. See below for the steps to get a local preview (this is not essential for simple markdown edits).
+![Menu_Docker](docs/images/sermon_podman.png "Screenshot of SerMon in Fedora with only Podman section")
+![Menu_Systemd_Cron](docs/images/sermon_systemd_cron.png "Screenshot of SerMon in openSUSE with only Systemd and Cron sections")
 
 
-## Edit the site
+## Branches and GNOME Shell versions
 
-To do structural authoring with a build-preview you can follow the development flow.
+The `master` branch includes all stable features and currently supports GNOME Shell _3.34_, _3.36_, _3.38_, _40_, _41_ and _42_.
+Among others, these versions of GNOME Shell are used in the following Linux distributions:
+* Debian 11 (Bullseye)
+* Fedora 31, 32, 33, 34, 35 and 36
+* Mageia 8
+* Manjaro 19.0, 20.0 to 20.2 and 21.0 to 21.2
+* openSUSE Leap 15.2 and 15.3
+* Red Hat Enterprise Linux 9 (Plow)
+* SUSE Linux Enterprise Desktop 15 SP2 and SP3
+* Ubuntu 19.10 (Eoan Ermine), 20.04 LTS (Focal Fossa), 20.10 (Groovy Gorilla), 21.04 (Hirsute Hippo), 21.10 (Impish Indri) and 22.04 LTS (Jammy Jellyfish)
 
-Working with the site is done using your commandline terminal and should work on any platform. So it can be bash, shell, cmd.exe or anything else (like WebStorm embedded terminal).
+The `gnome-shell-3-32` branch is a discontinued backport to GNOME Shell _3.32_.
+Among others, this version of GNOME Shell is used in the following Linux distributions:
+* Fedora 30
+* Mageia 7 and 7.1
+* Red Hat Enterprise Linux 8.1 to 8.6 (Ootpa)
+* Ubuntu 19.04 (Disco Dingo)
 
-
-### Prerequisites
-
-1. Get [node.js](http://nodejs.org/) (`> 0.10.0`) for your local platform, it comes with the `npm` package manager.
-
-1. Have the global grunt cli command: run `npm install grunt-cli -g` in your command line.
-
-1. You *dont* need a global docpad install; it comes as local dependency.
-
-
-### Get the project
-
-1. Fork the repository (or just clone if you got commit access).
-
-1. Checkout the `source` branch.
-
-1. Run `npm install` to pull all local dependencies. (this can take a minute)
-
-
-### Do some work in the project
-
-Use grunt to run various commands.
-
-1. The main tasks are:
-
-	1. Run `grunt clean` - remove all generated content.
-
-	1. Run `grunt watch` - regenerate and start a watch with LiveReload server at [http://localhost:9778/](http://localhost:9778/)
-
-	1. Run `grunt build` - regenerate the site for production environment (best to stop the watch if you have it active).
-
-	1. Run `grunt publish` - build and push to github `master` (live at [definitelytyped.org](http://definitelytyped.org/)). This will ask for your github credentials so you need commit access to the repository (otherwise send a PR with the your source). Make sure you also push the changes to `source`.
-
-	1. See `grunt -h` or the `Gruntfile.js` for additional commands.
+The `gnome-shell-3-28` branch is a discontinued backport to GNOME Shell _3.26_, _3.28_ and _3.30_.
+Among others, these versions of GNOME Shell are used in the following Linux distributions:
+* Debian 10 (Buster)
+* Fedora 27, 28 and 29
+* openSUSE Leap 15.0 and 15.1
+* Red Hat Enterprise Linux 7.5 to 7.9 (Maipo) and 8.0 (Ootpa)
+* SUSE Linux Enterprise Desktop 15 and 15 SP1
+* Ubuntu 18.04 LTS (Bionic Beaver) and 18.10 (Cosmic Cuttlefish)
 
 
-### Publish the changes
+## Building and Installing
 
-1. Push your changes to the `source` branch (or send a pull request).
+To clone the repository execute:
+```shell
+$ git clone https://github.com/rovellipaolo/gnome-shell-extension-sermon
+$ cd gnome-shell-extension-sermon
+```
 
-1. If you like some feedback first then use a fork (or branch).
+To build the extension execute:
+```shell
+$ make build
+```
+**NOTE:** This will create a zip archive named `sermon@rovellipaolo-gmail.com.shell-extension.zip`.
 
-1. The every commit that lands on `source` will automatically be rebuild and deployed via Travis-CI.
+To install the extension execute:
+```shell
+$ make install
+```
+**NOTE:** This will unzip the previously builded zip archive into `~/.local/share/gnome-shell/extensions/sermon@rovellipaolo-gmail.com`.
 
-1. Give Travis a minute or two to deploy the site, then verify your changes.
+Afterwards, restart GNOME Shell: press `Alt`+`F2`, type `r` and press enter.
 
-1. Optional: Fix some typos.
+Finally, if not already done, enable the extension at: [https://extensions.gnome.org](https://extensions.gnome.org/local)
+Or, alternatively, to enable the extension execute:
+```shell
+$ make enable
+```
+While to disable the extension execute:
+```shell
+$ make disable
+```
 
-Notes:
+## Configuring
 
-1. If you build or watch the content then you might get some yellow `warning`'s in the console. These can usually be ignored when docpad telling us that some transforms didn't have any effect: this is correct if you use a template transform (`.eco`) but have no template fields in the file (*yet*).
+See existing settings at: https://extensions.gnome.org/local/
 
-2. :warning: Direct changes to `master` branch will be overwritten or discarded so always edit through `source`!
+![Settings](docs/images/sermon_settings.png "Screenshot of SerMon settings")
+
+To change the settings go to: `org.gnome.shell.extensions.sermon.gschema.xml`
+And then execute:
+```shell
+$ make build-settings
+```
+
+## Running Checkstyle & Tests
+
+To run the checkstyle execute:
+```shell
+$ make checkstyle
+```
+**NOTE:** This is using [`eslint`](https://github.com/eslint/eslint) and [`prettier`](https://github.com/prettier/prettier) under-the-hood.
+
+You can also run the checkstyle automatically at every git commit by launching the following command:
+```
+$ make install-githooks
+```
+
+To run the tests execute:
+```shell
+$ make test
+
+...
+
+Container.isInstalled()
+  ✔ when container engine is found, returns true
+  ✔ when container engine is not found, returns false
+
+Container.getContainers()
+  ✔ when retrieving the containers, container engine ps command is executed
+
+Container.parseContainers()
+  ✔ when pasing command execution result with containers, returns a list of containers
+  ✔ when pasing command execution result without containers, returns an empty list
+
+Container.filterContainers()
+  ✔ returns the list of containers ordered by status
+  ✔ when no container is passed, returns an empty list
+
+Container.startContainer()
+  ✔ when starting a container, container engine start command is executed
+
+Container.stopContainer()
+  ✔ when stopping a Docker container, container engine stop command is executed
+
+Container.restartContainer()
+  ✔ when restarting a Docker container, container engine restart command is executed
+
+Container.removeContainer()
+  ✔ when removing a Docker container, container engine rm command is executed
+
+...
+
+MenuPresenter()
+  ✔ when initialized, there is no event in the menu
+  ✔ when initialized, there is no section in the menu
+  ✔ when initialized, the active sections are retrieved
+  ✔ when initialized, the icon in shown in the menu
+
+MenuPresenter.onClick()
+  ✔ when clicking on the menu and this is already open, no operation is performed
+  ✔ when clicking on the menu and this opens, the active sections are refreshed
+  ✔ when clicking on the menu and this opens, the menu is cleared and then shown again
+
+MenuPresenter.setupEvents()
+  ✔ when setting up the menu events, a click event is added to the menu
+
+MenuPresenter.setupView()
+  ✔ when setting up the menu, this is cleared and then shown
+  ✔ when setting up the menu, the section container is shown in the menu
+  ✔ when setting up the menu and Systemd is not enabled, its section is not shown
+  ✔ when setting up the menu and Systemd is enabled, its section is shown in first position
+  ✔ when setting up the menu and Cron is not enabled, its section is not shown
+  ✔ when setting up the menu and both Systemd and Cron are enabled, Cron section is shown in the menu in second position
+  ✔ when setting up the menu and only Cron is enabled, Cron section is shown in the menu in first position
+  ✔ when setting up the menu and Docker is not enabled, its section is not shown
+  ✔ when setting up the menu and all sections are enabled, Docker section is shown in the menu in third position
+  ✔ when setting up the menu and both Systemd and Docker are enabled, Docker section is shown in the menu in second position
+  ✔ when setting up the menu and only Docker is enabled, Docker section is shown in the menu in first position
+
+MenuPresenter.onDestroy()
+  ✔ when destroyed and without events, no operation is performed
+  ✔ when destroyed and with events, all events are removed from the menu
+  ✔ when destroyed and without views, no operation is performed
+  ✔ when destroyed and with views, all views are removed from the menu
+
+...
+
+✔ 668 completed
+```
+**NOTE:** This is using [`gjsunit`](https://github.com/philipphoffmann/gjsunit) under-the-hood.
 
 
-## Contributions
+## Debugging
 
-Contributions are welcome! Check the website [for more info](http://definitelytyped.org/pages/website-contributions.html), then return here and follow the instructions above.
+To show GNOME Shell logs execute:
+```shell
+$ make show-logs
 
-
-## License
-
-Copyright (c) 2014 DefinitelyTyped
-
-Licensed under the MIT license.
+[SerMon] DEBUG (MenuPresenter) On click menu
+[SerMon] DEBUG (MenuPresenter) Refreshing menu...
+[SerMon] DEBUG (MenuPresenter) Rendering menu...
+[SerMon] DEBUG (CommandLine) Executing: "systemctl list-units --type=service --all"
+[SerMon] DEBUG (CommandLine) Output: ...
+[SerMon] INFO (SectionContainerPresenter) Add section: "Systemd"
+[SerMon] DEBUG (CommandLine) Executing: "crontab -l"
+[SerMon] DEBUG (CommandLine) Output: ...
+[SerMon] INFO (SectionContainerPresenter) Add section: "Cron"
+[SerMon] DEBUG (CommandLine) Executing: "docker ps -a --format '{{.ID}} | {{.Status}} | {{.Names}}'"
+[SerMon] DEBUG (CommandLine) Output: ...
+[SerMon] INFO (SectionContainerPresenter) Add section: "Docker"
+[SerMon] DEBUG (CommandLine) Executing: "docker ps -a --format '{{.ID}} | {{.Image}} | {{.Status}} | {{.Names}}'"
+[SerMon] DEBUG (CommandLine) Output: ...
+[SerMon] INFO (SectionPresenter) Add item: "cron"
+[SerMon] INFO (SectionPresenter) Add item: "docker"
+[SerMon] INFO (SectionPresenter) Add item: "memcached"
+[SerMon] INFO (SectionPresenter) Add item: "mysql"
+[SerMon] INFO (SectionPresenter) Add item: "..."
+[SerMon] INFO (SectionPresenter) Add item: "0 * * * * /usr/local/bin/my_cron_script"
+[SerMon] INFO (SectionPresenter) Add item: "0 12 * * * (cd \"/opt/my_cron_repo\"; HOME= git pull)"
+[SerMon] INFO (SectionPresenter) Add item: "my_docker (123456789abc)"
+[SerMon] DEBUG (ClickableSectionItemPresenter) On mouse over: "my_docker (123456789abc)"
+[SerMon] DEBUG (ClickableSectionItemPresenter) On click: "my_docker (123456789abc)"
+[SerMon] DEBUG (CommandLine) Executing: "docker stop 123456789abc"
+[SerMon] INFO (DockerRepository) Docker container "123456789abc" stopped correctly!
+[SerMon] DEBUG (MenuPresenter) Rendering menu...
+```
