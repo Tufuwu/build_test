@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # kasserver - Manage domains hosted on All-Inkl.com through the KAS server API
 # Copyright (c) 2018 Christian Fetzer
 #
@@ -19,8 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Manage domains hosted on All-Inkl.com through the KAS server API"""
+"""Request Let's encrypt certificates for All-Inkl.com domains with lego"""
 
-from setuptools import setup
+from kasserver.kasserver_dns_lego import cli
 
-setup(setup_requires=["pbr"], pbr=True)
+cli()
