@@ -1,0 +1,120 @@
+#!/usr/bin/env node
+
+const spinner = require('char-spinner')
+const program = require('commander')
+const moment = require('moment')
+const geobuf = require('geobuf')
+const Transit = require('../index')
+const turf = require('../lib/utils/turf')
+
+spinner()
+
+program
+  .usage('[options] <gtfs>')
+  .description("Create newline-separated GeoJSON Features of all the trips' positions")
+  .option('-a, --array', 'Export as JSON Array instead of newline-separated datasets')
+  .option('-b, --geobuf', 'Export as Geobuf')
+  .option('-d, --date <n>', 'Date (default: today)')
+  .option('-n, --datasets <n>', 'Number of datasets to export', parseInt)
+  .option('-i, --indentation <spaces>', 'Set indentation level (default: 0)', parseInt)
+  .parse(process.argv)
+
+const objects = []
+let datasets = program.datasets || null
+program.indentation = program.indentation === undefined ? 0 : program.indentation
+program.date = program.date || new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+
+const dir = program.args[0]
+const dates = [program.date]
+
+function print (obj) {
+  if (program.geobuf) {
+    const buf = geobuf.featureToGeobuf(obj)
+    process.stdout.write(buf.encode().toBuffer())
+    return
+  }
+
+  console.log(JSON.stringify(obj, null, Array(program.indentation + 1).join(' ')))
+}
+
+const transit = new Transit()
+transit.importGTFS(dir, function (err) {
+  if (err) {
+    throw err
+  }
+
+  const trips = transit.trips
+  trips.forEach(function (trip) {
+    if (program.datasets && datasets === 0) {
+      return
+    }
+
+    dates.forEach(function (date) {
+      if (!trip.service.operating(date)) {
+        return
+      }
+
+      const prefixedPositions = prefixDates(trip.positions, date)
+      const linestring = toGeoJSON(prefixedPositions)
+
+      // some additional information of this trip
+      linestring.properties.trip = {
+        id: date + '_' + trip.id,
+        route: {
+          id: trip.route.id,
+          longName: trip.route.longName,
+          shortName: trip.route.shortName,
+          color: trip.route.color,
+          textColor: trip.route.textColor,
+          type: trip.route.type
+        },
+        shape: {
+          id: (trip.shape ? trip.shape.id : null)
+        }
+      }
+
+      if (program.array) {
+        objects.push(linestring)
+      } else {
+        print(linestring)
+      }
+
+      if (program.datasets) {
+        datasets--
+      }
+    })
+  })
+
+  if (program.array) {
+    print(objects)
+  }
+})
+
+function prefixDates (positions, date) {
+  const res = positions.map(function (position) {
+    const dateStr = moment(date).format('YYYY-MM-DD') + ' ' + position.time
+    position.time = new Date(dateStr)
+    return position
+  })
+  return res
+}
+
+function toGeoJSON (points) {
+  const coords = []
+  const times = []
+
+  points.forEach(function (point) {
+    coords.push(toLonLat(point))
+    times.push(point.time.getTime())
+  })
+
+  const linestring = turf.linestring(coords, {
+    time: times
+  })
+
+  return linestring
+}
+
+function toLonLat (point) {
+  return [point.lon, point.lat]
+}
