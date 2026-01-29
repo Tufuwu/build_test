@@ -35,5 +35,3 @@ jobs:
         run: npm run test-with-temp-cloud
         env:
           CI: true
-
-|End-of-Code|
