@@ -1,75 +1,54 @@
-import codecs
 import os
-import re
+from setuptools import setup
 
-from setuptools import Command, setup
+with open(os.path.join(os.path.dirname(__file__), 'README.rst'), encoding='utf-8') as f:
+    README = f.read()
 
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-
-
-def read(fname):
-    file_path = os.path.join(os.path.dirname(__file__), fname)
-    return codecs.open(file_path, encoding="utf-8").read()
-
-
-def get_version():
-    changes_path = os.path.join(BASE_PATH, "CHANGES.rst")
-    regex = r"^#*\s*(?P<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$"
-    with codecs.open(changes_path, encoding="utf-8") as changes_file:
-        for line in changes_file:
-            res = re.match(regex, line)
-            if res:
-                return res.group("version")
-    return "0.0.0"
-
-
-version = get_version()
-
-
-class VersionCommand(Command):
-    description = "print current library version"
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        print(version)
-
+# allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name="pytest-deadfixtures",
-    version=version,
-    author="João Luiz Lorencetti",
-    author_email="me@dirtycoder.net",
-    maintainer="João Luiz Lorencetti",
-    maintainer_email="me@dirtycoder.net",
-    license="MIT",
-    url="https://github.com/jllorencetti/pytest-deadfixtures",
-    description="A simple plugin to list unused fixtures in pytest",
-    long_description=read("README.rst"),
-    py_modules=["pytest_deadfixtures"],
-    install_requires=["pytest>=3.0.0"],
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Framework :: Pytest",
-        "Intended Audience :: Developers",
-        "Topic :: Software Development :: Testing",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
-        "Operating System :: OS Independent",
-        "License :: OSI Approved :: MIT License",
+    name="SimpleIDML",
+    version="1.1.3",
+    license='BSD Licence',
+    author='Stanislas Guerra',
+    author_email='stanislas.guerra@gmail.com',
+    description='A library to manipulate Adobe(r) IDML(r) files.',
+    long_description=README,
+    url='https://github.com/Starou/SimpleIDML',
+    project_urls={
+        'Source Code': 'https://github.com/Starou/SimpleIDML',
+        'Issue Tracker': 'https://github.com/Starou/SimpleIDML/issues',
+    },
+    package_dir={'': 'src'},
+    install_requires=['lxml', 'suds-py3'],
+    packages=[
+        'simple_idml',
+        'simple_idml.indesign',
     ],
-    cmdclass={"version": VersionCommand},
-    entry_points={"pytest11": ["deadfixtures = pytest_deadfixtures"]},
+    package_data={
+        'simple_idml.indesign': [
+            'scripts/*.jsx',
+        ]
+    },
+    data_files=[],
+    scripts=[
+        'src/scripts/simpleidml_create_package_from_dir.py',
+        'src/scripts/simpleidml_indesign_save_as.py',
+        'src/scripts/simpleidml_indesign_close_all_documents.py',
+    ],
+    classifiers=[
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Printing',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
 )

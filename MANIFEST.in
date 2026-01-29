@@ -1,7 +1,9 @@
 include LICENSE
-include AUTHORS.rst
-include CHANGES.rst
-include README.rst
-
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+include AUTHORS
+graft tests
+prune tests/htmlcov
+prune tests/regressiontests/outputs
+exclude tests/.coverage
+exclude tests/coverage.lcov
+global-exclude *.pyc
+global-exclude .DS_Store
