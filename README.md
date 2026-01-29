@@ -1,236 +1,190 @@
-# flat [![Build Status](https://github.com/hughsk/flat/actions/workflows/main.yml/badge.svg)](https://github.com/hughsk/flat/actions/workflows/main.yml)
+# d3-funnel
 
-Take a nested Javascript object and flatten it, or unflatten an object with
-delimited keys.
+[![npm](https://img.shields.io/npm/v/d3-funnel.svg?style=flat-square)](https://www.npmjs.com/package/d3-funnel)
+[![Build Status](https://img.shields.io/github/workflow/status/jakezatecky/d3-funnel/Build?style=flat-square)](https://github.com/jakezatecky/d3-funnel/actions/workflows/main.yml)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/jakezatecky/d3-funnel/master/LICENSE.txt)
 
-## Installation
+**d3-funnel** is an extensible, open-source JavaScript library for rendering
+funnel charts using the [D3.js][d3] library.
 
-``` bash
-$ npm install flat
+d3-funnel is focused on providing practical and visually appealing funnels
+through a variety of customization options. Check out the [examples page][examples]
+to get a showcasing of the several possible options.
+
+# Installation
+
+To install this library, simply include both [D3.js][d3] and D3Funnel:
+
+``` html
+<script src="/path/to/d3.js"></script>
+<script src="/path/to/dist/d3-funnel.js"></script>
 ```
 
-## Methods
+Alternatively, if you are using Webpack or Browserify, you can install the npm
+package and `import` the module. This will include a compatible version of
+D3.js for you:
 
-### flatten(original, options)
-
-Flattens the object - it'll return an object one level deep, regardless of how
-nested the original object was:
-
-``` javascript
-var flatten = require('flat')
-
-flatten({
-    key1: {
-        keyA: 'valueI'
-    },
-    key2: {
-        keyB: 'valueII'
-    },
-    key3: { a: { b: { c: 2 } } }
-})
-
-// {
-//   'key1.keyA': 'valueI',
-//   'key2.keyB': 'valueII',
-//   'key3.a.b.c': 2
-// }
+```
+npm install d3-funnel --save
 ```
 
-### unflatten(original, options)
-
-Flattening is reversible too, you can call `flatten.unflatten()` on an object:
-
 ``` javascript
-var unflatten = require('flat').unflatten
+import D3Funnel from 'd3-funnel';
+```
 
-unflatten({
-    'three.levels.deep': 42,
-    'three.levels': {
-        nested: true
-    }
-})
+# Usage
 
-// {
-//     three: {
-//         levels: {
-//             deep: 42,
-//             nested: true
-//         }
-//     }
-// }
+To use this library, you must create a container element and instantiate a new
+funnel chart. By default, the chart will assume the width and height of the
+parent container:
+
+``` html
+<div id="funnel"></div>
+
+<script>
+    const data = [
+        { label: 'Inquiries', value: 5000 },
+        { label: 'Applicants', value: 2500 },
+        { label: 'Admits', value: 500 },
+        { label: 'Deposits', value: 200 },
+    ];
+    const options = {
+        block: {
+            dynamicHeight: true,
+            minHeight: 15,
+        },
+    };
+
+    const chart = new D3Funnel('#funnel');
+    chart.draw(data, options);
+</script>
 ```
 
 ## Options
 
-### delimiter
+| Option                 | Description                                                               | Type     | Default                 |
+| ---------------------- | ------------------------------------------------------------------------- | -------- | ----------------------- |
+| `chart.width`          | The width of the chart in pixels or a percentage.                         | mixed    | Container's width       |
+| `chart.height`         | The height of the chart in pixels or a percentage.                        | mixed    | Container's height      |
+| `chart.bottomWidth`    | The percent of total width the bottom should be.                          | number   | `1 / 3`                 |
+| `chart.bottomPinch`    | How many blocks to pinch on the bottom to create a funnel "neck".         | number   | `0`                     |
+| `chart.inverted`       | Whether the funnel direction is inverted (like a pyramid).                | bool     | `false`                 |
+| `chart.animate`        | The load animation speed in milliseconds.                                 | number   | `0` (disabled)          |
+| `chart.curve.enabled`  | Whether the funnel is curved.                                             | bool     | `false`                 |
+| `chart.curve.height`   | The curvature amount.                                                     | number   | `20`                    |
+| `chart.totalCount`     | Override the total count used in ratio calculations.                      | number   | `null`                  |
+| `block.dynamicHeight`  | Whether the block heights are proportional to their weight.               | bool     | `false`                 |
+| `block.dynamicSlope`   | Whether the block widths are proportional to their value decrease.        | bool     | `false`                 |
+| `block.barOverlay`     | Whether the blocks have bar chart overlays proportional to its weight.    | bool     | `false`                 |
+| `block.fill.scale`     | The background color scale as an array or function.                       | mixed    | `d3.schemeCategory10`   |
+| `block.fill.type`      | Either `'solid'` or `'gradient'`.                                         | string   | `'solid'`               |
+| `block.minHeight`      | The minimum pixel height of a block.                                      | number   | `0`                     |
+| `block.highlight`      | Whether the blocks are highlighted on hover.                              | bool     | `false`                 |
+| `label.enabled`        | Whether the block labels should be displayed.                             | bool     | `true`                  |
+| `label.fontFamily`     | Any valid font family for the labels.                                     | string   | `null`                  |
+| `label.fontSize`       | Any valid font size for the labels.                                       | string   | `'14px'`                |
+| `label.fill`           | Any valid hex color for the label color.                                  | string   | `'#fff'`                |
+| `label.format`         | Either `function(label, value)` or a format string. See below.            | mixed    | `'{l}: {f}'`            |
+| `tooltip.enabled`      | Whether tooltips should be enabled on hover.                              | bool     | `false`                 |
+| `tooltip.format`       | Either `function(label, value)` or a format string. See below.            | mixed    | `'{l}: {f}'`            |
+| `events.click.block`   | Callback `function(data)` for when a block is clicked.                    | function | `null`                  |
 
-Use a custom delimiter for (un)flattening your objects, instead of `.`.
+### Label/Tooltip Format
 
-### safe
+The option `label.format` can either be a function or a string. The following
+keys will be substituted by the string formatter:
 
-When enabled, both `flat` and `unflatten` will preserve arrays and their
-contents. This is disabled by default.
+| Key     | Description                  |
+| ------- | ---------------------------- |
+| `'{l}'` | The block's supplied label.  |
+| `'{v}'` | The block's raw value.       |
+| `'{f}'` | The block's formatted value. |
 
-``` javascript
-var flatten = require('flat')
+### Event Data
 
-flatten({
-    this: [
-        { contains: 'arrays' },
-        { preserving: {
-              them: 'for you'
-        }}
-    ]
-}, {
-    safe: true
-})
+Block-based events are passed a `data` object containing the following elements:
 
-// {
-//     'this': [
-//         { contains: 'arrays' },
-//         { preserving: {
-//             them: 'for you'
-//         }}
-//     ]
-// }
-```
+| Key             | Type   | Description                           |
+| --------------- | ------ | ------------------------------------- |
+| index           | number | The index of the block.               |
+| node            | object | The DOM node of the block.            |
+| value           | number | The numerical value.                  |
+| fill            | string | The background color.                 |
+| label.raw       | string | The unformatted label.                |
+| label.formatted | string | The result of `options.label.format`. |
+| label.color     | string | The label color.                      |
 
-### object
-
-When enabled, arrays will not be created automatically when calling unflatten, like so:
-
-``` javascript
-unflatten({
-    'hello.you.0': 'ipsum',
-    'hello.you.1': 'lorem',
-    'hello.other.world': 'foo'
-}, { object: true })
-
-// hello: {
-//     you: {
-//         0: 'ipsum',
-//         1: 'lorem',
-//     },
-//     other: { world: 'foo' }
-// }
-```
-
-### overwrite
-
-When enabled, existing keys in the unflattened object may be overwritten if they cannot hold a newly encountered nested value:
-
-```javascript
-unflatten({
-    'TRAVIS': 'true',
-    'TRAVIS.DIR': '/home/travis/build/kvz/environmental'
-}, { overwrite: true })
-
-// TRAVIS: {
-//     DIR: '/home/travis/build/kvz/environmental'
-// }
-```
-
-Without `overwrite` set to `true`, the `TRAVIS` key would already have been set to a string, thus could not accept the nested `DIR` element.
-
-This only makes sense on ordered arrays, and since we're overwriting data, should be used with care.
-
-
-### maxDepth
-
-Maximum number of nested objects to flatten.
+Example:
 
 ``` javascript
-var flatten = require('flat')
-
-flatten({
-    key1: {
-        keyA: 'valueI'
+{
+    index: 0,
+    node: { ... },
+    value: 150,
+    fill: '#c33',
+    label: {
+        raw: 'Visitors',
+        formatted: 'Visitors: 150',
+        color: '#fff',
     },
-    key2: {
-        keyB: 'valueII'
+},
+```
+
+### Overriding Defaults
+
+You may wish to override the default chart options. For example, you may wish
+for every funnel to have proportional heights. To do this, simply modify the
+`D3Funnel.defaults` property:
+
+``` javascript
+D3Funnel.defaults.block.dynamicHeight = true;
+```
+
+Should you wish to override multiple properties at a time, you may consider
+using [lodash's][lodash-merge] `_.merge` or [jQuery's][jquery-extend] `$.extend`:
+
+``` javascript
+D3Funnel.defaults = _.merge(D3Funnel.defaults, {
+    block: {
+        dynamicHeight: true,
+        fill: {
+            type: 'gradient',
+        },
     },
-    key3: { a: { b: { c: 2 } } }
-}, { maxDepth: 2 })
-
-// {
-//   'key1.keyA': 'valueI',
-//   'key2.keyB': 'valueII',
-//   'key3.a': { b: { c: 2 } }
-// }
-```
-
-### transformKey
-
-Transform each part of a flat key before and after flattening.
-
-```javascript
-var flatten = require('flat')
-var unflatten = require('flat').unflatten
-
-flatten({
-    key1: {
-        keyA: 'valueI'
+    label: {
+        format: '{l}: ${f}',
     },
-    key2: {
-        keyB: 'valueII'
-    },
-    key3: { a: { b: { c: 2 } } }
-}, {
-    transformKey: function(key){
-      return '__' + key + '__';
-    }
-})
-
-// {
-//   '__key1__.__keyA__': 'valueI',
-//   '__key2__.__keyB__': 'valueII',
-//   '__key3__.__a__.__b__.__c__': 2
-// }
-
-unflatten({
-      '__key1__.__keyA__': 'valueI',
-      '__key2__.__keyB__': 'valueII',
-      '__key3__.__a__.__b__.__c__': 2
-}, {
-    transformKey: function(key){
-      return key.substring(2, key.length - 2)
-    }
-})
-
-// {
-//     key1: {
-//         keyA: 'valueI'
-//     },
-//     key2: {
-//         keyB: 'valueII'
-//     },
-//     key3: { a: { b: { c: 2 } } }
-// }
+});
 ```
 
-## Command Line Usage
+## Advanced Data
 
-`flat` is also available as a command line tool. You can run it with 
-[`npx`](https://ghub.io/npx):
+In the examples above, both `label` and `value` were just to describe a block
+within the funnel. A complete listing of the available options is included
+below:
 
-```sh
-npx flat foo.json
-```
+| Option          | Type   | Description                                                     | Example       |
+| --------------- | ------ | --------------------------------------------------------------- | ------------- |
+| label           | mixed  | **Required.** The label to associate with the block.            | `'Students'`  |
+| value           | number | **Required.** The value (or count) to associate with the block. | `500`         |
+| backgroundColor | string | A row-level override for `block.fill.scale`. Hex only.          | `'#008080'`   |
+| formattedValue  | mixed  | A row-level override for `label.format`.                        | `'USD: $150'` |
+| hideLabel       | bool   | Whether to hide the formatted label for this block.             | `true`        |
+| labelColor      | string | A row-level override for `label.fill`. Hex only.                | `'#333'`      |
 
-Or install the `flat` command globally:
- 
-```sh
-npm i -g flat && flat foo.json
-```
+## API
 
-Accepts a filename as an argument:
+Additional methods beyond `draw()` are accessible after instantiating the chart:
 
-```sh
-flat foo.json
-```
+| Method      | Description                                     |
+| ----------- | ----------------------------------------------- |
+| `destroy()` | Removes the funnel and its events from the DOM. |
 
-Also accepts JSON on stdin:
+# License
 
-```sh
-cat foo.json | flat
-```
+MIT license.
+
+[d3]: http://d3js.org/
+[examples]: http://jakezatecky.github.io/d3-funnel/
+[jQuery-extend]: https://api.jquery.com/jquery.extend/
+[lodash-merge]: https://lodash.com/docs#merge

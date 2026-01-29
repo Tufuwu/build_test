@@ -1,25 +1,29 @@
-name: Node.js CI
-
-on:
-  push:
-    branches: [ "master", "main" ]
-  pull_request:
-    branches: [ "master", "main" ]
-
+name: Build
+on: push
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [10.x, 12.x, 14.x]
-
+        node: ['12', '14', '16']
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    - run: npm test
+      -
+        uses: actions/checkout@v3
+      -
+        name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      -
+        name: Install dependencies
+        run: yarn install
+      -
+        name: Install Playwright
+        run: npx playwright install
+      -
+        name: Install Playwright browser
+        run: npx playwright install-deps
+      -
+        name: Run tests
+        run: npm run build
