@@ -1,5 +1,4 @@
-# NPM modules
-/node_modules
-
-# Rollup output
-/compiled
+*.pyc
+/dist/
+/build/
+/*.egg-info
