@@ -1,163 +1,167 @@
-RPLCD
-#####
+****************************
+Mopidy-AlarmClock
+****************************
 
-.. image:: https://img.shields.io/github/actions/workflow/status/dbgn/RPLCD/ci.yml?branch=master
-    :target: https://github.com/dbrgn/RPLCD/actions/workflows/ci.yml
-    :alt: Build Status
-.. image:: https://img.shields.io/pypi/v/RPLCD.svg
-    :target: https://pypi.python.org/pypi/RPLCD/
-    :alt: PyPI Version
-.. image:: https://img.shields.io/pypi/wheel/RPLCD.svg
-    :target: https://pypi.python.org/pypi/RPLCD/
-    :alt: PyPI Wheel
-.. image:: https://img.shields.io/pypi/pyversions/RPLCD.svg
-    :target: https://pypi.python.org/pypi/RPLCD/
-    :alt: PyPI Python Versions
-.. image:: https://img.shields.io/badge/dependencies-0-blue.svg
-    :target: https://pypi.python.org/pypi/RPLCD/
-    :alt: Dependencies
-.. image:: https://img.shields.io/pypi/l/RPLCD.svg
-    :target: https://pypi.python.org/pypi/RPLCD/
-    :alt: License
+.. image:: https://img.shields.io/pypi/v/Mopidy-AlarmClock.svg?style=flat
+    :target: https://pypi.python.org/pypi/Mopidy-AlarmClock/
+    :alt: Latest PyPI version
 
-A Python 3 Raspberry PI Character LCD library for the Hitachi HD44780
-controller. It supports both GPIO (parallel) mode as well as boards with an I²C
-port expander (e.g. the PCF8574 or the MCP23008).
+.. image:: https://img.shields.io/pypi/dm/Mopidy-AlarmClock.svg?style=flat
+    :target: https://pypi.python.org/pypi/Mopidy-AlarmClock/
+    :alt: Number of PyPI downloads
 
-This library is inspired by Adafruit Industries' CharLCD_ library as well as by
-Arduino's LiquidCrystal_ library.
+.. image:: https://img.shields.io/github/workflow/status/DavisNT/mopidy-alarmclock/Python%20build/develop.svg?style=flat
+    :target: https://github.com/DavisNT/mopidy-alarmclock/actions/workflows/ci.yml
+    :alt: GitHub Actions build status
 
-For GPIO mode, no external dependencies (except the ``RPi.GPIO`` library, which
-comes preinstalled on Raspbian) are needed to use this library. If you want to
-control LCDs via I²C, then you also need the ``python-smbus`` or ``smbus2`` library. If you
-want to control the LCD with ``pigpio``, you have to install the pigpio_ library.
+.. image:: https://coveralls.io/repos/DavisNT/mopidy-alarmclock/badge.svg?branch=develop
+    :target: https://coveralls.io/r/DavisNT/mopidy-alarmclock
+    :alt: Coveralls test coverage
 
-If you're trying to get started with RPLCD, you should probably `read the docs
-<#documentation>`__ :)
+A `Mopidy <https://www.mopidy.com/>`_ extension for using it as an alarm clock.
 
-.. image:: https://raw.github.com/dbrgn/RPLCD/master/photo-i2c.jpg
-    :alt: Photo of 20x4 LCD in action
+Mopidy-AlarmClock was originally created by `Mathieu Xhonneux <https://github.com/Zashas>`_ and now is maintained by `Davis Mosenkovs <https://github.com/DavisNT>`_.
+
+Installation
+============
+
+Install by running::
+
+    pip install Mopidy-AlarmClock
 
 
-Setup
-=====
-
-You can install RPLCD directly from `PyPI
-<https://pypi.python.org/pypi/RPLCD/>`_ using pip::
-
-    $ sudo pip install RPLCD
-
-If you want to use I²C, you also need either the smbus or `smbus2 <https://pypi.org/project/smbus2/>`_ library::
-
-    $ sudo apt install python-smbus
-    or
-    $ sudo pip install smbus2
-
-RPLCD will first try to use smbus if available and if not, fall back to smbus2.
-
-You can also install the library manually without pip. Either just copy the
-scripts to your working directory and import them, or download the repository
-and run ``python setup.py install`` to install it into your Python package
-directory.
-
-
-Features
-========
-
-Implemented
------------
-
-- Simple to use API
-- Support for both 4 bit and 8 bit modes
-- Support for both parallel (GPIO) and I²C connection
-- Support for custom characters
-- Support for backlight control circuits
-- Built-in support for `A00`, `A02` (standard HD44780)
-  or `ST0B` (see ST7066_, page 11) character tables
-- Caching: Only write characters if they changed
-- No external dependencies (except `RPi.GPIO`, and `python-smbus` or `smbus2` if you need
-  I²C support)
-
-Wishlist
---------
-
-These things may get implemented in the future, depending on my free time and
-motivation:
-
-- MicroPython port
-
-Supported I²C Port Expanders
-----------------------------
-
-- PCF8574 (used by a lot of I²C LCD adapters on Ali Express)
-- MCP23008 (used in Adafruit I²C LCD backpack)
-- MCP23017
-
-
-Documentation
+Configuration
 =============
 
-- Stable (released on PyPI): http://rplcd.readthedocs.io/en/stable/
-- Latest (current master): http://rplcd.readthedocs.io/en/latest/
+Optionally alarm defaults can be configured in ``mopidy.conf`` config file (the default default values are shown below)::
 
-Testing
-=======
+    [alarmclock]
+    # Default alarm time in Hours:Minutes format
+    def_time = 8:00
 
-Interactive Test Script
------------------------
+    # Name or Mopidy URI of default alarm playlist
+    def_playlist = 
 
-To test your LCD, please run the ``rplcd-tests`` script with the ``testsuite``
-target.
+    # Default state of Random Track Order (true or false)
+    def_random = false
 
-Unit Tests
-----------
+    # Default alarm volume (integer, 1 to 100)
+    def_volume = 100
 
-There are also unit tests. First, install dependencies:
-
-    pip install -U -r requirements-dev.txt
-
-Then run the tests:
-
-    py.test -v
+    # Default seconds to full volume (integer, 0 to 300)
+    def_vol_inc_duration = 30
 
 
-Coding Guidelines
-=================
-
-`PEP8 <http://www.python.org/dev/peps/pep-0008/>`__ via `flake8
-<https://pypi.python.org/pypi/flake8>`_ with ``max-line-width`` set to 99 and
-``E126-E128,C901`` ignored::
-
-    flake8 --max-line-length=99 --ignore=E126,E127,E128,C901 RPLCD/lcd.py
-
-
-About HD44780
+Usage
 =============
 
-The HD44780 LCD controller is a controller chip for driving alphanumeric LCD displays. Though it's
-not manufactured anymore there are a lot of compatible chips / clones of it e.g. the ST7066 or the
-KS0066. Displays sold with 'HD44780' in its name today typically are built with one of those 
-clones, though they all look the same from the outside most of the time (like in the image at the 
-start of this README). 
+Make sure that the `HTTP extension <http://docs.mopidy.com/en/latest/ext/http/>`_ is enabled. Then browse to the app on the Mopidy server (for instance, http://localhost:6680/alarmclock/).
 
+**WARNING! It is strongly recommended to use only local playlists with local media (files) for alarm clock.** 
 
-Resources
-=========
-
-- TC2004A-01 Data Sheet: http://www.adafruit.com/datasheets/TC2004A-01.pdf
-- HD44780U Data Sheet: http://www.adafruit.com/datasheets/HD44780.pdf
-- ST7066 Data Sheet: https://www.sparkfun.com/datasheets/LCD/st7066.pdf
-
+Althrough Mopidy-AlarmClock contains some safety measures against playlist/track inaccessibility (e.g. upon network outage) it is still much safer to use local media.
 
 License
-=======
+=============
+::
 
-This code is licensed under the MIT license, see the `LICENSE file
-<https://github.com/dbrgn/RPLCD/blob/master/LICENSE>`_ or `tldrlegal
-<http://www.tldrlegal.com/license/mit-license>`_ for more information. 
+   Copyright 2014 Mathieu Xhonneux
+   Copyright 2015-2020 Davis Mosenkovs
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 
-.. _charlcd: https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/tree/master/Adafruit_CharLCD
-.. _liquidcrystal: http://arduino.cc/en/Reference/LiquidCrystal
-.. _pigpio: http://abyz.me.uk/rpi/pigpio/
-.. _st7066: https://www.sparkfun.com/datasheets/LCD/st7066.pdf
+Project resources
+=================
+
+- `Source code <https://github.com/DavisNT/mopidy-alarmclock>`_
+- `Issue tracker <https://github.com/DavisNT/mopidy-alarmclock/issues>`_
+- `Development branch tarball <https://github.com/DavisNT/mopidy-alarmclock/archive/develop.tar.gz#egg=Mopidy-AlarmClock-dev>`_
+
+
+Changelog
+=========
+
+v0.1.9
+----------------------------------------
+
+- Cosmetic improvements.
+
+v0.1.8
+----------------------------------------
+
+- Upgraded to Mopidy 3.0+ and Python 3.7+.
+
+v0.1.7
+----------------------------------------
+
+- Play `backup alarm sound <http://soundbible.com/1787-Annoying-Alarm-Clock.html>`_ when playback cannot be started (within 30 seconds or more).
+- Added warning to readme that only local playlists/media should be used for alarm clock.
+
+v0.1.6
+----------------------------------------
+
+- Changed branching model to `git-flow <http://nvie.com/posts/a-successful-git-branching-model/>`_.
+- Refactoring for improved alarm scheduler.
+- Added `backup alarm sound <http://soundbible.com/1787-Annoying-Alarm-Clock.html>`_ (in case selected playlist is missing).
+- Disable *Consume* and *Single* playback modes.
+- Fixed incorrect Mopidy version requirement.
+- Misc refactoring.
+
+v0.1.5
+----------------------------------------
+
+- Added tests.
+- Fixed nondeterministic effects when cancelling and setting alarm again within 5 seconds (prevent stale ``idle()`` timers).
+- Fixed minor math bug in gradual volume increasing.
+- One digit minutes supported in alarm *Time*.
+- Leading zero for hours of current time in *Alarm state*.
+
+v0.1.4
+----------------------------------------
+
+- Alarm defaults can now be configured in ``mopidy.conf``.
+- Display alarm volume on *Alarm state*.
+- Display current time of alarm clock on *Alarm state*.
+- Added `Travis-CI build <https://travis-ci.org/DavisNT/mopidy-alarmclock>`_ and `Coveralls test coverage info <https://coveralls.io/r/DavisNT/mopidy-alarmclock>`_.
+- Fixed README (to be parsable by PyPI).
+
+v0.1.3
+----------------------------------------
+
+- Added adjustable volume and gradually increasing volume.
+- Fixed stale message appearing on page reload.
+- Minor internal code changes and interface changes.
+- Updated README/Changelog.
+
+v0.1.2
+----------------------------------------
+
+- Fixed alarm starting immediately in some situations.
+- Renamed *Shuffle Mode* to *Random Track Order*.
+
+v0.1.1
+----------------------------------------
+
+- Project taken over by `Davis Mosenkovs <https://github.com/DavisNT>`_.
+- Project moved from `Zashas/mopidy-alarmclock <https://github.com/Zashas/mopidy-alarmclock>`_ to `DavisNT/mopidy-alarmclock <https://github.com/DavisNT/mopidy-alarmclock>`_.
+- Fixed setup (+ minor technical fixes).
+- Automatically unmute and set volume to 100%.
+- Updated Shuffle method.
+- Timer resolution is now 5 sec.
+
+v0.1.0 (UNRELEASED)
+----------------------------------------
+
+- Created by `Mathieu Xhonneux <https://github.com/Zashas>`_.
+- Initial release.

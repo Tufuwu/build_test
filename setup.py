@@ -1,35 +1,51 @@
-#!/usr/bin/env python
+import re
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
-readme = open('README.rst').read()
 
-setup(name='RPLCD',
-      version='1.3.1',
-      description='A Raspberry Pi LCD library for the widely used Hitachi HD44780 controller.',
-      long_description=readme,
-      author='Danilo Bargen',
-      author_email='mail@dbrgn.ch',
-      url='https://github.com/dbrgn/RPLCD',
-      license='MIT',
-      keywords='raspberry, raspberry pi, lcd, liquid crystal, hitachi, hd44780',
-      packages=['RPLCD', 'RPLCD.codecs', 'RPLCD_Tests'],
-      entry_points={
-          'console_scripts': ['rplcd-tests=RPLCD_Tests.entrypoint:run'],
-      },
-      platforms=['any'],
-      python_requires='>=3.4',
-      classifiers=[
-          'Development Status :: 5 - Production/Stable',
-          'Environment :: Other Environment',
-          'Intended Audience :: Developers',
-          'License :: OSI Approved :: MIT License',
-          'Operating System :: POSIX',
-          'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Topic :: System :: Hardware :: Hardware Drivers',
-          'Topic :: Software Development :: Libraries :: Python Modules',
-      ],
-    )
+def get_version(filename):
+    content = open(filename).read()
+    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", content))
+    return metadata['version']
+
+
+setup(
+    name='Mopidy-AlarmClock',
+    version=get_version('mopidy_alarmclock/__init__.py'),
+    url='https://github.com/DavisNT/mopidy-alarmclock',
+    license='Apache License, Version 2.0',
+    author='Mathieu Xhonneux',
+    author_email='m.xhonneux@gmail.com',
+    maintainer='Davis Mosenkovs',
+    maintainer_email='python-apps@dm.id.lv',
+    description='A Mopidy extension for using it as an alarm clock.',
+    long_description=open('README.rst').read(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
+    zip_safe=False,
+    include_package_data=True,
+    python_requires='>= 3.7',
+    install_requires=[
+        'setuptools',
+        'Mopidy >= 3.0',
+        'Pykka >= 1.1',
+        'monotonic >= 1.4',
+    ],
+    test_suite='nose.collector',
+    tests_require=[
+        'nose',
+        'mock >= 1.0',
+    ],
+    entry_points={
+        'mopidy.ext': [
+            'alarmclock = mopidy_alarmclock:Extension',
+        ],
+    },
+    classifiers=[
+        'Environment :: No Input/Output (Daemon)',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3',
+        'Topic :: Multimedia :: Sound/Audio :: Players',
+    ],
+)
