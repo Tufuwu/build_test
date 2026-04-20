@@ -1,11 +1,9 @@
-include .coveragerc
-include .travis.yml
 include LICENSE
-include MANIFEST.in
-include README.rst
-include mopidy_alarmclock/ext.conf
-include mopidy_alarmclock/backup-alarm.mp3
-
-recursive-include mopidy_alarmclock/templates *
-recursive-include mopidy_alarmclock/static *
-recursive-include tests *.py
+include AUTHORS
+graft tests
+prune tests/htmlcov
+prune tests/regressiontests/outputs
+exclude tests/.coverage
+exclude tests/coverage.lcov
+global-exclude *.pyc
+global-exclude .DS_Store

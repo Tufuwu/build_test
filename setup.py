@@ -1,51 +1,54 @@
-import re
+import os
+from setuptools import setup
 
-from setuptools import find_packages, setup
+with open(os.path.join(os.path.dirname(__file__), 'README.rst'), encoding='utf-8') as f:
+    README = f.read()
 
-
-def get_version(filename):
-    content = open(filename).read()
-    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", content))
-    return metadata['version']
-
+# allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='Mopidy-AlarmClock',
-    version=get_version('mopidy_alarmclock/__init__.py'),
-    url='https://github.com/DavisNT/mopidy-alarmclock',
-    license='Apache License, Version 2.0',
-    author='Mathieu Xhonneux',
-    author_email='m.xhonneux@gmail.com',
-    maintainer='Davis Mosenkovs',
-    maintainer_email='python-apps@dm.id.lv',
-    description='A Mopidy extension for using it as an alarm clock.',
-    long_description=open('README.rst').read(),
-    packages=find_packages(exclude=['tests', 'tests.*']),
-    zip_safe=False,
-    include_package_data=True,
-    python_requires='>= 3.7',
-    install_requires=[
-        'setuptools',
-        'Mopidy >= 3.0',
-        'Pykka >= 1.1',
-        'monotonic >= 1.4',
-    ],
-    test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'mock >= 1.0',
-    ],
-    entry_points={
-        'mopidy.ext': [
-            'alarmclock = mopidy_alarmclock:Extension',
-        ],
+    name="SimpleIDML",
+    version="1.1.3",
+    license='BSD Licence',
+    author='Stanislas Guerra',
+    author_email='stanislas.guerra@gmail.com',
+    description='A library to manipulate Adobe(r) IDML(r) files.',
+    long_description=README,
+    url='https://github.com/Starou/SimpleIDML',
+    project_urls={
+        'Source Code': 'https://github.com/Starou/SimpleIDML',
+        'Issue Tracker': 'https://github.com/Starou/SimpleIDML/issues',
     },
+    package_dir={'': 'src'},
+    install_requires=['lxml', 'suds-py3'],
+    packages=[
+        'simple_idml',
+        'simple_idml.indesign',
+    ],
+    package_data={
+        'simple_idml.indesign': [
+            'scripts/*.jsx',
+        ]
+    },
+    data_files=[],
+    scripts=[
+        'src/scripts/simpleidml_create_package_from_dir.py',
+        'src/scripts/simpleidml_indesign_save_as.py',
+        'src/scripts/simpleidml_indesign_close_all_documents.py',
+    ],
     classifiers=[
-        'Environment :: No Input/Output (Daemon)',
-        'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: Apache Software License',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
+        'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Topic :: Multimedia :: Sound/Audio :: Players',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Printing',
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
