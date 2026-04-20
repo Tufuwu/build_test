@@ -1,71 +1,63 @@
-#!/usr/bin/env python
-# Generic setup script for single-package Python projects
-# by Thomas Perl <thp.io/about>
-
-from distutils.core import setup
-
-import re
+from setuptools import setup
+from pathlib import Path
 import os
-import glob
 
-PACKAGE = 'mygpoclient'
-SCRIPT_FILE = os.path.join(PACKAGE, '__init__.py')
+# 安全读取 README.md，不区分大小写
+def readme():
+    root = Path(__file__).parent
+    readme_file = None
+    for name in os.listdir(root):
+        if name.lower() == "readme.md":
+            readme_file = root / name
+            break
+    if readme_file and readme_file.exists():
+        return readme_file.read_text(encoding="utf-8")
+    return ""  # 文件不存在时返回空字符串
 
-main_py = open(SCRIPT_FILE).read()
-metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", main_py))
-docstrings = re.findall('"""(.*?)"""', main_py, re.DOTALL)
+setup(
+    name='content-hash',
+    description='Python implementation of EIP 1577 content hash',
+    long_description=readme(),
+    long_description_content_type='text/markdown',
+    license='MIT',
 
-# List the packages that need to be installed/packaged
-PACKAGES = (
-        PACKAGE,
+    version='1.0.0',
+
+    packages=['content_hash'],
+
+    entry_points={
+        'console_scripts': ['content-hash=content_hash.__main__:main'],
+    },
+
+    install_requires=[
+        'py-cid>=0.3.0,<0.4.0',
+        'py-multicodec>=0.2.1,<0.3.0',
+        'py-multihash>=0.2.3,<0.3.0',
+    ],
+
+    extras_require={
+        'lint': ['pylint'],
+        'test': ['pytest', 'pytest-cov'],
+    },
+
+    python_requires='>= 3.5',
+
+    author='Filip Š',
+    author_email='projects@filips.si',
+    url='https://github.com/filips123/ContentHashPy/',
+    keywords='ethereum, ethereum-name-service, ens, eip1577, web3, decentralized',
+
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Topic :: Internet :: Name Service (DNS)',
+        'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
+        'Topic :: Security :: Cryptography',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Utilities',
+    ],
+
+    include_package_data=True,
 )
-
-SCRIPTS = glob.glob('bin/*')
-
-# Metadata fields extracted from SCRIPT_FILE
-AUTHOR_EMAIL = metadata['author']
-VERSION = metadata['version']
-WEBSITE = metadata['website']
-LICENSE = metadata['license']
-DESCRIPTION = docstrings[0].strip()
-if '\n\n' in DESCRIPTION:
-    DESCRIPTION, LONG_DESCRIPTION = DESCRIPTION.split('\n\n', 1)
-else:
-    LONG_DESCRIPTION = None
-
-# Extract name and e-mail ("Firstname Lastname <mail@example.org>")
-AUTHOR, EMAIL = re.match(r'(.*) <(.*)>', AUTHOR_EMAIL).groups()
-
-DATA_FILES = [
-    ('share/man/man1', glob.glob('man/*')),
-]
-
-CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
-]
-
-setup(name=PACKAGE,
-      version=VERSION,
-      description=DESCRIPTION,
-      long_description=LONG_DESCRIPTION,
-      author=AUTHOR,
-      author_email=EMAIL,
-      license=LICENSE,
-      url=WEBSITE,
-      packages=PACKAGES,
-      scripts=SCRIPTS,
-      data_files=DATA_FILES,
-      download_url=WEBSITE+PACKAGE+'-'+VERSION+'.tar.gz',
-      classifiers=CLASSIFIERS,
-    )
-
