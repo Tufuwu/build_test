@@ -1,26 +1,35 @@
-# kasserver - Manage domains hosted on All-Inkl.com through the KAS server API
-# Copyright (c) 2018 Christian Fetzer
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-"""Manage domains hosted on All-Inkl.com through the KAS server API"""
+#!/usr/bin/env python
 
 from setuptools import setup
 
-setup(setup_requires=["pbr"], pbr=True)
+readme = open('README.rst').read()
+
+setup(name='RPLCD',
+      version='1.3.1',
+      description='A Raspberry Pi LCD library for the widely used Hitachi HD44780 controller.',
+      long_description=readme,
+      author='Danilo Bargen',
+      author_email='mail@dbrgn.ch',
+      url='https://github.com/dbrgn/RPLCD',
+      license='MIT',
+      keywords='raspberry, raspberry pi, lcd, liquid crystal, hitachi, hd44780',
+      packages=['RPLCD', 'RPLCD.codecs', 'RPLCD_Tests'],
+      entry_points={
+          'console_scripts': ['rplcd-tests=RPLCD_Tests.entrypoint:run'],
+      },
+      platforms=['any'],
+      python_requires='>=3.4',
+      classifiers=[
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Other Environment',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: MIT License',
+          'Operating System :: POSIX',
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+          'Topic :: System :: Hardware :: Hardware Drivers',
+          'Topic :: Software Development :: Libraries :: Python Modules',
+      ],
+    )
