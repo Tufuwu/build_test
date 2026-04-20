@@ -28,7 +28,7 @@ jobs:
       run: |
         ./download_etcd.sh 3.4.0
         python -m pip install --upgrade pip
-        python -m pip install tox coveralls
+        python -m pip install tox tox-gh-actions coveralls
     - name: Test with tox
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
