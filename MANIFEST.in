@@ -1,9 +1,4 @@
-include LICENSE
 include AUTHORS
-graft tests
-prune tests/htmlcov
-prune tests/regressiontests/outputs
-exclude tests/.coverage
-exclude tests/coverage.lcov
-global-exclude *.pyc
-global-exclude .DS_Store
+include LICENSE.txt
+include README.rst
+include NEWS.txt

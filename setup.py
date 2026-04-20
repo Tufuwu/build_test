@@ -1,54 +1,55 @@
+from setuptools import setup, find_packages
 import os
-from setuptools import setup
 
-with open(os.path.join(os.path.dirname(__file__), 'README.rst'), encoding='utf-8') as f:
-    README = f.read()
+here = os.path.abspath(os.path.dirname(__file__))
 
-# allow setup.py to be run from any path
-os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
+def read_file(filename):
+    path = os.path.join(here, filename)
+    return open(path, encoding="utf-8").read() if os.path.exists(path) else ""
+
+README = read_file("README.rst")
+NEWS = read_file("NEWS.txt")
+
+version = "0.5.0"
+
+install_requires = [
+    "urllib3>=1.7.1",
+    "dnspython>=1.13.0",
+]
+
+extras_require = {
+    "test": [
+        "pytest",
+        "pytest-mock",
+        "pyOpenSSL>=0.14",
+    ]
+}
 
 setup(
-    name="SimpleIDML",
-    version="1.1.3",
-    license='BSD Licence',
-    author='Stanislas Guerra',
-    author_email='stanislas.guerra@gmail.com',
-    description='A library to manipulate Adobe(r) IDML(r) files.',
-    long_description=README,
-    url='https://github.com/Starou/SimpleIDML',
-    project_urls={
-        'Source Code': 'https://github.com/Starou/SimpleIDML',
-        'Issue Tracker': 'https://github.com/Starou/SimpleIDML/issues',
-    },
-    package_dir={'': 'src'},
-    install_requires=['lxml', 'suds-py3'],
-    packages=[
-        'simple_idml',
-        'simple_idml.indesign',
-    ],
-    package_data={
-        'simple_idml.indesign': [
-            'scripts/*.jsx',
-        ]
-    },
-    data_files=[],
-    scripts=[
-        'src/scripts/simpleidml_create_package_from_dir.py',
-        'src/scripts/simpleidml_indesign_save_as.py',
-        'src/scripts/simpleidml_indesign_close_all_documents.py',
-    ],
+    name="python-etcd",
+    version=version,
+    description="A python client for etcd",
+    long_description=README + "\n\n" + NEWS,
+    long_description_content_type="text/x-rst",
     classifiers=[
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Topic :: Multimedia :: Graphics',
-        'Topic :: Printing',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        "Topic :: System :: Distributed Computing",
+        "Topic :: Software Development :: Libraries",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Database :: Front-Ends",
     ],
+    keywords="etcd raft distributed log api client",
+    author="Jose Plana",
+    author_email="jplana@gmail.com",
+    url="http://github.com/jplana/python-etcd",
+    license="MIT",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=install_requires,
+
+    # Modern testing: no nose, no test_suite
+    extras_require=extras_require,
 )
