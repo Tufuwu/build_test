@@ -1,0 +1,52 @@
+{
+  "name": "mapsort",
+  "description": "Performant sorting for complex input",
+  "version": "1.0.8",
+  "main": "compiled/cjs/mapsort.min.js",
+  "module": "compiled/esm/mapsort.min.js",
+  "unpkg": "compiled/iife/mapsort.min.js",
+  "types": "index.d.ts",
+  "files": [
+    "source",
+    "compiled",
+    "index.d.ts",
+    "copying.txt",
+    "readme-nl.md"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "babel-jest": "^29.3.1",
+    "babel-loader": "^9.1.0",
+    "babel-preset-minify": "^0.5.2",
+    "benchmark": "^2.1.4",
+    "jest": "^29.3.1",
+    "lodash": "^4.17.21",
+    "rollup": "^3.9.0",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.js",
+    "build-conceptual-benchmark": "webpack --config benchmarks/conceptual/webpack.config.js",
+    "test": "npm run-script build && jest && tsc --strict --noEmit --types \" \" test/type-test.ts",
+    "coverage": "TEST_TYPE=coverage jest --coverage"
+  },
+  "author": {
+    "name": "Nullhouse",
+    "url": "https://null.house"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pimm/mapsort.git"
+  },
+  "homepage": "https://null.house/open-source/mapsort",
+  "keywords": [
+    "performance",
+    "map",
+    "sort"
+  ]
+}
