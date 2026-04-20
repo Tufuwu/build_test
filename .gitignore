@@ -1,24 +1,17 @@
-/node_modules
-*.log
-*.pid
-test/child
-*.iml
-.idea/**
-*.heapsnapshot
-*.cpuprofile
-.cache-require-paths.json
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+env/
+build/
 dist/
-*.deb
-*.rpm
-.DS_Store
-*.swp
-*.swo
-currentTagChangelog.md
-joblog-X
-test/fixtures/path-check*.txt
-yarn.lock
-*.tar.gz
-e2e_time
-unit_time
-*.heapprofile
-a.out
+/MANIFEST
+*.egg-info/
+*.egg
+
+# pytest
+.cache/
+
+# Coverage report
+.coverage

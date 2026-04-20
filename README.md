@@ -1,245 +1,171 @@
-<div align="center">
-  <br/>
-  <a href="http://pm2.keymetrics.io/" title="PM2 Keymetrics link">
-    <img width=710px src="https://raw.githubusercontent.com/Unitech/pm2/master/pres/pm2-v4.png" alt="pm2 logo">
-  </a>
-  <br/>
-<br/>
-<b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
-  <i>Runtime Edition</i>
-<br/><br/>
+OpenSSH / LDAP public keys
+==========================
+[![Build Status](https://github.com/jirutka/ssh-ldap-pubkey/workflows/CI/badge.svg)](https://github.com/jirutka/ssh-ldap-pubkey/actions?query=workflow%3A%22CI%22)
+[![Code Climate](https://codeclimate.com/github/jirutka/ssh-ldap-pubkey/badges/gpa.svg)](https://codeclimate.com/github/jirutka/ssh-ldap-pubkey)
+[![version](https://img.shields.io/pypi/v/ssh-ldap-pubkey.svg?style=flat)](https://pypi.python.org/pypi/ssh-ldap-pubkey)
 
+This project provides an utility to manage SSH public keys stored in LDAP and also a script for
+OpenSSH server to load authorized keys from LDAP.
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dm/pm2" alt="Downloads per Month"/>
-</a>
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dy/pm2" alt="Downloads per Year"/>
-</a>
+Why?
+----
 
-<a href="https://badge.fury.io/js/pm2" title="NPM Version Badge">
-   <img src="https://badge.fury.io/js/pm2.svg" alt="npm version">
-</a>
+When you have dozen of servers it becomes difficult to manage your authorized keys. You have to
+copy all your public keys to `~/.ssh/authorized_keys` on every server you want to login to. And
+what if you someday change your keys?
 
-<a href="https://travis-ci.com/github/Unitech/pm2" title="PM2 Tests">
-  <img src="https://travis-ci.org/Unitech/pm2.svg?branch=master" alt="Build Status"/>
-</a>
+It’s a good practice to use some kind of a centralized user management, usually an LDAP server.
+There you have user’s login, uid, e-mail, … and password. What if we could also store public SSH
+keys on LDAP server? With this utility it’s easy as pie.
 
-<br/>
-<br/>
-<br/>
-</div>
 
+Alternatives
+------------
 
-PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
+If you need just a lightweight utility for OpenSSH server to load authorized keys from LDAP,
+then you can use [ssh-getkey-ldap](https://github.com/jirutka/ssh-getkey-ldap) written in Lua
+or [this one](https://gist.github.com/jirutka/b15c31b2739a4f3eab63) written in POSIX shell
+(but it requires `ldapsearch` utility and may not work well on some systems).
 
-Starting an application in production mode is as easy as:
 
-```bash
-$ pm2 start app.js
-```
+Requirements
+------------
 
-PM2 is constantly assailed by [more than 1800 tests](https://app.travis-ci.com/github/Unitech/pm2/branches).
+* Python 3.6+
+* [python-ldap] 3.x
+* [docopt] 0.6.x
 
-Official website: [https://pm2.keymetrics.io/](https://pm2.keymetrics.io/)
+You can install both Python modules from PyPI.
+python-ldap requires additional system dependencies – OpenLDAP.
+Refer to [Stack Overflow](http://stackoverflow.com/q/4768446/240963) for distribution-specific information.
 
-Works on Linux (stable) & macOS (stable) & Windows (stable). All Node.js versions are supported starting Node.js 12.X.
 
+Installation
+------------
 
-### Installing PM2
+### PyPI:
 
-With NPM:
+    pip install ssh-ldap-pubkey
 
-```bash
-$ npm install pm2 -g
-```
+### Alpine Linux
 
-You can install Node.js easily with [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) or [ASDF](https://blog.natterstefan.me/how-to-use-multiple-node-version-with-asdf).
+    apk add ssh-ldap-pubkey
 
-### Start an application
+Note: The package is currently in the (official) _community_ repository; make sure that you have community in `/etc/apk/repositories`.
 
-You can start any application (Node.js, Python, Ruby, binaries in $PATH...) like that:
 
-```bash
-$ pm2 start app.js
-```
+Usage
+-----
 
-Your app is now daemonized, monitored and kept alive forever.
+List SSH public keys stored in LDAP for the current user:
 
-### Managing Applications
+    ssh-ldap-pubkey list
 
-Once applications are started you can manage them easily:
+List SSH public keys stored in LDAP for the specified user:
 
-![Process listing](https://github.com/Unitech/pm2/raw/master/pres/pm2-ls-v2.png)
+    ssh-ldap-pubkey list -u flynn
 
-To list all running applications:
+Add the specified SSH public key for the current user to LDAP:
 
-```bash
-$ pm2 list
-```
+    ssh-ldap-pubkey add ~/.ssh/id_rsa.pub
 
-Managing apps is straightforward:
+Remove SSH public key(s) of the current user that matches the specified pattern:
 
-```bash
-$ pm2 stop     <app_name|namespace|id|'all'|json_conf>
-$ pm2 restart  <app_name|namespace|id|'all'|json_conf>
-$ pm2 delete   <app_name|namespace|id|'all'|json_conf>
-```
+    ssh-ldap-pubkey del flynn@grid
 
-To have more details on a specific application:
+Specify LDAP URI and base DN on command line instead of configuration file:
 
-```bash
-$ pm2 describe <id|app_name>
-```
+    ssh-ldap-pubkey list -b ou=People,dc=encom,dc=com -H ldaps://encom.com -u flynn
 
-To monitor logs, custom metrics, application information:
+As the LDAP manager, add SSH public key to LDAP for the specified user:
 
-```bash
-$ pm2 monit
-```
+    ssh-ldap-pubkey add -D cn=Manager,dc=encom,dc=com -u flynn ~/.ssh/id_rsa.pub
 
-[More about Process Management](https://pm2.keymetrics.io/docs/usage/process-management/)
+Show help for other options:
 
-### Cluster Mode: Node.js Load Balancing & Zero Downtime Reload
+    ssh-ldap-pubkey --help
 
-The Cluster mode is a special mode when starting a Node.js application, it starts multiple processes and load-balance HTTP/TCP/UDP queries between them. This increase overall performance (by a factor of x10 on 16 cores machines) and reliability (faster socket re-balancing in case of unhandled errors).
 
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/cluster.png)
+Configuration
+-------------
 
-Starting a Node.js application in cluster mode that will leverage all CPUs available:
+Configuration is read from /etc/ldap.conf — file used by LDAP nameservice switch library and the
+LDAP PAM module. An example file is included in [etc/ldap.conf][ldap.conf]. The following subset of
+parameters are used:
 
-```bash
-$ pm2 start api.js -i <processes>
-```
+*  **uri** ... URI(s) of the LDAP server(s) to connect to, separated by a space. The URI scheme may
+               be ldap, or ldaps. Default is `ldap://localhost`.
+*  **nss_base_passwd** ... distinguished name (DN) of the search base.
+*  **base** ... distinguished name (DN) of the search base. Used when *nss_base_passwd* is not set.
+*  **scope** ... search scope; _sub_, _one_, or _base_ (default is _sub_).
+*  **referrals** ... should client automatically follow referrals returned by LDAP servers (default is _on_)?
+*  **pam_filter** ... filter to use when searching for the user’s entry, additional to the login
+        attribute value assertion (`pam_login_attribute=<login>`). Default is
+        _objectclass=posixAccount_.
+*  **pam_login_attribute** ... the user ID attribute (default is _uid_).
+*  **ldap_version** ... LDAP version to use (default is 3).
+*  **sasl** ... enable SASL and specify mechanism to use (currently only GSSAPI is supported).
+*  **binddn** ... distinguished name (DN) to bind when reading the user’s entry (default is to bind
+                  anonymously).
+*  **bindpw** ... credentials to bind with when reading the user’s entry (default is none).
+*  **ssl** ... LDAP SSL/TLS method; _off_, _on_, or _start_tls_. If you use LDAP over SSL (i.e. URI `ldaps://`), leave this empty.
+*  **timelimit** ... search time limit in seconds (default is 10).
+*  **bind_timelimit** ... bind/connect time limit in seconds (default is 10). If multiple URIs are
+                          specified in _uri_, then the next one is tried after this timeout.
+*  **tls_cacertdir** ... path of the directory with CA certificates for LDAP server certificate
+                         verification.
+*  **pubkey_class** ... objectClass that should be added/removed to/from the user’s entry when adding/removing first/last public key and the *pubkey_attr* is mandatory for this class.
+   This is needed for the original openssh-lpk.schema (not for the one in this repository).
+   Default is `ldapPublicKey`.
+*  **pubkey_attr** ... name of LDAP attribute used for SSH public keys (default is `sshPublicKey`).
 
-`<processes>` can be `'max'`, `-1` (all cpu minus 1) or a specified number of instances to start.
+The only required parameter is *nss_base_passwd* or _base_, others have sensitive defaults. You
+might want to define _uri_ parameter as well. These parameters can be also defined/overriden
+with `--bind` and `--uri` options on command line.
 
-**Zero Downtime Reload**
+For more information about these parameters refer to ldap.conf man page.
 
-Hot Reload allows to update an application without any downtime:
 
-```bash
-$ pm2 reload all
-```
+Set up OpenSSH server
+--------------------
 
-[More informations about how PM2 make clustering easy](https://pm2.keymetrics.io/docs/usage/cluster-mode/)
+To configure OpenSSH server to fetch users’ authorized keys from LDAP server:
 
-### Container Support
+1.  Make sure that you have installed **ssh-ldap-pubkey** and **ssh-ldap-pubkey-wrapper** in
+    `/usr/bin` with owner `root` and mode `0755`.
+2.  Add these two lines to /etc/ssh/sshd_config:
 
-With the drop-in replacement command for `node`, called `pm2-runtime`, run your Node.js application in a hardened production environment.
-Using it is seamless:
+        AuthorizedKeysCommand /usr/bin/ssh-ldap-pubkey-wrapper
+        AuthorizedKeysCommandUser nobody
 
-```
-RUN npm install pm2 -g
-CMD [ "pm2-runtime", "npm", "--", "start" ]
-```
+3.  Restart sshd and check log file if there’s no problem.
 
-[Read More about the dedicated integration](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/)
+Note: This method is supported by OpenSSH since version 6.2-p1 (or 5.3 onRedHat). If you have an
+older version and can’t upgrade, for whatever weird reason, use [openssh-lpk] patch instead.
 
-### Host monitoring speedbar
 
-PM2 allows to monitor your host/server vitals with a monitoring speedbar.
+Set up LDAP server
+------------------
 
-To enable host monitoring:
+Just add the [openssh-lpk.schema] to your LDAP server, **or** add an attribute named `sshPublicKey`
+to any existing schema which is already defined in people entries. That’s all.
 
-```bash
-$ pm2 set pm2:sysmonit true
-$ pm2 update
-```
+Note: Presumably, you’ve already set up your LDAP server for centralized unix users management,
+i.e. you have the [NIS schema](http://www.zytrax.com/books/ldap/ape/nis.html) and users in LDAP.
 
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/vitals.png)
 
-### Terminal Based Monitoring
+License
+-------
 
-![Monit](https://github.com/Unitech/pm2/raw/master/pres/pm2-monit.png)
+This project is licensed under [MIT license](http://opensource.org/licenses/MIT).
 
-Monitor all processes launched straight from the command line:
 
-```bash
-$ pm2 monit
-```
+[python-ldap]: https://pypi.python.org/pypi/python-ldap/
+[docopt]: https://pypi.python.org/pypi/docopt/
+[ebuild]: https://github.com/cvut/gentoo-overlay/tree/master/sys-auth/ssh-ldap-pubkey
+[cvut-overlay]: https://github.com/cvut/gentoo-overlay
+[openssh-lpk]: http://code.google.com/p/openssh-lpk/
 
-### Log Management
-
-To consult logs just type the command:
-
-```bash
-$ pm2 logs
-```
-
-Standard, Raw, JSON and formated output are available.
-
-Examples:
-
-```bash
-$ pm2 logs APP-NAME       # Display APP-NAME logs
-$ pm2 logs --json         # JSON output
-$ pm2 logs --format       # Formated output
-
-$ pm2 flush               # Flush all logs
-$ pm2 reloadLogs          # Reload all logs
-```
-
-To enable log rotation install the following module
-
-```bash
-$ pm2 install pm2-logrotate
-```
-
-[More about log management](https://pm2.keymetrics.io/docs/usage/log-management/)
-
-### Startup Scripts Generation
-
-PM2 can generate and configure a Startup Script to keep PM2 and your processes alive at every server restart.
-
-Init Systems Supported: **systemd**, **upstart**, **launchd**, **rc.d**
-
-```bash
-# Generate Startup Script
-$ pm2 startup
-
-# Freeze your process list across server restart
-$ pm2 save
-
-# Remove Startup Script
-$ pm2 unstartup
-```
-
-[More about Startup Scripts Generation](https://pm2.keymetrics.io/docs/usage/startup/)
-
-### Updating PM2
-
-```bash
-# Install latest PM2 version
-$ npm install pm2@latest -g
-# Save process list, exit old PM2 & restore all processes
-$ pm2 update
-```
-
-*PM2 updates are seamless*
-
-## PM2+ Monitoring
-
-If you manage your apps with PM2, PM2+ makes it easy to monitor and manage apps across servers.
-
-![https://app.pm2.io/](https://pm2.io/img/app-overview.png)
-
-Feel free to try it:
-
-[Discover the monitoring dashboard for PM2](https://app.pm2.io/)
-
-Thanks in advance and we hope that you like PM2!
-
-## CHANGELOG
-
-[CHANGELOG](https://github.com/Unitech/PM2/blob/master/CHANGELOG.md)
-
-## Contributors
-
-[Contributors](http://pm2.keymetrics.io/hall-of-fame/)
-
-## License
-
-PM2 is made available under the terms of the GNU Affero General Public License 3.0 (AGPL 3.0).
-For other licenses [contact us](mailto:contact@keymetrics.io).
+[ldap.conf]: https://github.com/jirutka/ssh-ldap-pubkey/blob/master/etc/ldap.conf
+[openssh-lpk.schema]: https://github.com/jirutka/ssh-ldap-pubkey/blob/master/etc/openssh-lpk.schema
