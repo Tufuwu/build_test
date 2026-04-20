@@ -1,7 +1,7 @@
 name: 'Pull Request Checks'
 
 on:
-  PUSH:
+  push:
   workflow_dispatch:
   pull_request:
     paths:
