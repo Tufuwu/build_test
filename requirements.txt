@@ -1,5 +1,0 @@
-cfnlint
-pytest
-pytest-watch
-pytest-cov
-boto3
