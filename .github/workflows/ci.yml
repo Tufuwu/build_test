@@ -1,21 +1,30 @@
-name: Tufuwu/test2
+name: Node.js CI
+
 on:
   push:
-    branches:
-    - "**/*"
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-    - name: checkout
-      uses: actions/checkout@v4.1.0
-    - uses: actions/setup-node@v4.0.0
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: '12'
-        cache: npm
-    - run: npm install
-    - run: npm install
-    - run: npm run test
-    - run: npm run codecov
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Upload coverage
+      run: npm run codecov
+      if: always()
