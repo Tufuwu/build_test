@@ -1,14 +1,18 @@
-import { render as baseRender } from '@testing-library/react/pure';
-import React from 'react';
+/**
+ * 封装 wx 异步接口为 promise
+ */
+function wa(func, args = {}) {
+    return new Promise(resolve => {
+        func({
+            ...args,
+            complete(res) {
+                expect(res).toEqual(res)
+                resolve(res)
+            }
+        })
+    })
+}
 
-export * from '@testing-library/react';
-export function render(element, options) {
-  const result = baseRender(element, options);
-
-  return {
-    ...result,
-    setProps(props) {
-      result.rerender(React.cloneElement(element, props));
-    },
-  };
+module.exports = {
+    wa,
 }

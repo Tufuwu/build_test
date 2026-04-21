@@ -1,34 +1,45 @@
-# react-transition-group [![npm][npm-badge]][npm]
+# miniprogram-simulate
 
-> **ATTENTION!** To address many issues that have come up over the years, the API in v2 and above is not backwards compatible with the original [`React addon (v1-stable)`](https://github.com/reactjs/react-transition-group/tree/v1-stable).
->
-> **For a drop-in replacement for `react-addons-transition-group` and `react-addons-css-transition-group`, use the v1 release. Documentation and code for that release are available on the [`v1-stable`](https://github.com/reactjs/react-transition-group/tree/v1-stable) branch.**
->
-> We are no longer updating the v1 codebase, please upgrade to the latest version when possible
+[![](https://img.shields.io/npm/v/miniprogram-simulate.svg?style=flat)](https://www.npmjs.com/package/miniprogram-simulate)
+[![](https://img.shields.io/travis/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate)
+[![](https://img.shields.io/github/license/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate/blob/master/LICENSE)
+[![](https://img.shields.io/codecov/c/github/wechat-miniprogram/miniprogram-simulate.svg)](https://app.codecov.io/gh/wechat-miniprogram/miniprogram-simulate)
 
-A set of components for managing component states (including mounting and unmounting) over time, specifically designed with animation in mind.
+## 介绍
 
-## Documentation
+小程序自定义组件测试工具集。
 
-- [**Main documentation**](https://reactcommunity.org/react-transition-group/)
-- [Migration guide from v1](/Migration.md)
+目前因为小程序独特的运行环境，所以对于小程序自定义组件的单元测试一直没有比较优雅的解决方案，此工具集就是为了解决此痛点而诞生的。将原本小程序自定义组件双线程分离运行的机制调整成单线程模拟运行，利用 dom 环境进行渲染，借此来完成整个自定义组件树的搭建。
 
-## TypeScript
-TypeScript definitions are published via [**DefinitelyTyped**](https://github.com/DefinitelyTyped/DefinitelyTyped) and can be installed via the following command:
+运行此工具集需要依赖 js 运行环境和 dom 环境，因此可以采用 jsdom + nodejs（如 jest），也可以采用真实浏览器环境（如 karma）。文档[使用简介](./docs/tutorial.md)中会提供简单的使用方式介绍。
 
-```
-npm install @types/react-transition-group
-```
-
-## Examples
-
-Clone the repo first:
+## 安装
 
 ```
-git@github.com:reactjs/react-transition-group.git
+npm install --save-dev miniprogram-simulate
 ```
 
-Then run `npm install` (or `yarn`), and finally `npm run storybook` to start a storybook instance that you can navigate to in your browser to see the examples.
+## 使用
 
-[npm-badge]: https://img.shields.io/npm/v/react-transition-group.svg
-[npm]: https://www.npmjs.org/package/react-transition-group
+```js
+const simulate = require('miniprogram-simulate')
+
+test('test sth', () => {
+    const id = simulate.load('/components/comp/index') // 加载自定义组件
+    const comp = simulate.render(id) // 渲染自定义组件
+    
+    // 使用自定义组件封装实例 comp 对象来进行各种单元测试
+})
+```
+
+以上只是一个简单的例子，实际上这个工具集必须搭配 jest 或 jsdom/mocha 等测试框架来使用，更为详细的使用细节请参阅下述文档：
+
+* [使用简介](./docs/tutorial.md)
+* [接口文档](./docs/api.md)
+* [细节实现](./docs/detail.md)
+* [暂不支持特性](./docs/todo.md)
+* [更新日志](./docs/update.md)
+
+## 协议
+
+[MIT](./LICENSE)

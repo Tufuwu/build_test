@@ -1,0 +1,2 @@
+<view>{{index}}</view>
+<other-comp id="a" bindcustoma="onCustomA"></other-comp>
