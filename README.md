@@ -1,213 +1,228 @@
-# PSRQpy
+<img src=".github/nhm-logo.svg" align="left" width="150px" height="100px" hspace="40"/>
 
-This module aims to provide a python interface for querying the [ATNF pulsar catalogue](http://www.atnf.csiro.au/people/pulsar/psrcat/). It is an unofficial
-package and is not endorsed by or affiliated with the ATNF.
+# ckanext-versioned-datastore
 
-Full documentation of the module can be found [here](http://psrqpy.readthedocs.io/).
+[![Tests](https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore/actions/workflows/main.yml/badge.svg)](https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore/actions/workflows/main.yml)
+[![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-versioned-datastore/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-versioned-datastore)
+[![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg?style=flat-square)](https://www.python.org/)
 
-Any comments or suggestions are welcome.
+_A CKAN extension providing a versioned datastore using MongoDB and Elasticsearch._
 
-## Installation
+# Overview
 
-To install the code from source, clone the git repository and run either:
+This plugin provides a complete replacement for ckan's datastore plugin and therefore shouldn't be used in conjunction with it.
+Rather than storing data in PostgreSQL, resource data is stored in MongoDB and then made available to frontend APIs using Elasticsearch.
 
-```
-python setup.py install --user
-```
+This allows this plugin to:
 
-to install as a user, or
+  - provide full versioning of resource records - records can be updated when new resource data is uploaded without preventing access to the old data
+  - expose advanced search features using Elasticsearch's extensive feature set
+  - achieve fast search response times, particularly when compared to PostgreSQL, due Elasticsearch's search performance
+  - store large resources (millions of rows) and still provide high speed search responses
+  - store complex data as both MongoDB and Elasticsearch are JSON based, allowing object nesting and arrays
 
-```
-sudo python setup.py install
-```
+This plugin is built on [Eevee](https://github.com/NaturalHistoryMuseum/eevee).
 
-to install as root.
 
-The module can also be installed using `pip` with:
+# Installation
 
-```
-pip install psrqpy
-```
+Path variables used below:
+- `$INSTALL_FOLDER` (i.e. where CKAN is installed), e.g. `/usr/lib/ckan/default`
+- `$CONFIG_FILE`, e.g. `/etc/ckan/default/development.ini`
 
-or in a [Conda](https://docs.conda.io/en/latest/) environment using:
+1. Clone the repository into the `src` folder:
 
-```
-conda install -c conda-forge psrqpy
-```
+  ```bash
+  cd $INSTALL_FOLDER/src
+  git clone https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore.git
+  ```
 
-### Requirements
+2. Activate the virtual env:
 
-The [requirements](requirements.txt) for installing the code are:
+  ```bash
+  . $INSTALL_FOLDER/bin/activate
+  ```
 
- * [`requests`](http://docs.python-requests.org/en/master/)
- * [`beautifulsoup4`](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
- * [`numpy`](http://www.numpy.org/)
- * [`scipy`](https://www.scipy.org/)
- * [`astropy`](http://www.astropy.org/)
- * [`pandas`](https://pandas.pydata.org/)
- * [`ads`](https://ads.readthedocs.io/en/latest/)
- * [`matplotlib`](https://matplotlib.org/)
+3. Install the requirements from requirements.txt:
 
-## Examples
+  ```bash
+  cd $INSTALL_FOLDER/src/ckanext-versioned-datastore
+  pip install -r requirements.txt
+  ```
 
-A simple query of the catalogue to, e.g., just return all pulsar frequencies, would be:
+4. Run setup.py:
 
-```python
-import psrqpy
+  ```bash
+  cd $INSTALL_FOLDER/src/ckanext-versioned-datastore
+  python setup.py develop
+  ```
 
-q = psrqpy.QueryATNF(params='F0')
+5. Add 'versioned_datastore' to the list of plugins in your `$CONFIG_FILE`:
 
-# get frequencies as an astropy table
-t = q.table
+  ```ini
+  ckan.plugins = ... versioned_datastore
+  ```
 
-print(t['F0'])
-```
+# Configuration
 
-You can query multiple parameters, e.g.:
+There are a number of options that can be specified in your .ini config file.
+All configuration options are currently required.
 
-```python
-import psrqpy
+## **[REQUIRED]**
 
-q = psrqpy.QueryATNF(params=['F0', 'F1', 'RAJ', 'DecJ'])
+Name|Description|Example
+--|--|--
+`ckanext.versioned_datastore.elasticsearch_hosts`|A comma separated list of elasticsearch server hosts|`1.2.3.4,1.5.4.3,es.mydomain.local`
+`ckanext.versioned_datastore.elasticsearch_port`|The port for to use for the elasticsearch server hosts listed in the elasticsearch_hosts option|`9200`
+`ckanext.versioned_datastore.elasticsearch_index_prefix`|The prefix to use for index names in elasticsearch. Each resource in the datastore gets an index and the name of the index is the resource ID with this prefix prepended.|`nhm-`
+`ckanext.versioned_datastore.mongo_host`|The mongo server host|`10.54.24.10`
+`ckanext.versioned_datastore.mongo_port`|The port to use to connect to the mongo host|`27017`
+`ckanext.versioned_datastore.mongo_database`|The name of the mongo database to use to store datastore data in|`nhm`
 
-# get values as an astropy table
-t = q.table
+## **[OPTIONAL]**
 
-print(t['F0'])
-```
+Name|Description|Example
+--|--|--
+`ckanext.versioned_datastore.redis_host`|The redis server host. If this is provided slugging is enabled|`14.1.214.50`
+`ckanext.versioned_datastore.redis_port`|The port to use to connect to the redis host|`6379`
+`ckanext.versioned_datastore.redis_database`|The redis database index to use to store datastore multisearch slugs in|`1`
+`ckanext.versioned_datastore.slug_ttl`|The amount of time slugs should last for, in days. Default: `7`|`7`
+`ckanext.versioned_datastore.dwc_core_extension_name`|The name of the DwC core extension to use, as defined in [dwc/writer.py](/ckanext/versioned_datastore/lib/downloads/dwc/writer.py).|`gbif_occurrence`
+`ckanext.versioned_datastore.dwc_extension_names`|A comma-separated list of (non-core) DwC extension names, as defined in [dwc/writer.py](/ckanext/versioned_datastore/lib/downloads/dwc/writer.py).|`gbif_multimedia`
+`ckanext.versioned_datastore.dwc_org_name`|The organisation name to use in DwC-A metadata. Default: the value of `ckanext.doi.publisher` or `ckan.site_title`|`The Natural History Museum`
+`ckanext.versioned_datastore.dwc_org_email`|The contact email to use in DwC-A metadata. Default: the value of `smtp.mail_from`|`contact@yoursite.com`
+`ckanext.versioned_datastore.dwc_default_license`|The license to use in DwC-A metadata if the resources have differing licenses or no license is specified. Default: `null`|`http://creativecommons.org/publicdomain/zero/1.0/legalcode`
 
-You can query specific pulsars, e.g.:
 
-```
-import psrqpy
+# Further Setup
 
-q = psrqpy.QueryATNF(params=['F0', 'F1', 'RAJ', 'DecJ'], psrs=['J0534+2200', 'J0537-6910'])
+At the version of Eevee this plugin uses, you will also need to:
 
-# get values as an astropy table
-t = q.table
+  - install MongoDB 4.x
+  - install Elasticsearch 6.7.x (6.x is probably ok, but untested)
 
-# print the table
-print(t)
-  JNAME          F0       F0_ERR       F1      F1_ERR     RAJ      RAJ_ERR     DECJ     DECJ_ERR
-                 Hz         Hz       1 / s2    1 / s2                                           
----------- ------------- ------- ------------- ------ ------------ ------- ------------ --------
-J0534+2200     29.946923   1e-06  -3.77535e-10  2e-15 05:34:31.973   0.005 +22:00:52.06     0.06
-J0537-6910 62.0261895958 1.3e-09 -1.992272e-10  4e-17 05:37:47.416    0.11 -69:10:19.88      0.6
-```
+See the [Eevee](https://github.com/NaturalHistoryMuseum/eevee) repository for more details.
 
-You can set [conditions](http://www.atnf.csiro.au/research/pulsar/psrcat/psrcat_help.html?type=normal#condition) for the searches,
-e.g.:
+This plugin also requires CKAN's job queue, which is included in recent versions of CKAN or can be added to old versions using the ckanext-rq plugin.
 
-```python
-import psrqpy
-q = psrqpy.QueryATNF(params=['Jname', 'f0'], condition='f0 > 100 && f0 < 200', assoc='GC')
-```
 
-where `assoc=GC` looks for all pulsars in globular clusters.
+# Usage
 
-When a query is generated the entire catalogue is downloaded and stored in the `QueryATNF` object as
-a pandas [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html).
-The query can therefore be re-used to access data on different parameters, different pulsars, or
-using different conditions, without the need to re-download the catalogue. We may originally want
-to query pulsar frequencies using only frequencies greater than 10 Hz, with
+A brief tour!
 
-```python
-import psrqpy
-q = psrqpy.QueryATNF(params=['F0'], condition='F0 > 10')
-freqs = q.table['F0']
-```
+The plugin automatically detects resources on upload that can be added to the datastore.
+This is accomplished using the resource format.
+Currently the accepted formats are:
 
-Using the same `QueryATNF` object we could change to get frequency derivatives for pulsars
-with frequencies less than 10 Hz, with
+- CSV - csv, application/csv
+- TSV - tsv
+- XLS (old excel) - xls, application/vnd.ms-excel
+- XLSX (new excel) - xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 
-```python
-q.condition = 'F0 < 10'
-q.query_params = 'F1'
+If one of these formats is used then an attempt will be made to add the uploaded or URL to the datastore.
+Note that only the first sheet in multisheet XLS and XLSX files will be processed.
 
-fdot = q.table['F1']
-```
+Adding data to the datastore is accomplished in two steps:
 
-In these cases the whole catalogue (with no conditions applied and all available parameters) stored as a pandas [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
-is accessible with
+1. Ingesting the records into MongoDB. A document is used per unique record ID to store all versions and the documents for a specific resource are stored in a collection named after the resource's ID. For more information on the structure of these documents see the [Eevee](https://github.com/NaturalHistoryMuseum/eevee) repository for more details.
+2. Indexing the documents from MongoDB into Elasticsearch. One indexed is used for all versions of the records and a document in Elasticsearch is created per version of each record. The index is named after the resource's ID with the configured prefix prepended. For more information on the structure of these indexed documents see the [Eevee](https://github.com/NaturalHistoryMuseum/eevee) repository for more details.
 
-```python
-catalogue = q.catalogue
-```
+The ingesting and indexing is completed in the background using the CKAN's job queue.
 
-You can also [generate](http://psrqpy.readthedocs.io/en/latest/query.html#psrqpy.search.QueryATNF.ppdot) a
-_lovely_ period vs. period derivative plot based on the latest catalogue information, using
-just three lines of code, e.g.:
+Once data has been added to the datastore it can be searched using the `datastore_search` or more advanced `datastore_search_raw` actions.
+The `datastore_search` action closely mirrors the default CKAN datastore action of the same name.
+The `datastore_search_raw` action allows users to query the datastore using raw Elasticsearch queries, unlocking the full range of features it provides.
 
-```python
-from psrqpy import QueryATNF
-query = QueryATNF(params=['P0', 'P1', 'ASSOC', 'BINARY', 'TYPE', 'P1_I'])
-query.ppdot(showSNRs=True, showtypes='all')
-```
+## Actions
 
-gives
+All of this extension's actions are fully documented inline, including all parameters and results.
 
-![PPdot](../master/docs/source/images/ppdot.png)
+### `datastore_create`
+Adds a resource to the versioned datastore (note that this doesn't add any data, it just does setup work. This is different to CKAN's default `datastore_create` action).
 
-## Development and Support
+### `datastore_upsert`
+Upserts data into the datastore for the resource. The data can be provided in the data_dict using the key 'records' or, if data is not specified, the URL on the resource is used.
 
-Code development is done via the package's [GitHib repository](https://github.com/mattpitkin/psrqpy).
-Any contributions can be made via a [fork and pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) model
-from that repository, and must adhere to the [MIT license](#License). Any problems with the code
-or support requests can be submitted via the repository's [Issue tracker](https://github.com/mattpitkin/psrqpy/issues).
+### `datastore_delete`
+Deletes the data in the datastore against the given resource ID.
 
-## Test suite
+### `datastore_search`
+Search a resource's data using a similar API to CKAN's default `datastore_search` action.
 
-There are tests supplied that cover many of the functions within PSRQpy. These can be run from the
-base directory of the repository (after installing the [`pytest`](https://docs.pytest.org/en/latest/) and
-[`pytest-socket`](https://pypi.org/project/pytest-socket/) modules, e.g., with `pip`) by just calling:
+### `datastore_get_record_versions`
+Given a record id and a resource it appears in, returns the version timestamps available for that record in ascending order.
 
+### `datastore_get_resource_versions`
+Given a resource id, returns the version timestamps available for that resource in ascending order along with the number of records modified in the version and the number of records at that version.
+
+### `datastore_autocomplete`
+Provides autocompletion results against a specific field in a specific resource.
+
+### `datastore_reindex`
+Triggers a reindex of the given resource's data.
+
+### `datastore_query_extent`
+Return the geospatial extent of the results of a given datastore search query.
+
+### `datastore_get_rounded_version`
+Round the requested version of this query down to the nearest actual version of the resource.
+
+### `datastore_search_raw`
+This action allows you to search data in a resource using a raw elasticsearch query.
+
+### `datastore_ensure_privacy`
+This action runs through all resources (or handles a specific resource if a resource id is provided) and makes sure that the privacy set on each resource's package is reflected in the datastore.
+
+## Commands
+
+### `vds`
+
+1. `initdb`: ensure the tables needed by this plugin exist.
+    ```bash
+    ckan -c $CONFIG_FILE initdb
+    ```
+
+2. `reindex`: reindex either a specific resource or all resources.
+    ```bash
+    ckan -c $CONFIG_FILE reindex $OPTIONAL_RESOURCE_ID
+    ```
+
+## Interfaces
+
+One interface is made available through this plugin: `IVersionedDatastore`.
+
+Here is a brief overview of its functions:
+
+  - `datastore_modify_data_dict` - allows modification of the data dict before it is validated and used to create the search object
+  - `datastore_modify_search` - allows modifications to the search before it is made. This is kind of analogous to `IDatastore.datastore_search` however instead of passing around a query dict, instead an elasticsearch-dsl `Search` object is passed around
+  - `datastore_modify_result` - allows modifications to the result after the search
+  - `datastore_modify_fields` - allows modification of the field definitions before they are returned with the results of a datastore_search
+  - `datastore_modify_index_doc` - allows the modification of a resource's data during indexing
+  - `datastore_is_read_only_resource` - allows implementors to designate certain resources as read only
+  - `datastore_after_indexing` - allows implementors to hook onto the completion of an indexing task
+
+See the interface definition in this plugin for more details about these functions.
+
+# Testing
+_Test coverage is currently extremely limited._
+
+To run the tests in this extension, there is a Docker compose configuration available in this
+repository to make it easy.
+
+To run the tests against ckan 2.9.x on Python3:
+
+1. Build the required images
 ```bash
-pytest
+docker-compose build
 ```
 
-These tests are not included in the `pip` installed version of the code.
-
-## Copyright and referencing for the catalogue
-
-Regarding the use of the catalogue and software behind it, the [following statements](http://www.atnf.csiro.au/research/pulsar/psrcat/download.html) apply:
-
-> PSRCAT is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. PSRCAT is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
->
-> PSRCAT makes use of "evaluateExpression: A Simple Expression Evaluator". Copyright &copy; 1996 - 1999 Parsifal Software, All Rights Reserved.
->
-> The programs and databases remain the property of the Australia Telescope National Facility, CSIRO, and are covered by the [CSIRO Legal Notice and Disclaimer](http://www.csiro.au/en/About/Footer/Legal-notice).
->
-> If you make use of information from the ATNF Pulsar Catalogue in a publication, we would appreciate acknowledgement by reference to the publication "[The ATNF Pulsar Catalogue](http://adsabs.harvard.edu/abs/2005AJ....129.1993M)", R. N. Manchester, G. B. Hobbs, A. Teoh & M. Hobbs, Astronomical Journal, 129, 1993-2006 (2005) and by quoting the web address http://www.atnf.csiro.au/research/pulsar/psrcat for updated versions.
-
-If making use of this code to access the catalogue, or produce plots, I would be grateful if (as well as citing the ATNF pulsar catalogue [paper](http://adsabs.harvard.edu/abs/2005AJ....129.1993M) and [URL](http://www.atnf.csiro.au/research/pulsar/psrcat) given above) you consider citing the [JOSS](http://joss.theoj.org/) [paper](https://doi.org/10.21105/joss.00538) for this software:
-
-```tex
-@article{psrqpy,
-  author = {{Pitkin}, M.},
-   title = "{psrqpy: a python interface for querying the ATNF pulsar catalogue}",
-  volume = 3,
-  number = 22,
-   pages = 538,
-   month = feb,
-    year = 2018,
- journal = "{Journal of Open Source Software}",
-     doi = {10.21105/joss.00538},
-     url = {https://doi.org/10.21105/joss.00538}
-}
+2. Then run the tests.
+   The root of the repository is mounted into the ckan container as a volume by the Docker compose
+   configuration, so you should only need to rebuild the ckan image if you change the extension's
+   dependencies.
+```bash
+docker-compose run ckan
 ```
 
-## License
-
-This code is licensed under the [MIT License](http://opensource.org/licenses/MIT).
-
-&copy; Matt Pitkin, 2017
-
-[![PyPI version](https://badge.fury.io/py/psrqpy.svg)](https://badge.fury.io/py/psrqpy)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/psrqpy/badges/version.svg)](https://anaconda.org/conda-forge/psrqpy)
-[![version](https://img.shields.io/pypi/pyversions/psrqpy.svg)](https://pypi.org/project/psrqpy/)
-[![Build Status](https://travis-ci.org/mattpitkin/psrqpy.svg?branch=master)](https://travis-ci.org/mattpitkin/psrqpy)
-[![codecov](https://codecov.io/gh/mattpitkin/psrqpy/branch/master/graph/badge.svg)](https://codecov.io/gh/mattpitkin/psrqpy)
-[![Documentation Status](https://readthedocs.org/projects/psrqpy/badge/?version=latest)](http://psrqpy.readthedocs.io/en/latest/?badge=latest)
-[![status](http://joss.theoj.org/papers/711dc5566159f6e9f8ea5d07dbfaf5d2/status.svg)](http://joss.theoj.org/papers/711dc5566159f6e9f8ea5d07dbfaf5d2)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1489692.svg)](https://doi.org/10.5281/zenodo.1489692)
-[![ASCL](https://img.shields.io/badge/ascl-1812.017-blue.svg?colorB=262255)](http://ascl.net/1812.017)
+The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9`.

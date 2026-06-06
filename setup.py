@@ -1,10 +1,10 @@
-# coding: utf-8
+#!/usr/bin/env python3
+# encoding: utf-8
+#
+# This file is part of ckanext-versioned-datastore
+# Created by the Natural History Museum in London, UK
 
-"""
-A Python module for accessing the ATNF pulsar catalogue
-"""
+import setuptools
 
-from setuptools import setup
-
-setup(use_scm_version=True)
-
+if __name__ == "__main__":
+    setuptools.setup()

@@ -1,4 +1,10 @@
-*.egg-info/
+*.egg-info
+*.pyc
+.noseids
+.pytest_cache
+.coverage
+build/
+
 dist/
-psrqpy/_version.py
-__pycache__/
+.idea
+
