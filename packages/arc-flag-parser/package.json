@@ -1,0 +1,17 @@
+{
+  "name": "arc-flag-parser",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "pegjs index.pegjs && babel --plugins minify-dead-code-elimination index.js --out-file=index.js && prettier index.js --write"
+  },
+  "author": "Michael Rawlings <ml.rawlings@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-rc.1",
+    "@babel/core": "^7.0.0-rc.1",
+    "babel-plugin-minify-dead-code-elimination": "^0.4.3",
+    "pegjs": "^0.10.0"
+  }
+}
