@@ -1,53 +1,59 @@
-# Express Handlebars plugin for Nodemailer
-This plugin works with nodemailer 6.x. And uses the [express-handlebars](https://github.com/express-handlebars/express-handlebars) view
-engine to generate html emails.
+# play-sound
 
-# Install from npm
-```bash
-npm install nodemailer-express-handlebars
-```
-# Usage
+[![Downloads](https://img.shields.io/npm/dt/play-sound.svg)](https://npmjs.org/package/play-sound)
+
+Play sounds by shelling out to one of the available audio players.
+
+## Installation
+
+    npm install play-sound
+
+## Examples
+
 ```javascript
-//reference the plugin
-import hbs from 'nodemailer-express-handlebars';
-//attach the plugin to the nodemailer transporter
-transporter.use('compile', hbs(options));
-//send mail with options
-const mail = {
-   from: 'from@domain.com',
-   to: 'to@domain.com',
-   subject: 'Test',
-   template: 'email',
-   context: {
-       name: 'Name'
-   }
-}
-transporter.sendMail(mail);
+var player = require('play-sound')(opts = {})
+
+// $ mplayer foo.mp3 
+player.play('foo.mp3', function(err){
+  if (err) throw err
+})
+
+// { timeout: 300 } will be passed to child process
+player.play('foo.mp3', { timeout: 300 }, function(err){
+  if (err) throw err
+})
+
+// configure arguments for executable if any
+player.play('foo.mp3', { afplay: ['-v', 1 ] /* lower volume for afplay on OSX */ }, function(err){
+  if (err) throw err
+})
+
+// access the node child_process in case you need to kill it on demand
+var audio = player.play('foo.mp3', function(err){
+  if (err && !err.killed) throw err
+})
+audio.kill()
 ```
 
-You can send a multipart html and text email by setting the `text_template` option on a mail message.
-```javascript
-const mail = {
-   from: 'from@domain.com',
-   to: 'to@domain.com',
-   subject: 'Test',
-   template: 'email',
-   text_template: 'text',
-   context: {
-       name: 'Name'
-   }
-}
-```
-## Plugin Options
-The plugin expects the following options:
-* __viewEngine (required)__ either the express-handlebars view engine instance or [options for the view engine](https://github.com/express-handlebars/express-handlebars#configuration-and-defaults)
-* __viewPath (required)__ provides the path to the directory where your views are
-* __extName__ the extension of the views to use (defaults to `.handlebars`)
+## Options
 
-## Mail options
-Set the template and values properties on the mail object before calling `sendMail`
-* __template__ the name of the template file to use
-* __context__ this will be passed to the view engine as the context as well as view engine options see [here](https://github.com/express-handlebars/express-handlebars#renderviewviewpath-optionscallback-callback)
+* `players` – List of available audio players to check. Default:
+  * [`mplayer`](https://www.mplayerhq.hu/)
+  * [`afplay`](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/afplay.1.html)
+  * [`mpg123`](http://www.mpg123.de/)
+  * [`mpg321`](http://mpg321.sourceforge.net/)
+  * [`play`](http://sox.sourceforge.net/)
+  * [`omxplayer`](https://github.com/popcornmix/omxplayer)
+  * [`aplay`](https://linux.die.net/man/1/aplay)
+  * [`cmdmp3`](https://github.com/jimlawless/cmdmp3)
+  * [`cvlc`](https://www.commandlinux.com/man-page/man1/cvlc.1.html)
+  * [`powershell`](https://docs.microsoft.com/en-us/powershell/)
+* `player` – Audio player to use (skips availability checks)
 
-# License
+## Prior art
+
+* [play.js](https://github.com/Marak/play.js) - play sound files from node.js to your speakers
+
+## License
+
 MIT
