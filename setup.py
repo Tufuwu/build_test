@@ -1,41 +1,91 @@
-from codecs import open
-from os import path
+#!/usr/bin/env python
+"""Wiggle Plot for Seismic Data Section
 
-from setuptools import setup
+Visualize seismic data section using wiggle plots.
+"""
 
-here = path.abspath(path.dirname(__file__))
+DOCLINES = __doc__.split("\n")
 
-# Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+import sys
 
-setup(
-    name='aws_list_all',
-    version='0.8.0',
-    description='List all your AWS resources, all regions, all services.',
-    long_description=long_description,
-    url='https://github.com/JohannesEbke/aws_list_all',
-    author='Johannes Ebke',
-    author_email='johannes@ebke.org',
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-    ],
-    keywords='aws boto3 listings resources region services',
-    packages=['aws_list_all'],
-    install_requires=['boto3>=1.26.5', 'app_json_file_cache>=0.2.2'],
-    entry_points={
-        'console_scripts': [
-            'aws_list_all=aws_list_all.__main__:main',
-            'aws-list-all=aws_list_all.__main__:main',
-        ],
-    },
-    include_package_data=True,
-)
+from setuptools import setup, find_packages
+
+# Check Python version
+if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[0:2] < (3, 4):
+    raise RuntimeError("Python version 2.7 or >= 3.4 required.")
+
+CLASSIFIERS = """\
+Development Status :: 2 - Pre-Alpha
+Intended Audience :: Science/Research
+Intended Audience :: Developers
+License :: OSI Approved :: MIT License
+Programming Language :: Python
+Programming Language :: Python :: 2
+Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3
+Programming Language :: Python :: 3.4
+Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.6
+Topic :: Software Development
+Topic :: Scientific/Engineering
+Operating System :: Microsoft :: Windows
+Operating System :: POSIX
+Operating System :: Unix
+Operating System :: MacOS
+
+"""
+
+MAJOR = 0
+MINOR = 1
+MICRO = 0
+ISRELEASED = False
+VERSION = '{}.{}.{}'.format(MAJOR, MINOR, MICRO)
+
+
+# VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+
+def setup_package():
+    # Figure out whether to add ``*_requires = ['numpy']``.
+    # We don't want to do that unconditionally, because we risk updating
+    # an installed numpy which fails too often.  Just if it's not installed, we
+    # may give it a try.  See gh-3379.
+    try:
+        import numpy
+    except ImportError:  # We do not have numpy installed
+        build_requires = ['numpy>=1.8.2']
+    else:
+        # If we're building a wheel, assume there already exist numpy wheels
+        # for this platform, so it is safe to add numpy to build requirements.
+        # See gh-5184.
+        build_requires = (['numpy>=1.8.2'] if 'bdist_wheel' in sys.argv[1:]
+                          else [])
+
+    try:
+        import matplotlib
+    except ImportError:
+        build_requires += ['matplotlib>=2.0.0']
+
+    metadata = dict(
+        name='wiggle',
+        maintainer="Lijun Zhu",
+        version=VERSION,
+        maintainer_email="gatechzhu@gmail.com",
+        description=DOCLINES[0],
+        long_description="\n".join(DOCLINES[2:]),
+        url="https://github.com/gatechzhu/wiggle",
+        download_url="https://github.com/gatechzhu/wiggle/releases",
+        license='MIT',
+        classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
+        platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
+        test_suite='tests',
+        packages=find_packages(),
+        setup_requires=build_requires,
+        install_requires=build_requires,
+        tests_require=build_requires + ['pytest'],
+    )
+
+    setup(**metadata)
+
+
+if __name__ == '__main__':
+    setup_package()

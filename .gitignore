@@ -1,4 +1,5 @@
-/*.json
+# PyCharm config
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -89,12 +90,3 @@ ENV/
 
 # Rope project settings
 .ropeproject
-
-# Pickle files from listing
-*.pickle
-
-# listing file data dir
-data/
-
-# PyTest Cache
-.pytest_cache/
