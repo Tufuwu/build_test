@@ -1,238 +1,155 @@
-[![Version](https://img.shields.io/npm/v/jpeg-autorotate.svg)](https://github.com/johansatge/jpeg-autorotate/releases)
-[![Downloads](https://img.shields.io/npm/dm/jpeg-autorotate.svg)](https://www.pkgstats.com/pkg:jpeg-autorotate)
-[![Last commit](https://badgen.net/github/last-commit/johansatge/jpeg-autorotate)](https://github.com/johansatge/jpeg-autorotate/commits/master)
-[![Test](https://github.com/johansatge/jpeg-autorotate/actions/workflows/test.yml/badge.svg)](https://github.com/johansatge/jpeg-autorotate/actions)
-[![Coverage](https://badgen.net/codecov/c/github/johansatge/jpeg-autorotate)](https://codecov.io/github/johansatge/jpeg-autorotate/)
-[![Install Size](https://badgen.net/packagephobia/install/jpeg-autorotate)](https://packagephobia.com/result?p=jpeg-autorotate)
+[![Build Status](https://travis-ci.org/stonecircle/express-autoroute-json.svg?branch=master)](https://travis-ci.org/stonecircle/express-autoroute-json)
+[![dependencies Status](https://david-dm.org/stonecircle/express-autoroute-json/status.svg)](https://david-dm.org/stonecircle/express-autoroute-json)
+[![devDependencies Status](https://david-dm.org/stonecircle/express-autoroute-json/dev-status.svg)](https://david-dm.org/stonecircle/express-autoroute-json?type=dev)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3f269374a4293505f284/maintainability)](https://codeclimate.com/github/stonecircle/express-autoroute-json/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/3f269374a4293505f284/test_coverage)](https://codeclimate.com/github/stonecircle/express-autoroute-json/test_coverage)
 
-![Icon](icon.png)
+# Express-Autoroute-JSON - automatically define your JSON:API backend
 
-> A node module to rotate JPEG images based on EXIF orientation.
+express-autoroute-json is a handy tool which allows you to declarativly define endpoints for [ExpressJS](https://expressjs.com/) that speak [JSON:API](https://jsonapi.org) natively. It is designed to make use of [_Convention Over Configuration_](https://en.wikipedia.org/wiki/Convention_over_configuration) and your endpoints should have Zero boilerplate code, and only contain the definition of your business logic.
 
----
+## Quick-start
 
-* [What does it do](#what-does-it-do)
-* [Installation](#installation)
-* [Usage](#usage)
-  * [Options](#options)
-  * [CLI](#cli)
-  * [Node module](#node-module)
-    * [Sample usage](#sample-usage)
-    * [Error handling](#error-handling)
-* [Troubleshooting](#troubleshooting)
-  * [Thumbnail too large](#thumbnail-too-large)
-* [Changelog](#changelog)
-* [License](#license)
-* [Contributing](#contributing)
-* [Credits](#credits)
+We have a handy [Yeaman](http://yeoman.io/) generator that will spin up a fully functioning backend for you in an instant. To get started, install yeoman globally and install the [@authmaker/generator-express](https://github.com/authmaker/generator-express) generator globally. Don't worry if you're not using [Authmaker](https://authmaker.com/), you can still use this generator to quickly spin up your app.
 
-## What does it do
-
-This module applies the right orientation to a JPEG image, based on its EXIF tag. More precisely, it:
-
-* Rotates the pixels
-* Rotates the thumbnail, if there is one
-* Writes `1` in the `Orientation` EXIF tag (this is the default orientation)
-* Updates the `PixelXDimension` and `PixelYDimension` EXIF values
-* Does **not** alter the other EXIF tags
-
-It may be useful, if:
-
-* You need to compress your image with a tool that strips EXIF data without rotating the pixels (like the great [ImageOptim](https://imageoptim.com/))
-* You need to upload the image, but the destination application does not support EXIF orientation (like [WordPress](https://wordpress.org/))
-* You just want to get rid of the orientation tag, while leaving the other tags **intact**
-
-> More information about EXIF:
->
-> * [EXIF Orientation Handling Is a Ghetto](http://www.daveperrett.com/articles/2012/07/28/exif-orientation-handling-is-a-ghetto/)
-> * [Standard EXIF Tags](http://www.exiv2.org/tags.html)
-
-## Installation
-
-_This module needs Node `>=12`._
-
-Install with [npm](https://www.npmjs.com/):
-
-```bash
-$ npm install jpeg-autorotate --global
-# --global isn't required if you plan to use the node module
+```sh
+npm install -g yo
+npm install -g @authmaker/generator-express
 ```
 
-## Usage
+the generator **does not** generate a folder for you so create one and run the generator in that folder:
 
-### Options
-
-| Option | Default value | Description |
-| --- | --- | --- |
-| `quality` | `100` | Quality of the JPEG. Uncompressed by default, so the resulting image may be bigger than the original one. |
-| `jpegjsMaxResolutionInMP` | `jpeg-js` default | `maxResolutionInMP` option in `jpeg-js` ([doc](https://github.com/eugeneware/jpeg-js#decode-options)) |
-| `jpegjsMaxMemoryUsageInMB` | `jpeg-js` default | `maxMemoryUsageInMB` option in `jpeg-js` ([doc](https://github.com/eugeneware/jpeg-js#decode-options)) |
-
-### CLI
-
-Rotate a single image:
-
-```bash
-$ jpeg-autorotate /Users/johan/IMG_1234.jpg
+```sh
+mkdir my-app-backend
+cd my-app-backend
+yo @authmaker/express
 ```
 
-Rotate a set of images:
+the generator will ask you a series of questions to get started, and it will also ask you for a [MongoDB connection string](https://docs.mongodb.com/manual/reference/connection-string/) and setup that database connection for you.
 
-```bash
-$ jpeg-autorotate /Users/johan/images/IMG_*.jpg
+## Route definitions
+If you have run the above quick-start steps you will have a file `server/routes/v1/example.js` that looks like this:
+
+```javascript
+const autorouteJson = require('express-autoroute-json');
+const { models } = require('../../../models');
+
+module.exports.autoroute = autorouteJson({
+  model: models.example,
+  resource: 'example', // this will be pluralised in the routes
+
+  // default CRUD
+  find: {},
+  create: {},
+  update: {},
+  delete: {},
+});
 ```
 
-Glob support:
+there are a few things to note about this example. Firstly this is a **fully functioning** example that will create endpoints to create, retrieve, update and delete _'example'_ resources. When you run the server it will show the following output
 
-```bash
-$ jpeg-autorotate "/Users/johan/images/IMG_*.{jpg,jpeg,JPG,JPEG}"
+```sh
+info: creating endpoint: /v1/examples      #find all     - GET
+info: creating endpoint: /v1/examples/:id  #find by id   - GET
+info: creating endpoint: /v1/examples      #create       - POST
+info: creating endpoint: /v1/examples/:id  #update       - PATCH
+info: creating endpoint: /v1/examples/:id  #delete       - DELETE
 ```
 
-Passing options:
+you will also notice that the endpoints are prefixed with `/v1/`. This is because express-autroute-json is based on [express-autoroute](https://github.com/stonecircle/express-autoroute) which is designed to give you a nicer way to describe your node endpoints and can auto-prefix endpoints with the folder-names they are contained in.
 
-```
-$ jpeg-autorotate /Users/johan/IMG_1234.jpg --quality=85 --jpegjsMaxResolutionInMP=1234
-```
+If you want to create a _find-only_ endpoint i.e. you don't want to allow for the creation or deletion of resources then you can just remove the corresponding create, update and delete blocks from the autoroute definition.
 
-### Node module
 
-The Node module will load the image, apply the rotation, and return the binary data as a [Buffer](https://nodejs.org/api/buffer.html), allowing you to:
+```javascript
+const autorouteJson = require('express-autoroute-json');
+const { models } = require('../../../models');
 
-* Save it on disk
-* Load it in an image processing module (like [jimp](https://github.com/oliver-moran/jimp), [lwip](https://github.com/EyalAr/lwip), [gm](https://github.com/aheckmann/gm)...)
-* ...
-
-#### Sample usage
-
-```js
-const jo = require('jpeg-autorotate')
-const options = {
-  quality: 8,
-  jpegjsMaxResolutionInMP: 1234,
-}
-const path = '/Users/johan/IMG_1234.jpg' // You can use a Buffer too
-
-//
-// With a callback:
-//
-jo.rotate(path, options, (error, buffer, orientation, dimensions, quality) => {
-  if (error) {
-    console.log('An error occurred when rotating the file: ' + error.message)
-    return
-  }
-  console.log(`Orientation was ${orientation}`)
-  console.log(`Dimensions after rotation: ${dimensions.width}x${dimensions.height}`)
-  console.log(`Quality: ${quality}`)
-  // ...Do whatever you need with the resulting buffer...
-})
-
-//
-// With a Promise:
-//
-jo.rotate(path, options)
-  .then(({buffer, orientation, dimensions, quality}) => {
-    console.log(`Orientation was ${orientation}`)
-    console.log(`Dimensions after rotation: ${dimensions.width}x${dimensions.height}`)
-    console.log(`Quality: ${quality}`)
-    // ...Do whatever you need with the resulting buffer...
-  })
-  .catch((error) => {
-    console.log('An error occurred when rotating the file: ' + error.message)
-  })
+module.exports.autoroute = autorouteJson({
+  model: models.example,
+  resource: 'example', // this will be pluralised in the routes
+  find: {},
+});
 ```
 
-#### Error handling
+will result in:
 
-The `error` object returned by the module contains a readable `message`, but also a `code` for better error handling. Available codes are the following:
-
-```js
-const jo = require('jpeg-autorotate')
-
-jo.errors.read_file // File could not be opened
-jo.errors.read_exif // EXIF data could not be read
-jo.errors.no_orientation // No orientation tag was found
-jo.errors.unknown_orientation // The orientation tag is unknown
-jo.errors.correct_orientation // The image orientation is already correct
-jo.errors.rotate_file // An error occurred when rotating the image
+```sh
+info: creating endpoint: /v1/examples      #find all     - GET
+info: creating endpoint: /v1/examples/:id  #find by id   - GET
 ```
 
-Example:
+## Customising the business logic
 
-```js
-const jo = require('jpeg-autorotate')
-jo.rotate('/image.jpg')
-  .catch((error) => {
-    if (error.code === jo.errors.correct_orientation) {
-      console.log('The orientation of this image is already correct!')
+The simplest example of business logic that you might need for these endpoints is the ability to define authentication. Here is a simple example that restricts all endpoints in this autoroute definition to just be accessible to admins.
+
+```javascript
+const autorouteJson = require('express-autoroute-json');
+const { models } = require('../../../models');
+
+function isAdmin(req, res, next) {
+    //deny access if the user is not admin
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(401).send("You are not an admin");
     }
-  })
-```
-
-## Troubleshooting
-
-### Thumbnail too large
-
-The [piexifjs](https://github.com/hMatoba/piexifjs/) module has a [64kb limit](https://github.com/hMatoba/piexifjs/blob/7b9140ab8ebb8ff620bb20f6319a337dd150092b/piexif.js#L236-L243) when reading thumbnails.
-If you get the _Given thumbnail is too large_ error, you can try to remove the thumbnail from the image before rotating it:
-
-```js
-import piexif from 'piexifjs'
-
-function deleteThumbnailFromExif(imageBuffer) {
-  const imageString = imageBuffer.toString('binary')
-  const exifObj = piexif.load(imageString)
-  delete exifObj['thumbnail']
-  delete exifObj['1st']
-  const exifBytes = piexif.dump(exifObj)
-  return Buffer.from(piexif.insert(exifBytes, imageString), 'binary')
+    next();
 }
+
+module.exports.autoroute = autorouteJson({
+  model: models.example,
+  resource: 'example',
+
+  // defining authentication here auto-applies it to all endpoints in this autoroute definition
+  authentication: isAdmin,
+
+  find: {},
+  create: {},
+  update: {},
+  delete: {},
+});
 ```
 
-## Changelog
+If you wanted to make it so that only admins are allowed to create, update or delete resources but **everyone** is able to retrieve resources then we can define authentication on each action block independently:
 
-This project uses [semver](http://semver.org/).
+```javascript
+const autorouteJson = require('express-autoroute-json');
+const { models } = require('../../../models');
 
-| Version | Date | Notes |
-| --- | --- | --- |
-| `8.0.1` | 2022-01-10 | Remove `colors` package from dependencies |
-| `8.0.0` | 2021-11-12 | Node 16 support<br>Drop support for Node 10 |
-| `7.1.1` | 2020-10-11 | Introduce code coverage<br>Fix an error if `options` are not passed |
-| `7.1.0` | 2020-10-10 | Introduce `jpegjsMaxResolutionInMP` & `jpegjsMaxMemoryUsageInMB` options (#26) |
-| `7.0.0` | 2020-09-19 | Don't publish test and linting files on NPM |
-| `6.0.0` | 2020-05-30 | Dependencies update<br>Drop support for Node < 10<br>From `jpeg-js` update: _images larger than 100 megapixels or requiring more than 512MB of memory to decode will throw_ |
-| `5.0.3` | 2019-12-24 | Fix multiple file support in CLI<br>Dependencies update |
-| `5.0.2` | 2019-09-28 | Dependencies update |
-| `5.0.1` | 2019-06-08 | Fix CLI support |
-| `5.0.0` | 2019-03-03 | Drop `--jobs` CLI option<br>Drop support for Node 6 & 7<br>Introduce new `quality` property in the `jo.rotate` callback<br>Public API now supports both callbacks and Promises<br>Update documentation accordingly<br>Update dependencies |
-| `4.0.1` | 2018-11-29 | Fix rotations `5` and `7` (issue #11) |
-| `4.0.0` | 2018-07-15 | Drop support for Node 4 & 5<br>Unpublish lockfile<br>Use prettier for code formatting<br>Update documentation<br>Update dependencies |
-| `3.1.0` | 2017-12-03 | Output dimensions after rotation |
-| `3.0.1` | 2017-07-30 | Node 8 support<br>Update dependencies |
-| `3.0.0` | 2017-02-11 | CLI supports `glob`<br>No more `node 0.12` support<br>Drop semicolons<br>Add eslint rules |
-| `2.0.0` | 2016-06-03 | Supports buffers in entry<br>Returns a buffer even if there was an error<br>Improves tests |
-| `1.1.0` | 2016-04-23 | Adds test suite, removes lwip dependency |
-| `1.0.3` | 2016-03-29 | Displays help when no path given in CLI |
-| `1.0.2` | 2016-03-21 | Adds missing options in CLI help |
-| `1.0.1` | 2016-03-21 | Fixes NPM publishing fail ^\_^ |
-| `1.0.0` | 2016-03-21 | Initial version |
+function isAdmin(req, res, next) {
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(401).send("You are not an admin");
+    }
+    next();
+}
 
-## License
+module.exports.autoroute = autorouteJson({
+  model: models.example,
+  resource: 'example',
 
-This project is released under the [MIT License](license.md).
+  find: {},
+  create: {
+    authentication: isAdmin,
+  },
+  update: {
+    authentication: isAdmin,
+  },
+  delete: {
+    authentication: isAdmin,
+  },
+});
+```
 
-## Contributing
+## Further Documentation
 
-Bug reports and feature requests are welcome! More details in the [contribution guidelines](contributing.md).
+We are in the process of developing some more in-depth documentation (including courses) as part of the [Authmaker](https://authmaker.com) Curriculum. As I said above you **do not** need to use Authmaker if you want to to use express-autoroute-json, however the current [Authmaker documentation](https://beginner-guides.authmaker.com/current/index) is the most complete documentation of using this entire system in a full-stack application.
 
-## Credits
+There is a tiny bit more documentation on the [wiki](https://github.com/stonecircle/express-autoroute-json/wiki) but if you have any questions or want to request some specific documentation you can reach out to me [on Twitter](https://twitter.com/real_ate)
 
-* [piexifjs](https://github.com/hMatoba/piexifjs)
-* [jpeg-js](https://github.com/eugeneware/jpeg-js)
-* [exif-orientation-examples](https://github.com/recurser/exif-orientation-examples)
-* [yargs](https://github.com/bcoe/yargs)
-* [FontAwesome](http://fontawesome.io/)
-* [Chai](http://chaijs.com/)
-* [Mocha](http://mochajs.org)
-* [eslint](http://eslint.org)
-* [glob](https://github.com/isaacs/node-glob)
-* [prettier](https://prettier.io/)
+# Licence
+Copyright (c) 2018, Stone Circle <info@stonecircle.ie>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

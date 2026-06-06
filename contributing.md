@@ -1,21 +1,20 @@
-# Contributing
+# How To Contribute
 
-First off, thanks for taking the time to contribute! :tada:
+This is a fully Open Source project and we will gladly accept PRs and contributions!
 
-## Bugs and questions
+We would especially appreciate any help with documentation and any feedback you might have if you have tried out this library. You can reach out to me [on Twitter](https://twitter.com/real_ate) if you would like to get in touch.
 
-Report bugs, ask questions, and request features using [GitHub Issues](https://github.com/johansatge/jpeg-autorotate/issues).
+## Installation
 
-When submitting a bug report, do not hesitate to be as exhaustive as possible, by adding:
+* Clone this repository
+* `npm install`
 
-* A quick summary of the bug
-* The expected and actual behavior
-* The platform you are using (operating system, Node.js version...)
-* A code sample
-* Any other information that you think would be useful
+## Running tests
 
-## Working on the project
+* `npm run lint:js` - Runs eslint against the codebase (this is configured on Travis)
 
-When contributing to this repository, please create an issue first, so the change you wish to make can be discussed with the other maintainers.
+You need to run [MongoDB](https://www.mongodb.com/) locally to be able to run the tests. If you do not have mongo running locally you can use the `start-docker` and `stop-docker` scripts to manage a local mongo image
 
-When you submit code changes, your submissions are understood to be under the same license that covers the project. Feel free to contact the maintainers if that's a concern.
+* `npm run start-docker` - You only need this if you don't already have MongoDB running locally
+* `npm test`
+* `npm run stop-docker` - Stops the docker image if you started it
