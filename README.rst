@@ -1,47 +1,53 @@
-跟我一起写Makefile (PDF重制版)
-##############################
+Django widgets for replacing textareas with CodeMirror, an in-browser code editor.
+Tested on Django 3.2+, support Python 3.10+.
 
-.. image:: https://travis-ci.org/seisman/how-to-write-makefile.svg?branch=master
-    :target: https://travis-ci.org/seisman/how-to-write-makefile
+Installing
+==========
 
-简介
-----
+1. run ``pip install django-codemirror2``
+2. Add ``codemirror2`` to INSTALLED_APPS
+3. Collect static files: ``python manage.py collectstatic``
 
-《跟我一起写Makefile》是 `陈皓`_ 发表在其CSDN博客上的系列文章。该系列文章翻译整理自 `GNU Make Manual`_ ，一直受到读者的推荐，是很多人学习Makefile的首选文档。目前网络上流传的PDF版本多为祝冬华整理的版本。这个版本的排版一般，代码部分没有做任何语法高亮。
+To use django-codemirror2 directly from git, you need to initialize
+the Codemirror submodule by running ``git submodule init && git submodule update``.
 
-2010年初学Makefile的时候，读了前几章皮毛，一直用到了现在。最近想着重新学习一下Makefile，顺便学习一下Sphinx，重新制作一个更精美的PDF版本。
 
-相关
-----
+Usage
+=====
 
-- 书的文字部分来自于 `Andriki`_ 提供的Mediawiki源码；
-- 使用 `Sphinx`_ 制作文档
-- 项目主页： https://github.com/seisman/how-to-write-makefile
-- 网页在线版： https://seisman.github.io/how-to-write-makefile/
-- PDF下载： https://seisman.github.io/how-to-write-makefile/Makefile.pdf
+::
 
-本地编译
---------
+    from django import forms
+    from codemirror2.widgets import CodeMirrorEditor
 
-#. Clone项目到本地::
+    class TestForm(forms.Form):
+        css = forms.Charfield(widget=CodeMirrorEditor(options={'mode': 'css'}))
 
-   $ git clone https://github.com/seisman/how-to-write-makefile.git
+The ``options`` argument will be passed as JSON to ``CodeMirror.fromTextArea``, see
+http://codemirror.net/manual.html#config for possible values. Do not pass user-controlled
+data as options, as this can lead to an XSS vulnerability.
 
-#. 安装依赖::
+If you want to use a mode that depends on other modes, for example ``htmlmixed``, you
+need to load the dependencies, too, by passing the ``modes`` parameter:
 
-   $ pip install -r requirements.txt
+::
 
-#. 编译生成HTML::
+    html = forms.Charfield(widget=CodeMirrorEditor(modes=['css', 'xml', 'javascript', 'htmlmixed'],
+                options={'mode': 'htmlmixed'}))
 
-   $ make html
-   $ firefox build/html/index.html&
+If you want to customize the Javascript used to initialize the CodeMirror editor, use ``script_template``::
 
-#. 编译生成PDF（要求安装TeXLive 2016）::
+    foo = forms.Charfield(widget=CodeMirrorEditor(options={'mode': 'xml'}, 
+                script_template='some/template.html'))
 
-   $ make latexpdf
-   $ evince build/latex/Makefile.pdf&
+You can base your script template on the included template ``codemirror_script.html``.
 
-.. _`陈皓`: http://coolshell.cn/haoel
-.. _`Andriki`: http://andriki.com/mediawiki/index.php?title=Linux:%E8%B7%9F%E6%88%91%E4%B8%80%E8%B5%B7%E5%86%99Makefile
-.. _`Sphinx`: http://sphinx-doc.org/
-.. _`GNU Make Manual`: https://www.gnu.org/software/make/manual/
+
+Example app
+===========
+
+There is a simple example app included. To run it:
+
+1. run ``tox -e devenv``
+2. run ``./run_example_server.sh``
+3. visit http://localhost:8000/admin/testapp/ in your browser.
