@@ -1,11 +1,32 @@
-.project
-.pydevproject
+/commcare-cloud-bootstrap/specs
+!/commcare-cloud-bootstrap/specs/example*.yml
+.generated*
+!tests/test_envs/*/.generated.yml
+tests/migration_config/plans/new_node/migration_build_env1_plan/
+tests/file_migration_data/.generated_data
 *.swp
-
-*.pyc
-
+/config
+.vagrant/
+DimagiKeyStore
+.idea/
 .DS_Store
+**/ansible/*.retry
+*.pyc
+*.egg-info
+*.pickle
+*~
+/build
+/dist
+/.vscode
+couchdb@*_files
+**/config.py
+**/migrations/*/migration_build_*/
+**/migrations/*/copy_file_scripts_*/
+ 
+ # pyenv
+.python-version
 
-artist.egg-info
-build/
-dist/
+ # vault rotation temporary database
+.vault_rotation_db.kdbx
+
+/quick_monolith_install/install-config.yml

@@ -1,0 +1,396 @@
+account_alias: commcare-india
+terraform_version: '0.13'
+state_bucket: dimagi-terraform
+state_bucket_region: "us-east-1"
+region: "ap-south-1"
+environment: "india"
+ssl_policy: 'ELBSecurityPolicy-FS-1-2-Res-2020-10'
+azs:
+  - "ap-south-1a"
+  - "ap-south-1b"
+  - "ap-south-1c"
+az_codes:
+  - a
+  - b
+  - c
+vpc_begin_range: "10.203"
+
+openvpn_image: ami-085d67fbfe42a25e7
+
+vpn_connections: []
+
+external_routes: []
+
+ec2_metadata_tokens_required: yes
+servers:
+  - server_name: "control0-india"
+    server_instance_type: "t3.medium"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: control
+    os: bionic
+
+  - server_name: "djangomanage1-india"
+    server_instance_type: "t3.small"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: control
+    os: bionic
+
+  - server_name: "web2-india"
+    server_instance_type: "r5a.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 500
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: control
+    os: bionic
+    server_auto_recovery: true
+
+  - server_name: "web3-india"
+    server_instance_type: "r5a.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: control
+    os: bionic
+    server_auto_recovery: true
+
+  - server_name: "celery4-india"
+    server_instance_type: "t3.large"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: celery
+    os: bionic
+
+  - server_name: "celery5-india"
+    server_instance_type: "t3.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: celery
+    os: bionic
+
+  - server_name: "celery6-india"
+    server_instance_type: "t3.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: celery
+    os: bionic
+
+  - server_name: "couch5-india"
+    server_instance_type: "r5.xlarge"
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    block_device:
+      volume_size: 270
+      encrypted: yes
+      volume_type: "gp3"
+    group: couchdb2
+    os: bionic
+  
+  - server_name: "couch8-india"
+    server_instance_type: "r5.xlarge"
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    block_device:
+      volume_size: 250
+      encrypted: yes
+      volume_type: "gp3"
+    group: couchdb2
+    os: bionic
+
+  - server_name: "couch9-india"
+    server_instance_type: "r5.xlarge"
+    network_tier: "db-private"
+    az: "c"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    block_device:
+      volume_size: 250
+      encrypted: yes
+      volume_type: "gp3"
+    group: couchdb2
+    os: bionic
+   
+  - server_name: "esmaster2-india"
+    server_instance_type: t3.medium
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 40
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: "elasticsearch"
+    os: bionic
+    
+  - server_name: "esmaster3-india"
+    server_instance_type: t3.medium
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 40
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: "elasticsearch"
+    os: bionic
+    
+  - server_name: "esmaster4-india"
+    server_instance_type: t3.medium
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 40
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: "elasticsearch"
+    os: bionic
+
+  - server_name: "es0-india"
+    server_instance_type: "m5a.xlarge"
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 150
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: elasticsearch
+    os: bionic
+
+  - server_name: "es2-india"
+    server_instance_type: "m5a.xlarge"
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 150
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: elasticsearch
+    os: ubuntu_pro_bionic
+
+  - server_name: "escoordinator1-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 150
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: elasticsearch
+    os: ubuntu_pro_bionic
+
+  - server_name: "escoordinator2-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 150
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: elasticsearch
+    os: ubuntu_pro_bionic
+
+  - server_name: "escoordinator3-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "c"
+    volume_size: 150
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: elasticsearch
+    os: ubuntu_pro_bionic
+
+  - server_name: "formplayer1-india"
+    server_instance_type: "t3.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 200
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: formplayer
+    os: bionic
+    server_auto_recovery: true
+
+  - server_name: "pillow3-india"
+    server_instance_type: "t3.xlarge"
+    network_tier: "app-private"
+    az: "a"
+    volume_size: 60
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: pillowtop
+    os: bionic
+
+  - server_name: "kafka1-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 50
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: kafka
+    os: bionic
+
+  - server_name: "kafka2-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "c"
+    volume_size: 50
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: kafka
+    os: bionic
+
+  - server_name: "kafka3-india"
+    server_instance_type: "t3.large"
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 50
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: kafka
+    os: bionic
+
+  - server_name: "pgbouncer0-india"
+    server_instance_type: t3.small
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: "postgresql"
+    os: bionic
+
+  - server_name: "pgbouncer1-india"
+    server_instance_type: t3.small
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: "postgresql"
+    os: ubuntu_pro_bionic
+
+  - server_name: "pgbouncer2-india"
+    server_instance_type: t3.small
+    network_tier: "db-private"
+    az: "b"
+    volume_size: 80
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: "postgresql"
+    os: ubuntu_pro_bionic
+
+  - server_name: "rabbit_a3-india"
+    server_instance_type: t3.small
+    network_tier: "db-private"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: "rabbitmq"
+    os: ubuntu_pro_bionic
+
+  - server_name: "rabbit_c4-india"
+    server_instance_type: t3.small
+    network_tier: "db-private"
+    az: "c"
+    volume_size: 80
+    volume_encrypted: yes
+    volume_type: "gp3"
+    group: "rabbitmq"
+    os: ubuntu_pro_bionic
+
+proxy_servers:
+  - server_name: "proxy2-india"
+    server_instance_type: "t3.medium"
+    network_tier: "public"
+    az: "a"
+    volume_size: 80
+    volume_encrypted: no
+    volume_type: "gp3"
+    group: proxy
+    os: bionic
+
+rds_instances:
+  - identifier: "pgmain0-india"
+    instance_type: "db.t3.large"
+    storage: 500
+    multi_az: true
+    engine_version: "10.17"
+
+pgbouncer_nlbs:
+  - name: pgformplayer_nlb-india
+    targets:
+      - pgbouncer0-india
+      - pgbouncer1-india
+  - name: pgmain_nlb-india
+    targets:
+      - pgbouncer0-india
+  - name: pgucr_nlb-india
+    targets:
+      - pgbouncer0-india
+  - name: pgsynclogs_nlb-india
+    targets:
+      - pgbouncer0-india
+  - name: pgshard_nlb-india
+    targets:
+      - pgbouncer1-india
+      - pgbouncer2-india
+
+internal_albs:
+  - name: "couch_alb-india"
+    listener_port: 25984
+    target_port: 15984
+    targets:
+      - couch5-india
+      - couch8-india
+      - couch9-india
+
+elasticache_cluster:
+  create: yes
+  cache_node_type: "cache.r5.large"
+  cache_engine_version: "4.0.10"
+  cache_prameter_group: "default.redis4.0"
+  automatic_failover: true
+  transit_encryption: false
+  at_rest_encryption: true
+  auto_minor_version: false
+  cluster_size: 2
+  multi_az: true
+  maintenance_window: "sun:00:30-sun:01:30"
+  snapshot_retention: 7
+  snapshot_window: "10:30-11:30"
+
+r53_private_zone:
+  create: yes
+  domain_name:  "india.commcare.local"
+  create_record: yes
+  route_names:  "redis"
+
+efs_file_systems:
+  - efs_name: "efs_india"
+    create: yes
+    transition_to_ia:  "AFTER_7_DAYS"
+    create_access: no
+    create_mount: yes
+    create_record: yes
+    domain_name: "india.commcare.local"
+    route_names: "shared-efs"

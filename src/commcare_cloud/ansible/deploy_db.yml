@@ -1,0 +1,46 @@
+---
+- name: Common Database Machine Setup
+  hosts:
+    - redis
+    - elasticsearch
+    - rabbitmq
+    - formplayer
+    - django_manage
+  become: true
+  roles:
+    - {role: ecryptfs, tags: 'ecryptfs'}
+    - {role: backups, tags: 'backups,backups-only'}
+
+- name : PostgreSQL
+  import_playbook: deploy_postgres.yml
+
+- name : CitusDB
+  import_playbook: deploy_citusdb.yml
+
+- import_playbook: deploy_couchdb2.yml
+
+- name: Redis
+  import_playbook: deploy_redis.yml
+
+- name: Elasticsearch
+  hosts: elasticsearch
+  become: true
+  roles:
+    - {role: elasticsearch, tags: 'elasticsearch'}
+
+- import_playbook: deploy_rabbitmq.yml
+  tags:
+    - rabbitmq
+
+- import_playbook: deploy_kafka.yml
+  tags:
+    - kafka
+    - zookeeper
+
+# Note other machines also have java installed, but are initiated through the meta task
+- name: Java
+  become: true
+  hosts:
+    - celery
+  roles:
+    - {role: java, tags: java}

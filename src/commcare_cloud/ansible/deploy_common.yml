@@ -1,0 +1,143 @@
+- import_playbook: host_group_aliases.yml
+
+- name: Bootstrap Machine
+  hosts: all
+  become: true
+  roles:
+    - role: bootstrap-machine
+      tags:
+        - bootstrap-machine
+        - common
+
+- name: Common
+  hosts: all_commcarehq
+  become: true
+  roles:
+    - common
+  tags: common
+
+- name: ufw (firewall)
+  hosts: 'all_commcarehq:!proxy:!cas_proxy:!pna_proxy:!couchdb2_proxy:!reach_proxy'
+  become: true
+  roles:
+    - {role: ufw, tags: ufw, when: ufw_private_interface is defined}
+  tags: common
+
+- name: ufw (proxy firewall)
+  hosts: 'proxy:cas_proxy:pna_proxy:couchdb2_proxy:reach_proxy'
+  become: true
+  tasks:
+    - import_tasks: roles/ufw/tasks/proxy_ufw.yml
+      when: ufw_private_interface is defined or is_monolith|bool
+      tags: ufw-proxy
+  tags: common
+
+- name: ufw off (firewall)
+  hosts: all_commcarehq
+  become: true
+  tasks:
+    - ufw: state=disabled
+      when: ufw_private_interface is not defined and not is_monolith|bool
+      tags: ufw
+  tags: common
+
+- name: Datadog agent
+  hosts: all_commcarehq
+  become: true
+  roles:
+    - {role: datadog, tags: datadog, when: DATADOG_ENABLED|bool}
+  tags: common
+
+- name: Configure monit
+  hosts: all_commcarehq
+  roles:
+    - {role: monit, tags: monit}
+  tags: common
+
+- name: Configure static routes
+  hosts: all_commcarehq
+  tasks:
+
+  - name: Checks existing static routes
+    shell: 'ip route show {{ item.prefix }} | wc -l'
+    with_items: "{{ static_routes }}"
+    become: True
+    register: static_routes_status
+    changed_when: false
+    when: static_routes|default(false)
+    tags:
+      - static-routes
+      - after-reboot
+
+  - name: Adds static routes
+    shell: "route {{ item.item.cmd }} -net {{ item.item.prefix }} gw {{ item.item.gateway }}"
+    become: true
+    with_items: "{{ static_routes_status.results }}"
+    when: static_routes|default(false) and ((item.stdout == "0" and item.item.cmd == "add") or (item.stdout == "1" and item.item.cmd == "del"))
+    tags:
+      - static-routes
+      - after-reboot
+  tags: common
+
+- name: DNS configuration
+  hosts: all_commcarehq
+  tasks:
+
+  - name: Checks existing resolv.conf
+    stat:
+      path: /run/systemd/resolve/resolv.conf
+    register: resolvconf
+    tags:
+      - dns
+      - after-reboot
+  
+  - name: Checks resolv.conf stat
+    stat:
+      path: /etc/resolv.conf
+    register: etc_resolv_conf
+    tags:
+      - dns
+      - after-reboot
+
+  - name: Updating resolv.conf symbolic link 
+    when: ansible_distribution == "Ubuntu" and resolvconf.stat.exists and etc_resolv_conf.stat.islnk is defined and etc_resolv_conf.stat.islnk
+    become: yes
+    file:
+      src: /run/systemd/resolve/resolv.conf
+      dest: /etc/resolv.conf
+      state: link
+    tags:
+      - dns
+      - after-reboot
+  
+  - name: set running configuration
+    become: yes
+    lineinfile:
+      dest: /etc/resolv.conf
+      line: 'nameserver {{ item }}'
+    with_items: "{{ nameservers }}"
+    when: nameservers is defined
+    tags:
+      - dns
+      - after-reboot
+
+  - name: set resolvconf base configuration
+    become: yes
+    lineinfile:
+      dest: /etc/resolvconf/resolv.conf.d/base
+      line: 'nameserver {{ item }}'
+      create: yes
+    with_items: "{{ nameservers }}"
+    when: nameservers is defined
+    tags:
+      - dns
+      - after-reboot
+  tags: common
+  
+- name: Deploy lpar2rrd agent and server
+  hosts: all
+  become: yes
+  roles:
+    - role: lpar2rrd
+      when: lpar2rrd_agent_enabled | default(False)
+  tags: lpar2rrd        
