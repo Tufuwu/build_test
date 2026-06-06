@@ -1,43 +1,37 @@
 {
-  "name": "inline-source-map",
-  "version": "0.6.2",
-  "description": "Adds source mappings and base64 encodes them, so they can be inlined in your generated file.",
+  "name": "nodemailer-express-handlebars",
+  "version": "6.1.2",
+  "description": "A plugin for nodemailer that uses express-handlebars view engine to generate emails",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test-main": "tap test/*.js",
-    "test-0.8": "nave use 0.8 npm run test-main",
-    "test-0.10": "nave use 0.10 npm run test-main",
-    "test-0.12": "nave use 0.12 npm run test-main",
-    "test": "npm run test-main"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/thlorenz/inline-source-map.git"
-  },
-  "homepage": "https://github.com/thlorenz/inline-source-map",
-  "dependencies": {
-    "source-map": "~0.5.3"
-  },
-  "devDependencies": {
-    "tap": "~0.7.0",
-    "nave": "~0.5.0"
+    "test": "mocha --recursive test/tests"
   },
   "keywords": [
-    "source",
-    "map",
-    "inline",
-    "base64",
-    "bundle",
-    "generate",
-    "transpile"
+    "nodemailer",
+    "html",
+    "express-handlebars",
+    "handlebars"
   ],
-  "author": {
-    "name": "Thorsten Lorenz",
-    "email": "thlorenz@gmx.de",
-    "url": "http://thlorenz.com"
+  "author": "Vadim Kazakov <yads12@gmail.com>",
+  "homepage": "https://github.com/yads/nodemailer-express-handlebars",
+  "bugs": "https://github.com/yads/nodemailer-express-handlebars/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yads/nodemailer-express-handlebars"
   },
   "license": "MIT",
-  "engine": {
-    "node": ">=0.6"
+  "peerDependencies": {
+    "express-handlebars": ">= 8.0.0",
+    "nodemailer": ">= 6.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "express-handlebars": "^8.0.0",
+    "mocha": "^10.0.0",
+    "nodemailer": "^6.4.6"
+  },
+  "engines": {
+    "node": ">= 20"
   }
 }
