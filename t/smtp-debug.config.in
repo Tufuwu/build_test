@@ -1,5 +1,0 @@
-[multimailhook]
-	mailingList = Matthieu.Moy@imag.fr
-	mailer = smtp
-	smtpServer = mailhost.imag.fr
-	smtpServerDebugLevel = 1

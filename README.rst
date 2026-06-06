@@ -1,1 +1,0 @@
-git-multimail/README.rst
