@@ -1,5 +1,2 @@
-external/**
-jquery-ui/**
-template/**
-tmp/**
-*.min.js
+node_modules
+dist
