@@ -1,1 +1,0 @@
-exports.test = () => 'component/mobile.android';

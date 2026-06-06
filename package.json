@@ -1,36 +1,51 @@
 {
-  "name": "arc",
-  "private": true,
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "postinstall": "lerna bootstrap --hoist --no-ci",
-    "test": "NODE_OPTIONS=--openssl-legacy-provider nyc mocha packages/arc-*/test* --timeout=30000",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+  "author": "Alberto Terragni",
+  "bugs": "https://github.com/ilterra/markdown-yaml-metadata-parser/issues",
+  "dependencies": {
+    "detect-newline": "^3.1.0",
+    "js-yaml": "^4.1.0"
   },
-  "author": "Michael Rawlings <ml.rawlings@gmail.com>",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ],
+  "description": "Parse YAML metadata (front matter) in a markdown document",
   "devDependencies": {
-    "chai": "^4.1.2",
-    "codecov": "^3.0.0",
-    "lerna": "^6.6.2",
-    "memory-fs": "^0.4.1",
-    "mocha": "^10.0.0",
-    "nyc": "^15.1.0"
+    "ascjs": "^6.0.3",
+    "mkdirp": "^3.0.1",
+    "standard": "^17.1.2"
   },
-  "nyc": {
-    "exclude": [
-      "**/test.js",
-      "**/test/**",
-      "**/coverage/**",
-      "**/.cache/**",
-      "packages/example-*"
-    ],
-    "cache": true,
-    "all": true
-  }
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "exports": {
+    "require": "./cjs/lib/index.js",
+    "default": "./lib/index.js"
+  },
+  "files": [
+    "cjs",
+    "lib"
+  ],
+  "keywords": [
+    "front matter",
+    "markdown",
+    "metadata",
+    "parser",
+    "yaml"
+  ],
+  "license": "MIT",
+  "main": "./cjs/lib/index.js",
+  "module": "./lib/index.js",
+  "name": "markdown-yaml-metadata-parser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ilterra/markdown-yaml-metadata-parser"
+  },
+  "scripts": {
+    "build": "mkdirp cjs/lib cjs/test && ascjs lib cjs/lib --no-default && ascjs test cjs/test --no-default",
+    "lint": "standard --fix",
+    "prepublishOnly": "npm run build",
+    "pretest": "standard && npm run build",
+    "test": "npm run test:esm && npm run test:cjs",
+    "test:cjs": "node --test --experimental-test-coverage cjs/test/*.test.js",
+    "test:esm": "node --test --experimental-test-coverage test/*.test.js"
+  },
+  "type": "module",
+  "version": "4.0.0"
 }
