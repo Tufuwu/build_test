@@ -1,4 +1,0 @@
-
-
-# > typeof __filename
-# 'string'
