@@ -1,283 +1,351 @@
-[![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Coverage Status][coverage-image]][coverage-url]
+[![npm][npm]][npm-url]
+[![build][build]][build-url]
+[![deps][deps]][deps-url]
 
-# Rickshaw
+# typings-for-css-modules-loader
 
-Rickshaw is a JavaScript toolkit for creating interactive time series graphs, developed at [Shutterstock](http://www.shutterstock.com)
+Webpack loader that generates TypeScript typings for CSS modules from css-loader on the fly
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-## Table of Contents
+## Disclaimer
 
-- [Getting Started](#getting-started)
-- [Install](#install)
-  - [Dependencies](#dependencies)
-- [Rickshaw.Graph](#rickshawgraph)
-      - [element](#element)
-      - [series](#series)
-      - [renderer](#renderer)
-      - [width](#width)
-      - [height](#height)
-      - [min](#min)
-      - [max](#max)
-      - [padding](#padding)
-      - [interpolation](#interpolation)
-      - [stack](#stack)
-  - [Methods](#methods)
-      - [render()](#render)
-      - [configure()](#configure)
-      - [onUpdate(f)](#onupdatef)
-- [Extensions](#extensions)
-- [Rickshaw.Color.Palette](#rickshawcolorpalette)
-    - [Color Schemes](#color-schemes)
-    - [Interpolation](#interpolation)
-- [Rickshaw and Cross-Browser Support](#rickshaw-and-cross-browser-support)
-- [Minification](#minification)
-- [Development](#development)
-- [Contributing](#contributing)
-- [Authors](#authors)
-- [License](#license)
+This repository is a fork of the unmaintained https://github.com/Jimdo/typings-for-css-modules-loader repository.
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+## Installation
 
+Install via npm `npm install --save-dev @teamsupercell/typings-for-css-modules-loader`
 
-## Getting Started
+**webpack.config.js**
 
-Getting started with a simple graph is straightforward.  Here's the gist:
-
-```javascript
-var graph = new Rickshaw.Graph( {
-  element: document.querySelector('#graph'),
-  series: [
-    {
-      color: 'steelblue',
-      data: [ { x: 0, y: 23}, { x: 1, y: 15 }, { x: 2, y: 79 } ]
-    }, {
-      color: 'lightblue',
-      data: [ { x: 0, y: 30}, { x: 1, y: 20 }, { x: 2, y: 64 } ]
-    }
-  ]
-} );
-
-graph.render();
-```
-See the [overview](https://shutterstock.github.io/rickshaw/), [tutorial](http://shutterstock.github.com/rickshaw/tutorial/introduction.html), and [examples](http://shutterstock.github.com/rickshaw/examples/) for more.
-
-## Install
-
-In the browser, manually add `rickshaw.min.js` and `rickshaw.min.css` in the document head.
-
-Alternatively, you can install Rickshaw using [Bower](https://bower.io/) or [npm](https://npmjs.com).
-
-```sh
-# With bower
-bower install rickshaw
-# With npm
-npm install --save rickshaw
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          "style-loader",
+          "@teamsupercell/typings-for-css-modules-loader",
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
-### Dependencies
+## Options
 
-Rickshaw relies on the fantastic [D3 visualization library](http://mbostock.github.com/d3/) to do lots of the heavy lifting for stacking and rendering to SVG.
+|                       Name                        |    Type     |                         Description                          |
+| :-----------------------------------------------: | :---------: | :----------------------------------------------------------: |
+|              **[`banner`](#banner)**              | `{String}`  |   To add a 'banner' prefix to each generated `*.d.ts` file   |
+|           **[`formatter`](#formatter)**           | `{String}`  | Formats the generated `*.d.ts` file with specified formatter, eg. `prettier` |
+|                 **[`eol`](#eol)**                 | `{String}`  |   Newline character to be used in generated `*.d.ts` files   |
+|          **[`verifyOnly`](#verifyOnly)**          | `{Boolean}` | Validate generated `*.d.ts` files and fail if an update is needed (useful in CI) |
+| **[`disableLocalsExport`](#disableLocalsExport)** | `{Boolean}` |              Disable the use of locals export.               |
+| **[`prettierConfigFile`](#prettierConfigFile)**   | `{String}`  |                 Path to prettier config file                 |
 
-Some extensions require [jQuery](http://jquery.com) and [jQuery UI](http://jqueryui.com), but for drawing some basic graphs you'll be okay without.
+### `banner`
 
-Rickshaw uses [jsdom](https://github.com/tmpvar/jsdom) to run unit tests in Node to be able to do SVG manipulation. As of the jsdom 7.0.0 release, jsdom requires Node.js 4 or newer [jsdom changelog](https://github.com/tmpvar/jsdom/blob/master/Changelog.md#700). If you want to run the tests on your machine, and you don't have access to a version of node >= 4.0, you can `npm install jsdom@3`  so that you can run the tests using the [3.x branch of jsdom](https://github.com/tmpvar/jsdom/tree/3.x).
+To add a "banner" prefix to each generated `*.d.ts` file, you can pass a string to this option as shown below. The prefix is quite literally prefixed into the generated file, so please ensure it conforms to the type definition syntax.
 
-## Rickshaw.Graph
-
-A Rickshaw graph.  Send an `element` reference, `series` data, and optionally other properties to the constructor before calling `render()` to point the graph.  A listing of properties follows.  Send these as arguments to the constructor, and optionally set them later on already-instantiated graphs with a call to `configure()`
-
-##### element
-
-A reference to an HTML element that should hold the graph.
-
-##### series
-
-Array of objects containing series data to plot.  Each object should contain `data` at a minimum, a sorted array of objects each with x and y properties.  Optionally send a `name` and `color` as well.  Some renderers and extensions may also support additional keys.
-
-##### renderer
-
-A string containing the name of the renderer to be used.  Options include `area`, `stack`, `bar`, `line`, and `scatterplot`.  Defaults to `line`. Also see the `multi` meta renderer in order to support different renderers per series.
-
-##### width
-
-Width of the graph in pixels.  Falls back to the width of the `element`, or defaults to 400 if the element has no width.
-
-##### height
-
-Height of the graph in pixels.  Falls back to the height of the `element`, or defaults to 250 if the element has no height.
-
-##### min
-
-Lower value on the Y-axis, or `auto` for the lowest value in the series.  Defaults to 0.
-
-##### max
-
-Highest value on the Y-axis.  Defaults to the highest value in the series.
-
-##### padding
-
-An object containing any of `top`, `right`, `bottom`, and `left` properties specifying a padding percentage around the extrema of the data in the graph.  Defaults to 0.01 on top for 1% padding, and 0 on other sides. Padding on the bottom only applies when the `yMin` is either negative or `auto`.
-
-##### interpolation
-
-Line smoothing / interpolation method (see [D3 docs](https://github.com/mbostock/d3/wiki/SVG-Shapes#wiki-line_interpolate)); notable options:
-
-  * `linear`: straight lines between points
-  * `step-after`: square steps from point to point
-  * `cardinal`: smooth curves via cardinal splines (default)
-  * `basis`: smooth curves via B-splines
-
-##### stack
-
-Allows you to specify whether series should be stacked while in the context of stacking renderers (area, bar, etc).  Defaults to `stack: 'true'`. To unstack, `unstack: 'true'`.
-
-### Methods
-
-Once you have instantiated a graph, call methods below to get pixels on the screen, change configuration, and set callbacks.
-
-##### render()
-
-Draw or redraw the graph.
-
-##### configure()
-
-Set properties on an instantiated graph.  Specify any properties the constructor accepts, including `width` and `height` and `renderer`.  Call `render()` to redraw the graph and reflect newly-configured properties.
-
-##### onUpdate(f)
-
-Add a callback to run when the graph is rendered
-
-
-## Extensions
-
-Once you have a basic graph, extensions let you add functionality.  See the [overview](https://shutterstock.github.io/rickshaw/) and [examples](http://shutterstock.github.com/rickshaw/examples/) listing for more.
-
-* __Rickshaw.Graph.Legend__ - add a basic legend
-
-* __Rickshaw.Graph.HoverDetail__ - show details on hover
-
-* __Rickshaw.Graph.JSONP__ - get data via a JSONP request
-
-* __Rickshaw.Graph.Annotate__ - add x-axis annotations
-
-* __Rickshaw.Graph.RangeSlider__ - dynamically zoom on the x-axis with a slider
-
-* __Rickshaw.Graph.RangeSlider.Preview__ - pan and zoom via graphical preview of entire data set
-
-* __Rickshaw.Graph.Axis.Time__ - add an x-axis and grid lines with time labels
-
-* __Rickshaw.Graph.Axis.X__ - add an x-axis and grid lines with arbitrary labels
-
-* __Rickshaw.Graph.Axis.Y__ - add a y-axis and grid lines
-
-* __Rickshaw.Graph.Axis.Y.Scaled__ - add a y-axis with an alternate scale
-
-* __Rickshaw.Graph.Behavior.Series.Highlight__ - highlight series on legend hover
-
-* __Rickshaw.Graph.Behavior.Series.Order__ - reorder series in the stack with drag-and-drop
-
-* __Rickshaw.Graph.Behavior.Series.Toggle__ - toggle series on and off through the legend
-
-
-## Rickshaw.Color.Palette
-
-Rickshaw comes with a few color schemes. Instantiate a palette and specify a scheme name, and then call color() on the palette to get each next color.
-
-```javascript
-var palette = new Rickshaw.Color.Palette( { scheme: 'spectrum2001' } );
-
-palette.color() // => first color in the palette
-palette.color() // => next color in the palette...
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              banner:
+                "// autogenerated by typings-for-css-modules-loader. \n// Please do not change this file!"
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
-Optionally, to palette.color() can take a numeric argument to specify which color from the palette should be used (zero-indexed).  This can be helpful when assigning a color to series of a plot with particular meaning:
+### `formatter`
 
-```javascript
-var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
+Possible options: `none` and `prettier` (requires `prettier` package to be installed). Defaults to prettier if `prettier` module can be resolved.
 
-palette.color(0) // => first color in the palette - red in this example
-palette.color(2) // => third color in the palette - light blue
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              formatter: "prettier"
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
-#### Color Schemes
+### `eol`
 
-  * classic9
-  * colorwheel
-  * cool
-  * munin
-  * spectrum14
-  * spectrum2000
-  * spectrum2001
+Newline character to be used in generated `*.d.ts` files. By default a value from `require('os').eol` is used.
+This option is ignored when [`formatter`](#formatter) `prettier` is used.
 
-#### Interpolation
-
-For graphs with more series than palettes have colors, specify an `interpolatedStopCount` to the palette constructor.
-
-## Rickshaw and Cross-Browser Support
-
-This library works in modern browsers and Internet Explorer 9+.
-
-Rickshaw relies on the HTMLElement#classList API, which isn't natively supported in Internet Explorer 9.  Rickshaw adds support by including a shim which implements the classList API by extending the HTMLElement prototype.  You can disable this behavior if you like, by setting `RICKSHAW_NO_COMPAT` to a true value before including the library.
-
-## Minification
-
-If your project uses minification, you will need to give a hint to the minifier to leave variables named `$super` named `$super`.  For example, with uglify on the command line:
-
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              eol: "\r\n"
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
-$ uglify-js --reserved-names "$super" rickshaw.js > rickshaw.min.js
+
+### `verifyOnly`
+
+Validate generated `*.d.ts` files and fail if an update is needed (useful in CI).
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              verifyOnly: process.env.NODE_ENV === 'production'
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
-Or a sample configuration with `grunt-contrib-uglify`:
+### `disableLocalsExport`
 
-```javascript
-uglify: {
-  options: {
-    mangle: { except: ["$super"] }
+Disable the use of locals export. Defaults to `false`.
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              disableLocalsExport: true
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
+```
+
+### `prettierConfigFile`
+
+Path to the prettier config file
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              prettierConfigFile: resolve(__dirname, '../.prettierrc'),
+            }
+          },
+          {
+            loader: "css-loader",
+            options: { modules: true }
+          }
+        ]
+      }
+    ]
+  }
+};
+```
+
+
+
+## Example
+
+Imagine you have a file `~/my-project/src/component/MyComponent/myComponent.scss` in your project with the following content:
+
+```scss
+.some-class {
+  // some styles
+  &.someOtherClass {
+    // some other styles
+  }
+  &-sayWhat {
+    // more styles
   }
 }
 ```
 
-## Development
+Adding the `typings-for-css-modules-loader` will generate a file `~/my-project/src/component/MyComponent/myComponent.scss.d.ts` that has the following content:
 
-For building, we use [Node](http://nodejs.org) and [npm](http://npmjs.org). Running `npm run build` or `make` should get you going with any luck.
+```ts
+declare namespace MyComponentScssModule {
+  export interface IMyComponentScss {
+    "some-class": string;
+    someOtherClass: string;
+    "some-class-sayWhat": string;
+  }
+}
 
-After doing a build you can run the tests with the command: `npm test`
+declare const MyComponentScssModule: MyComponentScssModule.IMyComponentScss & {
+  /** WARNING: Only available when `css-loader` is used without `style-loader` or `mini-css-extract-plugin` */
+  locals: MyComponentScssModule.IMyComponentScss;
+};
 
-For more available options see the [package.json](package.json) scripts section.
+export = MyComponentScssModule;
+```
 
+```ts
+// using wildcard export when used with style-loader or mini-css-extract-plugin
+// or default export only when typescript `esModuleInterop` enabled
+import * as styles from "./myComponent.scss";
 
-## Contributing
+console.log(styles["some-class"]);
+console.log(styles.someOtherClass);
+```
 
-Pull requests are always welcome!  Please follow a few guidelines:
+```ts
+// using locals export when used without style-loader or mini-css-extract-plugin
+import { locals } from "./myComponent.scss";
 
-- Please don't include updated versions of `rickshaw.js` and `rickshaw.min.js`.  Just changes to the source files will suffice.
-- Add a unit test or two to cover the proposed changes
-- Do as the Romans do and stick with existing whitespace and formatting conventions (i.e., tabs instead of spaces, etc)
-- Consider adding a simple example under `examples/` that demonstrates any new functionality
+console.log(locals["some-class"]);
+console.log(locals.someOtherClass);
+```
 
-Please note that all interactions with Shutterstock follow the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+### Example in Visual Studio Code
 
-## Authors
+![typed-css-modules](https://cloud.githubusercontent.com/assets/749171/16340497/c1cb6888-3a28-11e6-919b-f2f51a282bba.gif)
 
-This library was developed by David Chester, Douglas Hunter, and Silas Sewell at [Shutterstock](http://www.shutterstock.com)
+## Upgrade from v1:
+- Update webpack config
+  - This package no longer replaces `css-loader`, but it has to be added alongside `css-loader`:
+  - `css-loader` is no longer a peer dependency due to the change above
+  - `css-loader` will need to be configured to output CSS Modules (e.g. `options: { modules: true; }`)
+```diff
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          "style-loader",
+          {
+            loader: "@teamsupercell/typings-for-css-modules-loader",
+            options: {
+              // pass all the options for `css-loader` to `css-loader`, eg.
+-             namedExport: true,
+-             modules: true
+            }
+          },
++         {
++           loader: "css-loader",
++           options: {
++             modules: true
++           }
++         },
+        ]
+      }
+    ]
+  }
+};
+```
 
+## Support
 
-## License
+As the loader just acts as an intermediary it can handle all kind of css preprocessors (`sass`, `scss`, `stylus`, `less`, ...).
+The only requirement is that those preprocessors have proper webpack loaders defined - meaning they can already be loaded by webpack anyways.
 
-Copyright (C) 2011-2020 by Shutterstock Images, LLC
+## Requirements
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The loader is supposed to be used with `css-loader`(https://github.com/webpack/css-loader). Thus it is a peer-dependency and the expected loader to create CSS Modules.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+## Known issues
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+### Webpack rebuilds / builds slow
 
-[npm-image]: https://img.shields.io/npm/v/rickshaw.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/rickshaw
-[travis-image]: https://travis-ci.org/shutterstock/rickshaw.svg?branch=master
-[travis-url]: https://travis-ci.org/shutterstock/rickshaw
-[coverage-image]: https://coveralls.io/repos/github/shutterstock/rickshaw/badge.svg?branch=master
-[coverage-url]: https://coveralls.io/github/shutterstock/rickshaw
+As the loader generates typing files, it is wise to tell webpack to ignore them.
+The fix is luckily very simple. Webpack ships with a "WatchIgnorePlugin" out of the box.
+Simply add this to your webpack plugins:
+
+```
+plugins: [
+    new webpack.WatchIgnorePlugin([
+      /css\.d\.ts$/
+    ]),
+    ...
+  ]
+```
+
+where `css` is the file extension of your style files. If you use `sass` you need to put `sass` here instead. If you use `less`, `stylus` or any other style language use their file ending.
+
+### Typescript does not find the typings
+
+As the webpack process is independent from your typescript "runtime" it may take a while for typescript to pick up the typings.
+
+It is possible to write a custom webpack plugin using the `fork-ts-checker-service-before-start` hook from https://github.com/TypeStrong/fork-ts-checker-webpack-plugin#plugin-hooks to delay the start of type checking until all the `*.d.ts` files are generated. Potentially, this plugin can be included in this repository.
+
+[npm]: https://img.shields.io/npm/v/@teamsupercell/typings-for-css-modules-loader.svg
+[npm-url]: https://npmjs.com/package/@teamsupercell/typings-for-css-modules-loader
+[build]: https://travis-ci.com/TeamSupercell/typings-for-css-modules-loader.svg?branch=master
+[build-url]: https://travis-ci.com/TeamSupercell/typings-for-css-modules-loader
+[deps]: https://david-dm.org/@teamsupercell/typings-for-css-modules-loader.svg
+[deps-url]: https://david-dm.org/@teamsupercell/typings-for-css-modules-loader

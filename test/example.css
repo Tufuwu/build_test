@@ -1,0 +1,11 @@
+.foo {
+  color: white;
+}
+
+.bar-baz {
+  color: green;
+}
+
+.composed {
+  composes: shared-style from "./example-shared.css";
+}
