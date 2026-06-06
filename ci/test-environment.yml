@@ -1,6 +1,0 @@
-name: test-env
-channels:
-  - conda-forge
-dependencies:
-  - anaconda-client
-  - pip
