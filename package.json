@@ -1,55 +1,57 @@
 {
-  "name": "nestor",
-  "type": "module",
-  "description": "Jenkins CLI and node.js client",
-  "keywords": [
-    "jenkins",
-    "ci",
-    "cli",
-    "api",
-    "client"
-  ],
-  "version": "3.1.2-pre.0",
-  "homepage": "https://github.com/cliffano/nestor",
-  "author": "Cliffano Subagio <blah@cliffano.com> (https://blog.cliffano.com)",
-  "contributors": [
-    "All contributors (https://github.com/cliffano/nestor/graphs/contributors)"
-  ],
-  "main": "./lib/jenkins.js",
-  "bin": {
-    "nestor": "./bin/nestor.js"
-  },
-  "preferGlobal": true,
+  "name": "download.jqueryui.com",
+  "version": "2.2.11",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cliffano/nestor.git"
+    "url": "https://github.com/jquery/download.jqueryui.com.git"
   },
-  "bugs": {
-    "url": "https://github.com/cliffano/nestor/issues"
-  },
-  "directories": {
-    "bin": "./bin",
-    "lib": "./lib",
-    "test": "./test"
-  },
+  "license": "MIT",
   "dependencies": {
-    "async": "^3.2.6",
-    "bagofcli": "^2.4.1",
-    "colors": "^1.4.0",
-    "cron": "^4.3.3",
-    "lodash": "^4.17.21",
-    "moment": "^2.30.1",
-    "rss-parser": "^3.13.0",
-    "swaggy-jenkins": "^3.1.0",
-    "xml2js": "^0.6.2"
+    "archiver": "5.3.0",
+    "async": "3.2.2",
+    "builder-amd": "0.0.3",
+    "builder-jquery-css": "0.0.4",
+    "dateformat": "4.5.1",
+    "eslint-config-jquery": "3.0.0",
+    "express": "4.17.1",
+    "fast-glob": "3.2.7",
+    "formidable": "1.2.2",
+    "gm": "1.23.1",
+    "grunt": "1.5.3",
+    "grunt-check-modules": "1.1.0",
+    "grunt-cli": "1.4.3",
+    "grunt-contrib-clean": "2.0.0",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-handlebars": "2.0.0",
+    "grunt-contrib-uglify": "5.0.1",
+    "grunt-eslint": "23.0.0",
+    "handlebars": "4.7.7",
+    "jquery-ui-themeroller": "0.0.5",
+    "lzma": "2.3.2",
+    "node-packager": "0.0.6",
+    "q": "1.5.1",
+    "qs": "6.10.1",
+    "requirejs": "2.3.6",
+    "rimraf": "3.0.2",
+    "semver": "7.3.5",
+    "sqwish": "0.2.2",
+    "uglify-js": "3.14.1",
+    "underscore": "1.13.1",
+    "winston": "3.3.3",
+    "wolfy87-eventemitter": "5.2.9",
+    "yargs": "16.2.0"
+  },
+  "optionalDependencies": {
+    "modern-syslog": "1.2.0"
   },
   "devDependencies": {
-    "@sinonjs/referee": "^11.0.1",
-    "sinon": "^21.0.0"
+    "nodeunit": "0.11.3"
   },
-  "scripts": {},
+  "main": "main.js",
+  "scripts": {
+    "test": "nodeunit test"
+  },
   "engines": {
-    "node": ">= 20.0.0"
-  },
-  "license": "MIT"
+    "node": "10 || 12 || 14"
+  }
 }
