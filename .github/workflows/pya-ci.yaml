@@ -27,7 +27,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       shell: bash -l {0}
       run: brew install portaudio
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v4
       with:
         activate-environment: test-env
         environment-file: ci/test-environment.yml
