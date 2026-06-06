@@ -1,242 +1,145 @@
+[![NPM version][npm-image]][npm-url]
+[![Build Status][build-image]][build-url]
+[![Dependency Status][deps-image]][deps-url]
 
-# Pa11y CI
+# postcss-cli-simple
 
-Pa11y CI is an accessibility test runner built using [Pa11y] focused on running on Continuous Integration environments.
+Simple CLI for [postcss]. To be used in Makefiles. If you are looking for more options check out [postcss-cli].
+More on the [history of this project][history].
 
-Pa11y CI runs accessibility tests against multiple URLs and reports on any issues. This is best used during automated testing of your application and can act as a gatekeeper to stop a11y issues from making it to live.
+## Installation
 
-[![NPM version][shield-npm]][info-npm]
-[![Node.js version support][shield-node]][info-node]
-[![Build status][shield-build]][info-build]
-[![Dependencies][shield-dependencies]][info-dependencies]
-[![LGPL-3.0 licensed][shield-license]][info-license]
-
----
-
-## Table Of Contents
-
-- [Requirements](#requirements)
-- [Usage](#usage)
-  - [Configuration](#configuration)
-  - [Default configuration](#default-configuration)
-  - [URL configuration](#url-configuration)
-  - [Sitemaps](#sitemaps)
-  - [Docker](#docker)
-- [Tutorials and articles](#tutorials-and-articles)
-- [Contributing](#contributing)
-- [Support and Migration](#support-and-migration)
-- [Licence](#licence)
-
-
-## Requirements
-
-This command line tool requires [Node.js] 8+. You can install through npm:
-
-```sh
-npm install -g pa11y-ci
-```
-
+npm install postcss-cli-simple
 
 ## Usage
 
-Pa11y CI can be used by running it as a command line tool, `pa11y-ci`:
+    postcss [options] -o output-file input-file
 
-```
-Usage: pa11y-ci [options] [<paths>]
+In Makefile you can use it with [pattern rules]:
 
-Options:
+````Make
+deploy/%.css: %.css
+  ./node_modules/.bin/postcss \
+    --use postcss-url --postcss-url.url=rebase \
+    --use autoprefixer --autoprefixer.browsers "> 5%" \
+    --use cssnano --no-cssnano.discardUnused
+    --output $@ $<
+````
 
-  -h, --help                       output usage information
-  -V, --version                    output the version number
-  -c, --config <path>              the path to a JSON or JavaScript config file
-  -s, --sitemap <url>              the path to a sitemap
-  -f, --sitemap-find <pattern>     a pattern to find in sitemaps. Use with --sitemap-replace
-  -r, --sitemap-replace <string>   a replacement to apply in sitemaps. Use with --sitemap-find
-  -x, --sitemap-exclude <pattern>  a pattern to find in sitemaps and exclude any url that matches
-  -j, --json                       Output results as JSON
-  -T, --threshold <number>         permit this number of errors, warnings, or notices, otherwise fail with exit code 2
-```
+#### `--output|-o`
 
-### Configuration
+Output file name.
 
-By default, Pa11y CI looks for a config file in the current working directory, named `.pa11yci`. This should be a JSON file.
+#### `--use|-u`
 
-You can use the `--config` command line argument to specify a different file, which can be either JSON or JavaScript. The config files should look like this:
+Plugin to be used. Multiple plugins can be specified. At least one plugin needs to be specified either with `--use` option or in the config file.
 
-```json
+Plugin options can be specified using [yargs dot notation]. For example, to pass `browsers` option to `autoprefixer` one can use `--autoprefixer.browsers "> 5%"`. To set plugin option to `false` use [yargs boolean negation]. For example, to switch off `discardUnused` in `cssnano` try: `--no-cssnano.discardUnused`.  
+
+#### `--map|-m`
+
+Activate source map generation. By default inline maps are generated. To generate source maps
+in a separate _.map_ file use `--map file` or `--no-map.inline`.
+
+You can use [advances source map options][source-map-options] - some examples:
+
+- `--no-map` - do not generated source maps - even if previous maps exist
+- `--map.annotation <path>` - specify alternaive path to be used in source map annotation appended to CSS
+- `--no-map.annotation` - supress adding annotation to CSS
+- `--no-map.sourcesContent` - remove origin CSS from maps
+
+#### `--config|-c`
+
+JSON file with plugin configuration. Plugin names should be the keys.
+
+````json
 {
-    "urls": [
-        "http://pa11y.org/",
-        "http://pa11y.org/contributing"
-    ]
-}
-```
-
-Pa11y will be run against each of the URLs in the `urls` array and the paths specified as CLI arguments. Paths can be specified as relative, absolute and as [glob](https://github.com/isaacs/node-glob#glob) patterns.
-
-### Default configuration
-
-You can specify a default set of [pa11y configurations] that should be used for each test run. These should be added to a `defaults` object in your config. For example:
-
-```json
-{
-    "defaults": {
-        "timeout": 1000,
-        "viewport": {
-            "width": 320,
-            "height": 480
-        }
+    "autoprefixer": {
+        "browsers": "> 5%"
     },
-    "urls": [
-        "http://pa11y.org/",
-        "http://pa11y.org/contributing"
-    ]
+    "postcss-cachify": {
+        "baseUrl": "/res"
+    }
 }
-```
+````
 
-Pa11y CI has a few of its own configurations which you can set as well:
+JavaScript configuration can be used if functions are allowed as plugins parameters. Although you might be better off writing your own plugin.
 
-  - `concurrency`: The number of tests that should be run in parallel. Defaults to `1`.
-  - `useIncognitoBrowserContext`: Run test with an isolated incognito browser context, stops cookies being shared and modified between tests. Defaults to `true`.
+````js
+module.exports = {
+  "postcss-url": {
+    url: function(url) { return "http://example.com/" + url; }
+  },
+  autoprefixer: {
+    browsers: "> 5%"
+  }
+};
+````
 
-### URL configuration
+Alternatively configuration options can be passed as `--plugin.option` parameters.
 
-Each URL in your config file can be an object and specify [pa11y configurations] which override the defaults too. You do this by using an object instead of a string, and providing the URL as a `url` property on that object. This can be useful if, for example, you know that a certain URL takes a while to load or you want to check what the page looked like when the tests were run:
+Note that command-line options can also be specified in the config file:
 
-```json
+````json
 {
-    "defaults": {
-        "timeout": 1000
+    "use": ["autoprefixer", "postcss-cachify"],
+    "output": "bundle.css",
+    "autoprefixer": {
+        "browsers": "> 5%"
     },
-    "urls": [
-        "http://pa11y.org/",
-        {
-            "url": "http://pa11y.org/contributing",
-            "timeout": 50000,
-            "screenCapture": "myDir/my-screen-capture.png"
-        }
-    ]
+    "postcss-cachify": {
+        "baseUrl": "/res"
+    }
 }
-```
+````
 
-### Sitemaps
+#### `--syntax|-s`
 
-If you don't wish to specify your URLs in a config file, you can use an XML sitemap that's published somewhere online. This is done with the `--sitemap` option:
+Optional module to use as a [custom PostCSS syntax](https://github.com/postcss/postcss#syntaxes).
 
-```sh
-pa11y-ci --sitemap http://pa11y.org/sitemap.xml
-```
+#### `--parser|-p`
 
-This takes the text content of each `<loc>` in the XML and runs Pa11y against that URL. This can also be combined with a config file, but URLs in the sitemap will override any found in your JSON config.
+Optional module to use as a [custom PostCSS input parser](https://github.com/postcss/postcss#syntaxes).
 
-If you'd like to perform a find/replace operation on each URL in a sitemap, e.g. if your sitemap points to your production URLs rather than local ones, then you can use the following flags:
+#### `--stringifier|-t`
 
-```sh
-pa11y-ci --sitemap http://pa11y.org/sitemap.xml --sitemap-find pa11y.org --sitemap-replace localhost
-```
+Optional module to use as a [custom PostCSS output stringifier](https://github.com/postcss/postcss#syntaxes).
 
-The above would ensure that you run Pa11y CI against local URLs instead of the live site.
+#### `--help|-h`
 
-If there are items in the sitemap that you'd like to exclude from the testing (for example PDFs) you can do so using the `--sitemap-exclude` flag.
+Show help
 
-### Docker
+### Examples
 
-If you want to run `pa11y-ci` in a Docker container then you can use the [`buildkite/puppeteer`](https://github.com/buildkite/docker-puppeteer) image as this installs Chrome and all the required libs to run headless chrome on Linux.
+Use autoprefixer as a postcss plugin pass parameters from a json file
 
-You will need a `config.json` that sets the `--no-sandbox` Chromium launch arguments:
-```json
-{
-    "defaults": {
-        "chromeLaunchConfig": {
-            "args": [
-                "--no-sandbox"
-            ]
-        }
-    },
-    "urls": [
-        "http://pa11y.org/",
-        "http://pa11y.org/contributing"
-    ]
-}
-```
+    postcss --use autoprefixer -c options.json -o screen.css screen.css
 
-And then a Dockerfile that installs `pa11y-ci` and adds the `config.json`
+Use more than one plugin and pass config parameters
 
-```Dockerfile
-FROM buildkite/puppeteer:v1.15.0
-
-RUN npm install --global --unsafe-perm pa11y-ci
-ADD config.json /usr/config.json
-
-ENTRYPOINT ["pa11y-ci", "-c", "/usr/config.json"]
-```
+    postcss --use autoprefixer --autoprefixer.browsers "> 5%" \
+        --use postcss-cachify --postcss-cachify.baseUrl /res \
+        -o screen.css screen.css
 
 
-## Tutorials and articles
+## License
 
-Here are some useful articles written by Pa11y users and contributors:
+MIT
 
-- [Automated accessibility testing with Travis and Pa11y CI](http://andrewmee.com/posts/automated-accessibility-testing-node-travis-ci-pa11y/)
-
-
-## Contributing
-
-There are many ways to contribute to Pa11y CI, we cover these in the [contributing guide](CONTRIBUTING.md) for this repo.
-
-If you're ready to contribute some code, clone this repo locally and commit your code on a new branch.
-
-Please write unit tests for your code, and check that everything works by running the following before opening a <abbr title="pull request">PR</abbr>:
-
-```sh
-npm run lint
-npm test
-```
-
-You can also run verifications and tests individually:
-
-```sh
-npm run lint                # Verify all of the code (ESLint)
-npm test                    # Run all tests
-npm run test-unit           # Run the unit tests
-npm run coverage            # Run the unit tests with coverage
-npm run test-integration    # Run the integration tests
-```
+[postcss]: https://npmjs.org/package/postcss
+[postcss-cli]: https://npmjs.org/package/postcss-cli
+[history]: https://github.com/postcss/postcss/issues/154#issuecomment-177278640
+[source-map-options]: https://github.com/postcss/postcss/blob/master/docs/source-maps.md
+[pattern rules]: https://www.gnu.org/software/make/manual/html_node/Pattern-Rules.html
+[yargs dot notation]: https://www.npmjs.com/package/yargs#dot-notation
+[yargs boolean negation]: https://www.npmjs.com/package/yargs#negate-fields
 
 
-## Support and Migration
+[npm-image]: https://img.shields.io/npm/v/postcss-cli-simple.svg
+[npm-url]: https://npmjs.org/package/postcss-cli-simple
 
-Pa11y CI major versions are normally supported for 6 months after their last minor release. This means that patch-level changes will be added and bugs will be fixed. The table below outlines the end-of-support dates for major versions, and the last minor release for that version.
-
-We also maintain a [migration guide](MIGRATION.md) to help you migrate.
-
-| :grey_question: | Major Version | Last Minor Release | Node.js Versions | Support End Date |
-| :-------------- | :------------ | :----------------- | :--------------- | :--------------- |
-| :heart:         | 2             | N/A                | 8+               | N/A              |
-| :hourglass:     | 1             | 1.3                | 4+               | 2018-04-18       |
-
-If you're opening issues related to these, please mention the version that the issue relates to.
-
-
-## Licence
-
-Licensed under the [Lesser General Public License (LGPL-3.0)](LICENSE).<br/>
-Copyright &copy; 2016–2017, Team Pa11y
-
-
-[issues]: https://github.com/pa11y/pa11y-ci/issues
-[node.js]: https://nodejs.org/
-[pa11y]: https://github.com/pa11y/pa11y
-[pa11y configurations]: https://github.com/pa11y/pa11y#configuration
-[sidekick-proposal]: https://github.com/pa11y/sidekick/blob/master/PROPOSAL.md
-[twitter]: https://twitter.com/pa11yorg
-
-[info-dependencies]: https://gemnasium.com/pa11y/pa11y-ci
-[info-license]: LICENSE
-[info-node]: package.json
-[info-npm]: https://www.npmjs.com/package/pa11y-ci
-[info-build]: https://travis-ci.org/pa11y/pa11y-ci
-[shield-dependencies]: https://img.shields.io/gemnasium/pa11y/pa11y-ci.svg
-[shield-license]: https://img.shields.io/badge/license-LGPL%203.0-blue.svg
-[shield-node]: https://img.shields.io/badge/node.js%20support-8-brightgreen.svg
-[shield-npm]: https://img.shields.io/npm/v/pa11y-ci.svg
-[shield-build]: https://img.shields.io/travis/pa11y/pa11y-ci/master.svg
+[build-image]: https://img.shields.io/github/workflow/status/pirxpilot/postcss-cli/check
+[build-url]: https://github.com/pirxpilot/postcss-cli/actions/workflows/check.yaml
+ 
+[deps-image]: https://img.shields.io/librariesio/release/npm/postcss-cli-simple
+[deps-url]: https://libraries.io/npm/postcss-cli-simple
