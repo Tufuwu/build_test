@@ -1,110 +1,119 @@
 {
-  "name": "cozy-home",
-  "version": "1.82.0",
-  "main": "src/index.jsx",
-  "scripts": {
-    "tx": "tx pull --all || true",
-    "posttx": "./scripts/check-locales.sh",
-    "lint": "yarn lint:js && yarn lint:styles && yarn typecheck",
-    "lint:js": "eslint '{src,test}/**/*.{js,jsx}'",
-    "lint:styles": "stylint src/styles --config ./.stylintrc",
-    "build": "yarn build:browser",
-    "build:browser": "cs build --browser --barV7 false",
-    "build:mobile": "cs build --mobile",
-    "watch": "yarn watch:browser",
-    "watch:browser": "cs watch --browser --barV7 false",
-    "watch:mobile": "cs watch --mobile",
-    "start": "cs start --browser --barV7 false",
-    "cozyPublish": "cozy-app-publish --token $REGISTRY_TOKEN --prepublish downcloud --postpublish mattermost",
-    "deploy": "git-directory-deploy --directory build/ --branch ${DEPLOY_BRANCH:-build} --repo=${DEPLOY_REPOSITORY:-origin}",
-    "test": "jest",
-    "typecheck": "yarn tsc"
+  "name": "cql-execution",
+  "version": "2.3.3",
+  "description": "An execution framework for the Clinical Quality Language (CQL)",
+  "keywords": [
+    "CQL",
+    "HL7",
+    "MITRE",
+    "CQM"
+  ],
+  "bugs": {
+    "url": "https://github.com/cqframework/clinical_quality_language/issues"
   },
+  "contributors": [
+    {
+      "name": "Chris Moesel",
+      "email": "cmoesel@mitre.org"
+    },
+    {
+      "name": "Rob Dingwell",
+      "email": "bobd@mitre.org"
+    },
+    {
+      "name": "Jason Walonoski",
+      "email": "jwalonoski@mitre.org"
+    },
+    {
+      "name": "Luke Osborne",
+      "email": "lwosborne@mitre.org"
+    },
+    {
+      "name": "Kristian Mulcahy",
+      "email": "kmulcahy@mitre.org"
+    },
+    {
+      "name": "James Bradley",
+      "email": "jhbradley@mitre.org"
+    },
+    {
+      "name": "Chris Hossenlopp",
+      "email": "hossenlopp@mitre.org"
+    },
+    {
+      "name": "Chris Tohline",
+      "email": "ctohline@mitre.org"
+    },
+    {
+      "name": "Adam Holmes",
+      "email": "aholmes@mitre.org"
+    },
+    {
+      "name": "Pete Krautscheid",
+      "email": "krautscheid@mitre.org"
+    },
+    {
+      "name": "Dylan Mahalingam",
+      "email": "kmahalingam@mitre.org"
+    },
+    {
+      "name": "Matthew Gramigna",
+      "email": "mgramigna@mitre.org"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cozy/cozy-home.git"
-  },
-  "author": "Cozy Cloud <contact@cozycloud.cc> (https://cozy.io/)",
-  "contributors": [
-    "CPatchane"
-  ],
-  "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/cozy/cozy-home/issues"
-  },
-  "homepage": "https://github.com/cozy/cozy-home#readme",
-  "dependencies": {
-    "@sentry/react": "7.119.0",
-    "cozy-client": "^48.25.0",
-    "cozy-device-helper": "2.7.0",
-    "cozy-doctypes": "1.83.8",
-    "cozy-flags": "4.0.0",
-    "cozy-harvest-lib": "^30.0.0",
-    "cozy-intent": "^2.19.2",
-    "cozy-interapp": "^0.9.0",
-    "cozy-keys-lib": "^6.1.1",
-    "cozy-logger": "1.10.4",
-    "cozy-minilog": "^3.3.1",
-    "cozy-realtime": "4.6.0",
-    "cozy-sharing": "^16.0.0",
-    "cozy-stack-client": "^48.16.0",
-    "cozy-tsconfig": "1.2.0",
-    "cozy-ui": "^111.19.0",
-    "date-fns": "2.28.0",
-    "es-abstract": "1.20.2",
-    "form-data": "2.5.1",
-    "leaflet": "1.7.1",
-    "localforage": "^1.10.0",
-    "lodash": "4.17.21",
-    "moment": "2.29.4",
-    "papaparse": "5.3.1",
-    "prop-types": "^15.8.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-inspector": "5.1.1",
-    "react-redux": "7.2.6",
-    "react-remove-scroll": "^2.5.5",
-    "react-router-dom": "6.6.2",
-    "react-swipeable-views": "0.14.0",
-    "react-type-animation": "3.2.0",
-    "redux": "4.2.0",
-    "redux-logger": "3.0.6",
-    "redux-persist": "^6.0.0",
-    "redux-thunk": "2.3.0",
-    "reselect": "^4.1.8",
-    "rooks": "7.14.1",
-    "terser-webpack-plugin": "1.4.4"
+    "url": "https://github.com/cqframework/cql-execution.git"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.16.5",
-    "@testing-library/react": "13.3.0",
-    "@testing-library/react-hooks": "8.0.1",
-    "@types/classnames": "2.2.6",
-    "@types/react": "18.0.17",
-    "@types/react-dom": "18.0.6",
-    "@welldone-software/why-did-you-render": "8.0.3",
-    "babel-jest": "27.5.1",
-    "babel-preset-cozy-app": "2.0.2",
-    "bundlemon": "1.3.2",
-    "cozy-scripts": "8.2.0",
-    "eslint": "8.9.0",
-    "eslint-config-cozy-app": "4.0.0",
-    "eslint-import-resolver-alias": "^1.1.2",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-import-alias": "^1.2.0",
-    "git-directory-deploy": "1.5.1",
-    "ignore-not-found-export-webpack-plugin": "1.0.2",
-    "jest": "28.1.3",
-    "jest-environment-jsdom": "28.1.3",
-    "jest-fetch-mock": "3.0.3",
-    "lint-staged": "8.2.1",
-    "mockdate": "3.0.5",
-    "npm-run-all": "4.1.5",
-    "react-hot-loader": "^4.13.0",
-    "react-test-renderer": "18.2.0",
-    "remark-preset-lint-recommended": "5.0.0",
-    "stylint": "2.0.0",
-    "stylus": "0.55.0",
-    "url-search-params-polyfill": "8.1.1"
-  }
+    "@types/luxon": "1",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^17.0.10",
+    "@types/test-console": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "browserify": "^16.5.1",
+    "coveralls": "^3.1.0",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^6.11.0",
+    "mocha": "^9.1.3",
+    "nyc": "^15.1.0",
+    "prettier": "^2.1.1",
+    "should": "^13.2.3",
+    "test-console": "^2.0.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4",
+    "xml-js": "^1.6.11"
+  },
+  "dependencies": {
+    "@lhncbc/ucum-lhc": "^4.1.3",
+    "luxon": "^1.25.0"
+  },
+  "resolutions": {
+    "glob-parent": "^5.1.2",
+    "ansi-regex": "^5.0.1"
+  },
+  "main": "lib/cql",
+  "types": "lib/cql.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "prepare": "npm run build && npm run build:browserify",
+    "build": "tsc",
+    "build:browserify": "npm run build && node ./bin/browserify.js",
+    "build:test-data": "cd ./test/generator && ./gradlew generateTestData && cd ..",
+    "build:spec-test-data": "node test/spec-tests/generate-cql.js && cd ./test/generator && ./gradlew generateSpecTestData && cd ..",
+    "build:all": "npm run build && npm run build:browserify && npm run build:test-data && npm run build:spec-test-data",
+    "watch:test-data": "cd ./test/generator && ./gradlew watchTestData && cd ..",
+    "test": "TS_NODE_PROJECT=\"./tsconfig.test.json\" TS_NODE_FILES=true mocha --reporter spec --recursive",
+    "test:nyc": "TS_NODE_PROJECT=\"./tsconfig.test.json\" TS_NODE_FILES=true nyc --reporter=html npx mocha --reporter spec --recursive",
+    "test:watch": "TS_NODE_PROJECT=\"./tsconfig.test.json\" TS_NODE_FILES=true mocha --reporter spec --recursive --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check \"**/*.{js,ts}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,ts}\"",
+    "test:plus": "npm test && npm run build && npm run lint && npm run prettier"
+  },
+  "license": "Apache-2.0"
 }

@@ -1,26 +1,33 @@
 {
-  "extends": ["cozy-app/react"],
-  "plugins": ["import-alias"],
-  "rules": {
-    "no-param-reassign": "error",
-    "promise/no-callback-in-promise": "error",
-    "import-alias/import-alias": [
-      "error",
-      {
-        "relativeDepth": 1,
-        "aliases": [
-          { "alias": "components", "matcher": "^components" },
-          { "alias": "config", "matcher": "^config" },
-          { "alias": "containers", "matcher": "^containers" },
-          { "alias": "locales", "matcher": "^locales" },
-          { "alias": "lib", "matcher": "^lib" },
-          { "alias": "styles", "matcher": "^styles" },
-          { "alias": "test", "matcher": "^test" }
-        ]
-      }
-    ]
-  },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "tsconfig.json"
-  }
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+          "experimentalObjectRestSpread": true
+      }
+  },
+  "rules": {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "indent": ["error", 2, { "SwitchCase": 1 }],
+      "linebreak-style": ["error", "unix"],
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-loss-of-precision": "off",
+      "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
+      "quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }],
+      "semi": ["error", "always"]
+  },
+  "overrides": [{
+    "files": ["test/**/*.{js,ts}", "examples/**/*.js", "bin/**/*.js"],
+    "rules": {
+      "@typescript-eslint/no-var-requires": "off"
+    }
+  }],
+  "env": {
+      "es6": true,
+      "node": true,
+      "mocha": true
+  },
+  "extends": ["plugin:@typescript-eslint/recommended", "prettier"]
 }
