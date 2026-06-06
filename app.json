@@ -1,0 +1,26 @@
+{
+  "name": "Python Markdown Wiki",
+  "description": "Markdown wiki for Heroku",
+  "keywords": [
+    "small",
+    "sharp",
+    "tool"
+  ],
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "cloudinary:starter"
+  ],
+  "env": {
+  },
+  "scripts": {
+    "postdeploy": "python cli.py createdb"
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-python"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    }
+  ]
+}

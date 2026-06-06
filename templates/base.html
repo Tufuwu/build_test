@@ -1,0 +1,76 @@
+{% if request.environ.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest' %}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ topic.name }}</title>
+    <script src="{{ url_for('static', filename='bundles/bundle.js') }}"></script>
+    <style>
+      @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+      @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-jp.css);
+      * { font-family: 'Spoqa Han Sans', 'Spoqa Han Sans JP', sans-serif; }
+      {% if 'CSS'|env -%}
+        @import url({{ 'CSS'|env }});
+      {%- endif %}
+    </style>
+  </head>
+  <body style="padding-top:60px;">
+    <nav class="navbar navbar-light bg-light fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header hidden-xs">
+          <a class="navbar-brand" href="{{ url_for('index') }}">Wiki</a>
+        </div>
+        <div class="float-right">
+          <form class="navbar-form" action="/" method="GET" role="search" style="border: 0;">
+            <div class="input-group">
+              <input type="text" name="topic" class="form-control" placeholder="Search" value="{{ topic.name }}">
+              <span class="input-group-append">
+                <input class="btn btn-outline-info" type="submit" value="→" />
+              </span>
+            </div>
+          </form>
+        </div>
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container">
+      <div class="row mt-3 mb-3">
+        <div class="col-md-12">
+	    <h1 class="float-left">{{ topic.name }}</h1>
+            <div class="float-right">
+              {% block submenu %}
+              <a class="btn btn-outline-primary" href="{{ url_for('edit', topic=topic) }}">Edit</a>
+              {% endblock %}
+            </div>
+        </div>
+      </div>
+      {% block nav %}
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            {% set nav_items = [
+              { 'title': 'Contents', 'url': url_for('topic', topic=topic) },
+              { 'title': 'Backlinks', 'url': url_for('backlinks', topic=topic) },
+              { 'title': 'Keynote', 'url': url_for('keynote', topic=topic) },
+            ] %}
+            {% for nav in nav_items -%}
+              <li role="presentation" class="nav-item">
+                <a class="nav-link {% if request.path == nav['url'] %}active{% endif %}" href="{{ nav['url'] }}">{{ nav['title'] }}</a>
+              </li>
+            {%- endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endblock %}
+      <div class="row mt-3">
+        <div class="col-md-12 markdown-body">
+          {% endif %}
+              {% block body %}
+              {{ topic.body|default('', true)|parse_link|safe|markdown }}
+              {% endblock %}
+          {% if request.environ.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest' %}
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+{% endif %}
