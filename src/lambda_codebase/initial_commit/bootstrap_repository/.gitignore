@@ -1,38 +1,28 @@
 .vscode
-.idea
 .pyc
 .zip
 .DS_Store
+.pylintrc
 cleanup.py
 config
 config.sec
 config.bak
 policy.json
 pipeline.yml
-packaged.yaml
-template-sam.yml
+template-sam.yaml
 template-deploy.yml
-template-sam-out.yml
 master-deploy.yml
 .pytest_cache
-shared_layer.zip
-.aws-sam
-samconfig.toml
-pipeline.json
-template-sam.yml
-deploy.sh
 
 # Byte-compiled / optimized / DLL files
-__pycache__
+__pycache__/
 *.py[cod]
 *$py.class
-outfile
+
 # C extensions
 *.so
 
 # Distribution / packaging
-package.yaml
-aws_deployment_framework.egg-info
 .Python
 develop-eggs/
 dist/
