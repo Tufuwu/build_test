@@ -1,8 +1,6 @@
-include *.txt
-include *.rst
-recursive-include doc *
-recursive-include contrib *
-recursive-include share *
-recursive-include rmtoo/collection *
-prune *~
-prune *.pyc
+include README.rst LICENSE.txt
+include examples/*.svg
+include documentation/presentation.odp
+include inkex/*.txt
+include po/*
+include scripts/boxes2pot scripts/boxes2inkscape
