@@ -1,34 +1,28 @@
 ---
 name: Bug report
-about: Report a bug you've found in this extension
-title: ''
+about: Create a report to help us improve
+title: "[BUG]"
 labels: bug
 assignees: ''
 
 ---
 
-**Description**
+**Describe the bug**
 A clear and concise description of what the bug is.
 
-**Expected Behaviour**
-What you expected to happen instead.
+**Environment (please complete the following information):**
+ - OS: [e.g. Ubuntu 16.04]
+ - Program Version [ph5toms 2018.268]
 
 **To Reproduce**
-Steps to reproduce the bug.
+Steps to reproduce the behavior:
 
-**Error Log**
-Paste any relevant error logs below:
-```
-<error log here>
-```
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
 **Screenshots**
-Add screenshots to illustrate the bug if you want.
+If applicable, add screenshots to help explain your problem.
 
-**Your Setup**
- - CKAN version: [e.g. 2.8.3]
- - Commit/version of this repo:
- - Browser (if relevant): [e.g. chrome, safari]
 
-**Anything Else?**
-...
+**Additional context**
+Add any other context about the problem here.
