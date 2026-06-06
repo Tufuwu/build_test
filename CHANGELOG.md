@@ -1,69 +1,174 @@
-v1.3.0 (December 16, 2022)
-* Update C# restsharp codegen to support (107)[https://restsharp.dev/v107/]
-* Fixes an issue where HTTP code snippet was generating wrong boundaries (11084)[https://github.com/postmanlabs/postman-app-support/issues/11084]
-* Fixes an issue with Axios code snippets not including maxBodyLength param
+# Changelog
 
-v1.2.1 (April 26, 2022)
-* Add label for 'R' language
+## [v1.2.7](https://github.com/recurly/react-recurly/tree/v1.2.7) (2022-11-30)
 
-v1.2.0 (April 22, 2022)
-* Add new codegens - php-guzzle, R-httr, R-rcurl
-* Fix issue with pipeline failing due to updated version of RestSharp
-* Fix for - [502](https://github.com/postmanlabs/postman-code-generators/issues/502) Allow GET method to have a body in java-okhttp if present in input request
-* Fix for - [476](https://github.com/postmanlabs/postman-code-generators/pull/476) Properly escape already escaped double quotes in curl body
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.6...v1.2.7)
 
-v1.1.5 (May 10, 2021)
-* Fixed an issue with how JSON bodies are shown in code snippets for Ruby, C#, and Dart.
 
-v1.1.4 (May 6, 2021)
-* Fix an issue with empty GraphQL body
+**Merged Pull Requests**
 
-v1.1.3 (Mar 2, 2021)
-* Use proper indentation for JSON bodies in Javascript and Nodejs codegens
-* Fix for - [445](https://github.com/postmanlabs/postman-code-generators/issues/445) Add proper indentation in nodejs-axios when bodytype is urlencoded
-* Fix for - [248](https://github.com/postmanlabs/postman-code-generators/issues/248) Use quoteType everywhere in curl, not just in the url
-* Fix for - [454](https://github.com/postmanlabs/postman-code-generators/issues/454) Fix encoding when generating HTTP code snippets
-* Fix for - [426](https://github.com/postmanlabs/postman-code-generators/issues/426) Use json.dumps in Python codegens if Content-Type is JSON
+- Risk data collector form passing [#197](https://github.com/recurly/react-recurly/pull/197) ([abachman](https://github.com/abachman))
 
-v1.1.2 (Dec 15, 2020)
-* Fix for - [8736](https://github.com/postmanlabs/postman-app-support/issues/8736) Add content type support for individual form-data fields
-* Fix for - [8635](https://github.com/postmanlabs/postman-app-support/issues/8635) Use Json.parse for all json like application types
-* Fix for - [9212](https://github.com/postmanlabs/postman-app-support/issues/9212) Add semicolon after header key in curl codegen if the value is empty string. 
-* Add Newman test for powershell
 
-v1.1.1 (Nov 10, 2020)
-* Change string to enum in cURL quoteType option.
-* Fix new line issue in dart-http and HTTP codegen
-* Fix an issue where deepinstall was failing when folder name had spaces.
 
-v1.1.0 (Nov 2, 2020)
-* Added support for Dart http
-* Fix for - [315](https://github.com/postmanlabs/postman-code-generators/issues/315): Manually parse url provided in the request.
-* Fix for - [253](https://github.com/postmanlabs/postman-code-generators/issues/253): Add -g flag to curl if braces ({}) or brackets ([]) are present in the url.
-* Fix for - [257](https://github.com/postmanlabs/postman-code-generators/issues/257): Use double quotes to escape semicolon in curl requests
-* Fix for - [247](https://github.com/postmanlabs/postman-code-generators/issues/247): Add ContentType to python snippets for multipart/formdata
-* Fix for - [186](https://github.com/postmanlabs/postman-code-generators/issues/186): Add ` as line continuation delimiter for curl codegen
-* Fix for - [248](https://github.com/postmanlabs/postman-code-generators/issues/248): Add quoteType as an additional option in curl codegen
-* Fix deadlock in error case in Swift and Objective-C codegens.
-* Fix for - [325](https://github.com/postmanlabs/postman-code-generators/issues/325): Use encodeURIComponent instead of escape for urlencoded request body.
-* Fix for - [350](https://github.com/postmanlabs/postman-code-generators/issues/350): Sanitize \r in request body.
-* Fix for - [366](https://github.com/postmanlabs/postman-code-generators/issues/366): Add support for uploading binary files for multipart/form-data bodies in python-http.client.
-* Fix for - [353](https://github.com/postmanlabs/postman-code-generators/issues/353): Add optional import of FoundationNetworking in swift codegen
-* Fix for - [284](https://github.com/postmanlabs/postman-code-generators/issues/284): Replace double-quotes by single-quotes in codegen/php-curl
-* Fix for - [330](https://github.com/postmanlabs/postman-code-generators/issues/330): Use url.toString method for converting url in shell-httpie codegen
+## [v1.2.6](https://github.com/recurly/react-recurly/tree/v1.2.6) (2022-10-27)
 
-v1.0.2 (Oct 15, 2020)
-* Fixed spaces around variables and arguments in Python codgen to comply with PEP 8.
-* Added Content-Length header to generated HTTP snippets.
-* Switched to multiline strings for Raw bodies in Go.
-* Stopped manually encoding response bodes in `utf8` for Python-requests.
-* Removed unnecessary semicolons at the end of statements in Ruby.
-* Fixed wrong name of HTTP codegen in README
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.4...v1.2.6)
 
-v1.0.1 (Jun 29, 2020)
-- Fix for - [8674](https://github.com/postmanlabs/postman-app-support/issues/8674): Add URL sanitization for quotes in cURL, Java Unirest, NodeJS Native, Python http.client, and Swift. 
 
-v1.0.0 (May 29, 2020)
-- Add axios framework support
-- Add ES6 syntax support for NodeJS Request, NodeJS Native and NodeJS Unirest
-- Fix snippet generation for powershell and jquery, where form data params had no type field
+**Merged Pull Requests**
+
+- listen_for_attach_event [#187](https://github.com/recurly/react-recurly/pull/187) ([smagdicatrecurly](https://github.com/smagdicatrecurly))
+- Adds demo for automated focus shift on individual card Elements [#183](https://github.com/recurly/react-recurly/pull/183) ([chrissrogers](https://github.com/chrissrogers))
+- setup element when didmount [#182](https://github.com/recurly/react-recurly/pull/182) ([WillXing](https://github.com/WillXing))
+- Docs fix: UseCheckoutPricingInput `subscriptions` [#157](https://github.com/recurly/react-recurly/pull/157) ([javimbk](https://github.com/javimbk))
+- Docs Fix: useRecurly Paypal example [#156](https://github.com/recurly/react-recurly/pull/156) ([javimbk](https://github.com/javimbk))
+- Revert "add security to github CODEOWNER file" [#147](https://github.com/recurly/react-recurly/pull/147) ([eternal44](https://github.com/eternal44))
+- add security to github CODEOWNER file [#142](https://github.com/recurly/react-recurly/pull/142) ([eternal44](https://github.com/eternal44))
+- fix(lib/provider.js): fix RecurlyProvider throwing error when fraud property is set [#123](https://github.com/recurly/react-recurly/pull/123) ([mikeedwards](https://github.com/mikeedwards))
+
+
+
+## [v1.2.4](https://github.com/recurly/react-recurly/tree/v1.2.4) (2021-02-05)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.3...v1.2.4)
+
+
+**Merged Pull Requests**
+
+- useCheckoutPricing will return its pricing instance [#108](https://github.com/recurly/react-recurly/pull/108) ([chrissrogers](https://github.com/chrissrogers))
+- Add typedef for ThreeDSecureAction component [#105](https://github.com/recurly/react-recurly/pull/105) ([james-braund-gw](https://github.com/james-braund-gw))
+
+
+
+## [v1.2.3](https://github.com/recurly/react-recurly/tree/v1.2.3) (2020-11-20)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.2...v1.2.3)
+
+
+**Merged Pull Requests**
+
+- 1.2.3 [#103](https://github.com/recurly/react-recurly/pull/103) ([dbrudner](https://github.com/dbrudner))
+- Update type for SetCheckoutPricing [#99](https://github.com/recurly/react-recurly/pull/99) ([andreisocaciu](https://github.com/andreisocaciu))
+- Add the Contributor Convenant [#96](https://github.com/recurly/react-recurly/pull/96) ([cainj](https://github.com/cainj))
+- Fixes typo in docs for 3ds.actionTokenId [#94](https://github.com/recurly/react-recurly/pull/94) ([dbrudner](https://github.com/dbrudner))
+- Adds event reporting when Recurly.js is initialized [#93](https://github.com/recurly/react-recurly/pull/93) ([dbrudner](https://github.com/dbrudner))
+- Fixes PropTypes.fraud.kount.dataCollector in <Provider /> [#92](https://github.com/recurly/react-recurly/pull/92) ([dbrudner](https://github.com/dbrudner))
+
+
+
+## [v1.2.2](https://github.com/recurly/react-recurly/tree/v1.2.2) (2020-05-18)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.1...v1.2.2)
+
+
+**Merged Pull Requests**
+
+- 1.2.2 [#75](https://github.com/recurly/react-recurly/pull/75) ([dbrudner](https://github.com/dbrudner))
+- Adds PropTypes and PropsTable for <RecurlyProvider /> [#74](https://github.com/recurly/react-recurly/pull/74) ([dbrudner](https://github.com/dbrudner))
+- Fixes type for useCheckoutPricing [#73](https://github.com/recurly/react-recurly/pull/73) ([dbrudner](https://github.com/dbrudner))
+- Fixes currency symbol character encoding in demo [#71](https://github.com/recurly/react-recurly/pull/71) ([dbrudner](https://github.com/dbrudner))
+- Fixes checkout pricing demo [#70](https://github.com/recurly/react-recurly/pull/70) ([dbrudner](https://github.com/dbrudner))
+- 1.2.1 [#67](https://github.com/recurly/react-recurly/pull/67) ([dbrudner](https://github.com/dbrudner))
+
+**Closed Issues**
+
+- Plan loading issues [#55](https://github.com/recurly/react-recurly/issues/55)
+
+
+## [v1.2.1](https://github.com/recurly/react-recurly/tree/v1.2.1) (2020-05-05)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.2.0...v1.2.1)
+
+
+
+
+
+## [v1.2.0](https://github.com/recurly/react-recurly/tree/v1.2.0) (2020-05-05)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.1.2...v1.2.0)
+
+
+**Merged Pull Requests**
+
+- Fixes "types" directory in package.json [#66](https://github.com/recurly/react-recurly/pull/66) ([dbrudner](https://github.com/dbrudner))
+- 1.2.0 [#65](https://github.com/recurly/react-recurly/pull/65) ([dbrudner](https://github.com/dbrudner))
+- Adds types [#60](https://github.com/recurly/react-recurly/pull/60) ([dbrudner](https://github.com/dbrudner))
+- Use checkout pricing currency [#57](https://github.com/recurly/react-recurly/pull/57) ([dbrudner](https://github.com/dbrudner))
+- Fixes readme on npm [#53](https://github.com/recurly/react-recurly/pull/53) ([dbrudner](https://github.com/dbrudner))
+- Removes deploy-storybook postPublish step [#52](https://github.com/recurly/react-recurly/pull/52) ([dbrudner](https://github.com/dbrudner))
+
+
+
+## [v1.1.2](https://github.com/recurly/react-recurly/tree/v1.1.2) (2020-03-31)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.1.1...v1.1.2)
+
+
+**Merged Pull Requests**
+
+- 1.1.2 [#51](https://github.com/recurly/react-recurly/pull/51) ([dbrudner](https://github.com/dbrudner))
+- Fixes issue with useCheckoutPricing currency [#49](https://github.com/recurly/react-recurly/pull/49) ([dbrudner](https://github.com/dbrudner))
+- Fixes small error in demo [#48](https://github.com/recurly/react-recurly/pull/48) ([dbrudner](https://github.com/dbrudner))
+- Updates useRecurly to set correct prototype on copied recurly instance [#46](https://github.com/recurly/react-recurly/pull/46) ([dbrudner](https://github.com/dbrudner))
+- Updates version of react-recurly in demo to 1.1.1 [#43](https://github.com/recurly/react-recurly/pull/43) ([dbrudner](https://github.com/dbrudner))
+- Adds docs to .npmignore [#42](https://github.com/recurly/react-recurly/pull/42) ([dbrudner](https://github.com/dbrudner))
+
+**Closed Issues**
+
+- OnChange fires multiple times when blurring or focusing CardNumberElement [#29](https://github.com/recurly/react-recurly/issues/29)
+
+
+## [v1.1.1](https://github.com/recurly/react-recurly/tree/v1.1.1) (2020-03-13)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.1.0...v1.1.1)
+
+
+**Merged Pull Requests**
+
+- 1.1.1 [#41](https://github.com/recurly/react-recurly/pull/41) ([dbrudner](https://github.com/dbrudner))
+- Adds lodash to dependencies [#40](https://github.com/recurly/react-recurly/pull/40) ([dbrudner](https://github.com/dbrudner))
+- Updates react-recurly version in demo [#39](https://github.com/recurly/react-recurly/pull/39) ([dbrudner](https://github.com/dbrudner))
+
+**Closed Issues**
+
+- useCheckoutPricing hook is not found in the package. [#36](https://github.com/recurly/react-recurly/issues/36)
+
+
+## [v1.1.0](https://github.com/recurly/react-recurly/tree/v1.1.0) (2020-03-12)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.0.2...v1.1.0)
+
+
+**Merged Pull Requests**
+
+- 1.1.0 [#38](https://github.com/recurly/react-recurly/pull/38) ([dbrudner](https://github.com/dbrudner))
+- Adds small changes to useCheckoutPricing test suite [#35](https://github.com/recurly/react-recurly/pull/35) ([dbrudner](https://github.com/dbrudner))
+- Updates issue template to include link to codesandbox demo [#30](https://github.com/recurly/react-recurly/pull/30) ([dbrudner](https://github.com/dbrudner))
+- Release/pricing [#28](https://github.com/recurly/react-recurly/pull/28) ([dbrudner](https://github.com/dbrudner))
+- Fixes all warnings in demo and lib [#18](https://github.com/recurly/react-recurly/pull/18) ([dbrudner](https://github.com/dbrudner))
+- Fixes demo [#13](https://github.com/recurly/react-recurly/pull/13) ([dbrudner](https://github.com/dbrudner))
+
+
+
+## [v1.0.2](https://github.com/recurly/react-recurly/tree/v1.0.2) (2020-01-16)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.0.1...v1.0.2)
+
+
+
+
+
+## [v1.0.1](https://github.com/recurly/react-recurly/tree/v1.0.1) (2020-01-12)
+
+[Full Changelog](https://github.com/recurly/react-recurly/compare/v1.0.0...v1.0.1)
+
+
+
+
+
+## [v1.0.0](https://github.com/recurly/react-recurly/tree/v1.0.0) (2020-01-10)
+
+
+
+
