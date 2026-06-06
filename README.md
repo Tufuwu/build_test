@@ -1,45 +1,125 @@
-# miniprogram-simulate
+# <img src="build/icons/128x128.png" width="64px" align="center" alt="Excel Parser Processor"> Excel Parser Processor
 
-[![](https://img.shields.io/npm/v/miniprogram-simulate.svg?style=flat)](https://www.npmjs.com/package/miniprogram-simulate)
-[![](https://img.shields.io/travis/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate)
-[![](https://img.shields.io/github/license/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate/blob/master/LICENSE)
-[![](https://img.shields.io/codecov/c/github/wechat-miniprogram/miniprogram-simulate.svg)](https://app.codecov.io/gh/wechat-miniprogram/miniprogram-simulate)
+### A Desktop app for processing all rows of Excel files
 
-## 介绍
+Simply generates an array of items from the rows of an Excel file and does the repetitive tedious operations step by step
+recursively till every item of the array is processed. For example downloads all the URL's in an Excel file.
 
-小程序自定义组件测试工具集。
+[![Dependency Status][dependabot-badge]][dependabot-url]
+[![Build Status][gh-actions-image]][gh-actions-url]
+[![Github Tag][github-tag-image]][github-tag-url]
+[![codecov][codecov-image]][codecov-url]
+[![Backers on Open Collective](https://opencollective.com/excel-parser-processor/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/excel-parser-processor/sponsors/badge.svg)](#sponsors)
+[![Open Source Helpers](https://www.codetriage.com/btargac/excel-parser-processor/badges/users.svg)](https://www.codetriage.com/btargac/excel-parser-processor)
+[![CodeFactor][CodeFactor-image]][CodeFactor-url]
+[![CodeQL][codeql-image]][codeql-url]
 
-目前因为小程序独特的运行环境，所以对于小程序自定义组件的单元测试一直没有比较优雅的解决方案，此工具集就是为了解决此痛点而诞生的。将原本小程序自定义组件双线程分离运行的机制调整成单线程模拟运行，利用 dom 环境进行渲染，借此来完成整个自定义组件树的搭建。
+#### How to use
 
-运行此工具集需要依赖 js 运行环境和 dom 环境，因此可以采用 jsdom + nodejs（如 jest），也可以采用真实浏览器环境（如 karma）。文档[使用简介](./docs/tutorial.md)中会提供简单的使用方式介绍。
+You can [download the latest release](https://github.com/btargac/excel-parser-processor/releases) for your operating system
+or build it yourself (see [Development](#development)).
 
-## 安装
+Just select or drag & drop an Excel file, then select the output folder for the downloaded images or files. All the items
+in the Excel file will be downloaded into the selected folder, and you will be notified about the state of ongoing progress.
 
+#### Sample Excel file structure
+
+|               | A                                                                 | B                         | C                         |
+| ------------- | :---------------------------------------------------------------- | :-------------------------| :-------------------------|
+| 1             | https://www.buraktargac.com/sample_image.gif                      | optional-sample-file-name | optional-sub-folder-name  |
+| 2             | https://www.buraktargac.com/sample_image.png                      | optional-sample-file-name | optional-sub-folder-name  |
+| 3             | https://www.buraktargac.com/sample_image.jpg                      |                           |                           |
+| .             | ...                                                               |                           |                           |
+| .             | ...                                                               |                           |                           |
+| n             | Asset URL ( can be any type of file jpg, jpeg, png, txt, doc, etc)|                           |                           |
+
+<br/>
+
+Currently there is no limit for `n`, I tested with 4000 items and unless your IP is banned from the publisher there
+is no problem to download as much as you can.
+
+#### Demo
+<img src="excel-parser-processor.gif" width="640px" height="480px" align="center" alt="Excel Parser Processor Demo">
+
+#### Development
+
+You need to have [Node.js](https://nodejs.org) installed on your computer in order to develop & build this app.
+
+```bash
+$ git clone https://github.com/btargac/excel-parser-processor.git
+$ cd excel-parser-processor
+$ npm install
+$ npm run build
+$ npm start
 ```
-npm install --save-dev miniprogram-simulate
+
+If you are changing the view or renderer related things, you can use Webpack's watch feature with
+
+```bash
+$ npm run start-renderer-dev
 ```
 
-## 使用
+After running this command, you'll see a webpack process watching your files after a new renderer.bundle.js is generated
+you can refresh the Excel parser processor app window with `cmd + R` or `ctrl + R` depending on your system.
 
-```js
-const simulate = require('miniprogram-simulate')
+To generate binaries on your computer after your development is completed, you can run;
 
-test('test sth', () => {
-    const id = simulate.load('/components/comp/index') // 加载自定义组件
-    const comp = simulate.render(id) // 渲染自定义组件
-    
-    // 使用自定义组件封装实例 comp 对象来进行各种单元测试
-})
+```bash
+$ npm run dist
 ```
 
-以上只是一个简单的例子，实际上这个工具集必须搭配 jest 或 jsdom/mocha 等测试框架来使用，更为详细的使用细节请参阅下述文档：
+This will add binaries under `/release` folder on your project folder.
 
-* [使用简介](./docs/tutorial.md)
-* [接口文档](./docs/api.md)
-* [细节实现](./docs/detail.md)
-* [暂不支持特性](./docs/todo.md)
-* [更新日志](./docs/update.md)
+`/release` folder is ignored at the repository. Github Actions will be building the binaries after your branch is merged with master.
 
-## 协议
+## Contributors
 
-[MIT](./LICENSE)
+This project exists thanks to all the people who contribute. [[Code of Conduct](CODE_OF_CONDUCT.md)].
+<a href="graphs/contributors"><img src="https://opencollective.com/excel-parser-processor/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/excel-parser-processor#backer)]
+
+<a href="https://opencollective.com/excel-parser-processor#backers" target="_blank"><img src="https://opencollective.com/excel-parser-processor/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/excel-parser-processor#sponsor)]
+
+<a href="https://opencollective.com/excel-parser-processor/sponsor/0/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/1/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/2/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/3/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/4/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/5/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/6/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/7/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/8/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/excel-parser-processor/sponsor/9/website" target="_blank"><img src="https://opencollective.com/excel-parser-processor/sponsor/9/avatar.svg"></a>
+
+
+
+#### License
+MIT © [Burak Targaç](https://github.com/btargac)
+
+[dependabot-badge]: https://badgen.net/github/dependabot/btargac/excel-parser-processor?icon=dependabot
+[dependabot-url]: https://github.com/btargac/excel-parser-processor/security/dependabot
+
+[gh-actions-image]: https://github.com/btargac/excel-parser-processor/actions/workflows/main.yml/badge.svg?branch=master
+[gh-actions-url]: https://github.com/btargac/excel-parser-processor/actions/workflows/main.yml
+
+[github-tag-image]: https://img.shields.io/github/tag/btargac/excel-parser-processor.svg
+[github-tag-url]: https://github.com/btargac/excel-parser-processor/releases/latest
+
+[codecov-image]: https://codecov.io/gh/btargac/excel-parser-processor/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/btargac/excel-parser-processor
+
+[CodeFactor-image]: https://www.codefactor.io/repository/github/btargac/excel-parser-processor/badge
+[CodeFactor-url]: https://www.codefactor.io/repository/github/btargac/excel-parser-processor
+
+[codeql-image]: https://github.com/btargac/excel-parser-processor/actions/workflows/codeql-analysis.yml/badge.svg?branch=master
+[codeql-url]: https://github.com/btargac/excel-parser-processor/actions/workflows/codeql-analysis.yml

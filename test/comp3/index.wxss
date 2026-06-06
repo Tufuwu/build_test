@@ -1,7 +1,0 @@
-.index {
-  color: green;
-
-  .inner {
-    color: red;
-  }
-}

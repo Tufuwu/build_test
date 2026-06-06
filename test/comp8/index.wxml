@@ -1,3 +1,0 @@
-<custom-ul class="ul">
-  <custom-li class="li" wx:for="{{list}}" wx:key="*this">{{item}}</custom-li>
-</custom-ul>

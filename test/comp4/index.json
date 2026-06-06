@@ -1,6 +1,0 @@
-{
-    "component": true,
-    "usingComponents": {
-        "other-comp": "./other"
-    }
-}
