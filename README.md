@@ -1,273 +1,106 @@
-# React Redux Loading Bar
+Jed Gettext Parser
+==================
 
-[![npm version](https://img.shields.io/npm/v/react-redux-loading-bar.svg?style=flat-square)](https://www.npmjs.com/package/react-redux-loading-bar)
-[![build status](https://github.com/mironov/react-redux-loading-bar/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/mironov/react-redux-loading-bar/actions/workflows/ci.yml)
-[![coverage status](https://coveralls.io/repos/github/mironov/react-redux-loading-bar/badge.svg?branch=master)](https://coveralls.io/github/mironov/react-redux-loading-bar?branch=master)
-[![npm downloads](https://img.shields.io/npm/dm/react-redux-loading-bar.svg?style=flat)](https://www.npmjs.com/package/react-redux-loading-bar)
+JavaScript Gettext `.mo` file parsing for [Jed](https://github.com/slexaxton/Jed/).
 
-A React component that provides Loading Bar (aka Progress Bar) for long running tasks.
+![CI](https://github.com/Ortham/jed-gettext-parser/workflows/CI/badge.svg?branch=master&event=push)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/oliverhamlet.svg)](https://saucelabs.com/u/oliverhamlet)
 
-![Demo GIF](http://d.pr/i/JbwN+)
+## Introduction
 
-Consists of:
+[Gettext](https://www.gnu.org/software/gettext/) is an old translation standard with implementations in many languages. It's one that localisation-aware programmers and translators are likely to be familiar with.
 
-* React component — displays loading bar and simulates progress
-* Redux reducer — manages loading bar's part of the store
-* (optional) Redux middleware — automatically shows and hides Loading Bar for actions with promises
+[Jed](https://github.com/slexaxton/Jed/) provides a very nice interface for translation using Gettext in Javascript.
 
-## Examples
+Jed doesn't supply Gettext translation file parsers, so this library can act as the bridge between Gettext binary files and Jed.
 
-See [Demo](http://mironov.github.io/react-redux-loading-bar/) or its [source code](https://github.com/mironov/react-redux-loading-bar/tree/gh-pages/src).
+*Note: Jed Gettext Parser is made to work with Jed, but is a third-party library. Please direct any support queries to this repository's issue tracker, and [the author](https://github.com/Ortham).*
 
-## Installation
+## Install
 
-```bash
-npm install --save react-redux-loading-bar
+Jed Gettext Parser can be loaded as a browser global, an AMD module, or in Node. It requires support for:
+
+* [Typed Arrays](http://caniuse.com/#feat=typedarrays) ([polyfill](https://github.com/inexorabletash/polyfill/blob/master/typedarray.js))
+* [Encoding API](http://caniuse.com/#feat=textencoder) ([polyfill](https://github.com/inexorabletash/text-encoding))
+
+Node supports Typed Arrays, and npm will automatically handle the Encoding API polyfill as a dependency.
+
+##### Browser Global
+
+```
+<script src="jedGettextParser.js"></script>
+<script>
+// Use jedGettextParser
+</script>
+```
+
+##### AMD Module
+
+```
+require(['jedGettextParser'], function(jedGettextParser) {
+    // Use jedGettextParser
+});
+```
+
+##### Node
+
+```
+npm install jed-gettext-parser
+```
+
+```
+var jedGettextParser = require('jed-gettext-parser');
+// Use jedGettextParser
 ```
 
 ## Usage
 
-Mount the `LoadingBar` component anywhere in your application:
+Once you've loaded Jed and Jed Gettext Parser, they can can be used together:
 
-```jsx
-import LoadingBar from 'react-redux-loading-bar'
+```
+var moBuffer = new ArrayBuffer();
+// Fill the moBuffer with the contents of a .mo file in whatever way you like.
 
-export default class Header extends React.Component {
-  render() {
-    return (
-      <header>
-        <LoadingBar />
-      </header>
-    )
-  }
+// locale_data is an object holding locale data as expected by Jed.
+var locale_data = jedGettextParser.mo.parse(moBuffer);
+
+// Now load using Jed.
+var i18n = new Jed({
+    'locale_data': locale_data,
+    'domain': 'messages'
+});
+```
+
+#### API
+
+The library currently exposes only one function:
+
+```
+var data = jedGettextParser.mo.parse(buffer[, options]);
+```
+
+* `data`: an object that can be used as the value of Jed's `locale_data` initialisation option.
+* `buffer`: an `ArrayBuffer` object that holds the contents of the `.mo` file to parse.
+* `options`: an object that can be optionally provided to specify some settings.
+
+The `options` object has the following structure (default values given):
+
+```
+var options = {
+    encoding: undefined,
+    domain: 'messages'
 }
 ```
 
-Good news is that it doesn't include any positioning. You can attach it to the top of any block or the whole page.
+* `encoding`: The encoding to use when reading the `.mo` file. If undefined, the encoding given in the `.mo` file will be used. Otherwise, valid values are those given in the [Encoding API specification](http://encoding.spec.whatwg.org/#names-and-labels).
+* `domain`: The domain under which the translation data should be stored.
 
-You can even include multiple loading bars on the same page, that will render independently. They need to be provided with
-a scope so that you can adjust them independently.
+If an issue is encountered during parsing, an `Error` object describing the problem will be thrown.
 
-```jsx
-import LoadingBar from 'react-redux-loading-bar'
+## Motivation
 
-export default class Header extends React.Component {
-  render() {
-    return (
-      <header>
-        <LoadingBar />
-      </header>
-      <section>
-        <LoadingBar scope="sectionBar" />
-      </section>
-    )
-  }
-}
-```
+There are two types of Gettext translation files: the `.po` files contain human-readable text that can be easily edited by translators, and the `.mo` files contain equivalent binary data. Some Gettext implementations use one, the other, or both.
 
-Install the reducer to the store:
+While developing a [Chromium Embedded Framework](https://code.google.com/p/chromiumembedded)-based application ([LOOT](github.com/loot/loot)) which required localisation of strings in the C++ and the Javascript code, I decided that parsing the `.mo` localisation files in each language separately was the neatest and simplest way of achieving this. The only Javascript `.mo` file parser I could find was [gettext-parser](https://github.com/andris9/gettext-parser), and it's Node-only, so I wrote this little library.
 
-```jsx
-import { combineReducers } from 'redux'
-import { loadingBarReducer } from 'react-redux-loading-bar'
-
-const reducer = combineReducers({
-  // app reducers
-  loadingBar: loadingBarReducer,
-})
-```
-
-## Usage with [`redux-promise-middleware`](https://github.com/pburtchaell/redux-promise-middleware)
-
-Apply middleware to automatically show and hide loading bar on actions with promises:
-
-```jsx
-import { createStore, applyMiddleware } from 'redux'
-import { loadingBarMiddleware } from 'react-redux-loading-bar'
-import rootReducer from './reducers'
-
-const store = createStore(
-  rootReducer,
-  // promise middleware
-  applyMiddleware(loadingBarMiddleware())
-)
-```
-
-## Usage with custom suffixes or alternative promise middleware
-
-You can configure promise type suffixes that are used in your project:
-
-```jsx
-import { createStore, applyMiddleware } from 'redux'
-import { loadingBarMiddleware } from 'react-redux-loading-bar'
-import rootReducer from './reducers'
-
-const store = createStore(
-  rootReducer,
-  applyMiddleware(
-    loadingBarMiddleware({
-      promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
-    })
-  )
-)
-```
-
-## Usage with custom scope (for multiple loading bars)
-
-```jsx
-import { createStore, applyMiddleware } from 'redux'
-import { loadingBarMiddleware } from 'react-redux-loading-bar'
-import rootReducer from './reducers'
-
-const store = createStore(
-  rootReducer,
-  applyMiddleware(
-    loadingBarMiddleware({
-      scope: 'sectionBar',
-    })
-  )
-)
-```
-
-If you're not using `redux-promise-middleware` or any other promise middleware, you can skip installing the `loadingBarMiddleware()` and dispatch `SHOW`/`HIDE` actions manually. The other option is to write your own middleware that will be similar to the [bundled one](https://github.com/mironov/react-redux-loading-bar/blob/master/src/loading_bar_middleware.js).
-
-## Usage without middleware
-
-You can dispatch `SHOW`/`HIDE` actions wherever you want by importing the corresponding action creators:
-
-```jsx
-import { showLoading, hideLoading } from 'react-redux-loading-bar'
-
-dispatch(showLoading())
-// do long running stuff
-dispatch(hideLoading())
-```
-
-You need to dispatch `HIDE` as many times as `SHOW` was dispatched to make the bar disappear. In other words, the loading bar is shown until all long running tasks complete.
-
-## Usage without middleware but with scope
-
-You need to provide the scope to the actions:
-
-```jsx
-import { showLoading, hideLoading } from 'react-redux-loading-bar'
-
-dispatch(showLoading('sectionBar'))
-// do long running stuff
-dispatch(hideLoading('sectionBar'))
-```
-
-## Usage with [`redux-saga`](https://github.com/redux-saga/redux-saga)
-
-Install the `loadingBarReducer()` and mount Loading Bar in your application.
-You can import and dispatch `showLoading` and `hideLoading` from your sagas.
-
-```jsx
-import { showLoading, hideLoading } from 'react-redux-loading-bar'
-
-export function* fetchData() {
-  try {
-    yield put(showLoading())
-    const payload = yield call(API, params)
-    // payload processing
-  } finally {
-    yield put(hideLoading())
-  }
-}
-```
-
-## Usage with [`immutable-js`](https://github.com/facebook/immutable-js)
-
-You can change component import line if your top level redux store object is `immutable`.
-
-```jsx
-import { ImmutableLoadingBar as LoadingBar } from 'react-redux-loading-bar'
-
-// Mount LoadingBar component as usual
-```
-
-## Usage with jQuery Ajax Requests
-
-If you happen to use jQuery for Ajax requests, you can dispatch `SHOW`/`HIDE` actions on `ajaxStart`/`ajaxStop` global events:
-
-```jsx
-$(document).on('ajaxStart', this.props.actions.showLoading)
-$(document).on('ajaxStop', this.props.actions.hideLoading)
-```
-
-See [a demo](http://mironov.github.io/react-redux-loading-bar/?ajax) or checkout [the code](https://github.com/mironov/react-redux-loading-bar/blob/gh-pages/src/demo_ajax.js).
-
-## RTL (Right-To-Left) Layout
-
-Pass `direction="rtl"` to make Loading Bar simulate progress from right to left:
-
-```jsx
-<LoadingBar direction="rtl" />
-```
-
-## Styling
-
-You can apply custom styling right on the `LoadingBar` component. For example you can change the color and height of the loading bar:
-
-```jsx
-<LoadingBar style={{ backgroundColor: 'blue', height: '5px' }} />
-```
-
-Alternatively, you can specify your own CSS class.
-
-**Please note that will disable default styling (which is `background-color: red; height: 3px; position: absolute;`).**
-
-```jsx
-<LoadingBar className="loading" />
-```
-
-Don't forget to set `height`, `background-color` and `position` for the `loading` class in your CSS files.
-
-## Configure Progress Simulation
-
-You can change updateTime (by default 200ms), maxProgress (by default 90%) and progressIncrease (by default 5%):
-
-```jsx
-<LoadingBar updateTime={100} maxProgress={95} progressIncrease={10} />
-```
-
-By default, the Loading Bar will only display if the action took longer than `updateTime` to finish. This helps keep things feeling snappy, and avoids the annoyingness of showing a Loading Bar for fractions of seconds. If you want to show Loading Bar even on quickly finished actions you can pass the `showFastActions` prop:
-
-```jsx
-<LoadingBar showFastActions />
-```
-
-## Reset progress
-
-You can dispatch the `resetLoading` action to ultimately hide Loading Bar even when multiple long running tasks are still in progress.
-
-## Tests
-
-```bash
-npm test
-```
-
-## Contributing
-
-In lieu of a formal styleguide, take care to maintain the existing coding style.
-Add unit tests for any new or changed functionality. Lint and test your code.
-
-## Contributors (in chronological order)
-
-- [@mironov](https://github.com/mironov)
-- [@ThomasMarnet](https://github.com/ThomasMarnet)
-- [@hieuhlc](https://github.com/hieuhlc)
-- [@josefernand](https://github.com/josefernand)
-- [@greenpart](https://github.com/greenpart)
-- [@larrydahooster](https://github.com/larrydahooster)
-- [@janslow](https://github.com/janslow)
-- [@vitosamson](https://github.com/vitosamson)
-- [@seb0zz](https://github.com/seb0zz)
-- [@neogermi](https://github.com/neogermi)
-- [@MikeDevice](https://github.com/MikeDevice)
-- [@Kovensky](https://github.com/Kovensky)
-- [@dengbupapapa](https://github.com/dengbupapapa)
-
-To see what has changed in recent versions of Loading Bar, see the [CHANGELOG](https://github.com/mironov/react-redux-loading-bar/blob/master/CHANGELOG.md).
-
-Licensed MIT. Copyright 2016-current Anton Mironov.
+I used [gettext-parser](https://github.com/andris9/gettext-parser) to cross-check my understanding of the Gettext mo file [spec](https://www.gnu.org/software/gettext/manual/html_node/MO-Files.html), and as inspiration for this library's API, so thanks to Andris Reinman for writing it.
