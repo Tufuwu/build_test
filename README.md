@@ -1,130 +1,273 @@
-# npm-bump
+# React Redux Loading Bar
 
-> A better `npm version major|minor|patch`
+[![npm version](https://img.shields.io/npm/v/react-redux-loading-bar.svg?style=flat-square)](https://www.npmjs.com/package/react-redux-loading-bar)
+[![build status](https://github.com/mironov/react-redux-loading-bar/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/mironov/react-redux-loading-bar/actions/workflows/ci.yml)
+[![coverage status](https://coveralls.io/repos/github/mironov/react-redux-loading-bar/badge.svg?branch=master)](https://coveralls.io/github/mironov/react-redux-loading-bar?branch=master)
+[![npm downloads](https://img.shields.io/npm/dm/react-redux-loading-bar.svg?style=flat)](https://www.npmjs.com/package/react-redux-loading-bar)
 
-<!--
-[![Build Status](https://travis-ci.org/mgol/npm-bump.svg?branch=main)](https://travis-ci.org/mgol/npm-bump)
-[![Build status](https://ci.appveyor.com/api/projects/status/3lddln8y5hvn5pq0/branch/main?svg=true)](https://ci.appveyor.com/project/mgol/npm-bump/branch/main)
--->
+A React component that provides Loading Bar (aka Progress Bar) for long running tasks.
+
+![Demo GIF](http://d.pr/i/JbwN+)
+
+Consists of:
+
+* React component — displays loading bar and simulates progress
+* Redux reducer — manages loading bar's part of the store
+* (optional) Redux middleware — automatically shows and hides Loading Bar for actions with promises
+
+## Examples
+
+See [Demo](http://mironov.github.io/react-redux-loading-bar/) or its [source code](https://github.com/mironov/react-redux-loading-bar/tree/gh-pages/src).
 
 ## Installation
 
-To install invoke:
-
-```shell
-npm install -g npm-bump
+```bash
+npm install --save react-redux-loading-bar
 ```
-
-You now have the `npm-bump` binary available.
-
-If you want to use it as a module, invoke:
-
-```shell
-npm install npm-bump --save
-```
-
-## Rationale
-
-The aim of this module is to keep a repository in a state where if the `version` value in `package.json` points to a stable version, it's a tagged commit that was published to npm. Since one can add Git endpoints as packages' "versions", this allows to quickly check if an installed dependency uses a pre-release or a stable version.
 
 ## Usage
 
-Once the package has been installed, it may be used from the terminal:
+Mount the `LoadingBar` component anywhere in your application:
 
-```shell
-npm-bump releaseType
+```jsx
+import LoadingBar from 'react-redux-loading-bar'
+
+export default class Header extends React.Component {
+  render() {
+    return (
+      <header>
+        <LoadingBar />
+      </header>
+    )
+  }
+}
 ```
 
-where `releaseType` is one of: `major`, `minor` and `patch`.
+Good news is that it doesn't include any positioning. You can attach it to the top of any block or the whole page.
 
-To use as a module, do the following:
+You can even include multiple loading bars on the same page, that will render independently. They need to be provided with
+a scope so that you can adjust them independently.
 
-```js
-var npmBump = require('npm-bump');
-npmBump(releaseType);
+```jsx
+import LoadingBar from 'react-redux-loading-bar'
+
+export default class Header extends React.Component {
+  render() {
+    return (
+      <header>
+        <LoadingBar />
+      </header>
+      <section>
+        <LoadingBar scope="sectionBar" />
+      </section>
+    )
+  }
+}
 ```
 
-You can check the version of `npm-bump` via:
+Install the reducer to the store:
 
-```shell
-npm-bump --version
+```jsx
+import { combineReducers } from 'redux'
+import { loadingBarReducer } from 'react-redux-loading-bar'
+
+const reducer = combineReducers({
+  // app reducers
+  loadingBar: loadingBarReducer,
+})
 ```
 
-Regardless of using the package as a binary or a module, invoking the above code will result in:
+## Usage with [`redux-promise-middleware`](https://github.com/pburtchaell/redux-promise-middleware)
 
-1. Creating a new commit that increases the project version to the nearest stable one having a larger `major`/`minor`/`patch` than currently.
-2. Tagging the commit with a specified version.
-3. Creating a new commit with an increased patch version and the `-pre` suffix added.
-4. Asking the user to do a final check and proceed or rollback.
+Apply middleware to automatically show and hide loading bar on actions with promises:
 
-If the user goes along, the new version gets published and created commits and tags pushed to the `origin` remote. Otherwise, all the changes are reversed.
+```jsx
+import { createStore, applyMiddleware } from 'redux'
+import { loadingBarMiddleware } from 'react-redux-loading-bar'
+import rootReducer from './reducers'
 
-Until the user gives the final green light, everything happens locally and is fully reversible.
-
-### Pre-releases
-
-If you supply `releaseType` other than `major`/`minor`/`patch`, it will be treated as a pre-release identifier and a proper pre-release version will be tagged & published. Such a version will be published with an npm tag equal to the identifier. For example, if your package is currently at version `1.0.0-pre`, the following command:
-
-```shell
-npm-bump beta
+const store = createStore(
+  rootReducer,
+  // promise middleware
+  applyMiddleware(loadingBarMiddleware())
+)
 ```
 
-will publish a version `1.0.0-beta.0` under the tag `beta` and bump the version to `1.0.0-beta.1-pre`.
+## Usage with custom suffixes or alternative promise middleware
 
-## Options
+You can configure promise type suffixes that are used in your project:
 
-You can optionally pass the remote name and the branch name to be used, in addition to a prefix to be applied to the version bump commit message. By default the remote is assumed to be `origin` and the branch: `main`.
+```jsx
+import { createStore, applyMiddleware } from 'redux'
+import { loadingBarMiddleware } from 'react-redux-loading-bar'
+import rootReducer from './reducers'
 
-You can also provide the `access` option with the `public` or `private` value to declare whether the package should be public or private. When not provided, it uses default npm behavior: scoped packages are private & unscoped ones - public.
-
-To customize, do the following:
-
-1. When using from shell:
-
-```shell
-npm-bump minor --remote origin --branch main --prefix "[no-ci]" --access public
+const store = createStore(
+  rootReducer,
+  applyMiddleware(
+    loadingBarMiddleware({
+      promiseTypeSuffixes: ['REQUEST', 'SUCCESS', 'FAILURE'],
+    })
+  )
+)
 ```
 
-or:
+## Usage with custom scope (for multiple loading bars)
 
-```shell
-npm-bump minor -r origin -b main -p "[no-ci]" ---access public
+```jsx
+import { createStore, applyMiddleware } from 'redux'
+import { loadingBarMiddleware } from 'react-redux-loading-bar'
+import rootReducer from './reducers'
+
+const store = createStore(
+  rootReducer,
+  applyMiddleware(
+    loadingBarMiddleware({
+      scope: 'sectionBar',
+    })
+  )
+)
 ```
 
-Run:
+If you're not using `redux-promise-middleware` or any other promise middleware, you can skip installing the `loadingBarMiddleware()` and dispatch `SHOW`/`HIDE` actions manually. The other option is to write your own middleware that will be similar to the [bundled one](https://github.com/mironov/react-redux-loading-bar/blob/master/src/loading_bar_middleware.js).
 
-```shell
-npm-bump --help
+## Usage without middleware
+
+You can dispatch `SHOW`/`HIDE` actions wherever you want by importing the corresponding action creators:
+
+```jsx
+import { showLoading, hideLoading } from 'react-redux-loading-bar'
+
+dispatch(showLoading())
+// do long running stuff
+dispatch(hideLoading())
 ```
 
-or:
+You need to dispatch `HIDE` as many times as `SHOW` was dispatched to make the bar disappear. In other words, the loading bar is shown until all long running tasks complete.
 
-```shell
-npm-bump -h
+## Usage without middleware but with scope
+
+You need to provide the scope to the actions:
+
+```jsx
+import { showLoading, hideLoading } from 'react-redux-loading-bar'
+
+dispatch(showLoading('sectionBar'))
+// do long running stuff
+dispatch(hideLoading('sectionBar'))
 ```
 
-to see the full information about accepted options.
+## Usage with [`redux-saga`](https://github.com/redux-saga/redux-saga)
 
-2. When using as a library:
+Install the `loadingBarReducer()` and mount Loading Bar in your application.
+You can import and dispatch `showLoading` and `hideLoading` from your sagas.
 
-```js
-var npmBump = require('npm-bump').custom({
-    remote: 'origin',
-    branch: 'main',
-    prefix: '[no-ci]',
-    access: 'public',
-});
-npmBump(minor);
+```jsx
+import { showLoading, hideLoading } from 'react-redux-loading-bar'
+
+export function* fetchData() {
+  try {
+    yield put(showLoading())
+    const payload = yield call(API, params)
+    // payload processing
+  } finally {
+    yield put(hideLoading())
+  }
+}
 ```
 
-## Supported Node.js versions
+## Usage with [`immutable-js`](https://github.com/facebook/immutable-js)
 
-This project aims to support all Node.js versions supported upstream with the exception of those in maintenance mode (see [Release README](https://github.com/nodejs/Release/blob/main/README.md) for more details).
+You can change component import line if your top level redux store object is `immutable`.
+
+```jsx
+import { ImmutableLoadingBar as LoadingBar } from 'react-redux-loading-bar'
+
+// Mount LoadingBar component as usual
+```
+
+## Usage with jQuery Ajax Requests
+
+If you happen to use jQuery for Ajax requests, you can dispatch `SHOW`/`HIDE` actions on `ajaxStart`/`ajaxStop` global events:
+
+```jsx
+$(document).on('ajaxStart', this.props.actions.showLoading)
+$(document).on('ajaxStop', this.props.actions.hideLoading)
+```
+
+See [a demo](http://mironov.github.io/react-redux-loading-bar/?ajax) or checkout [the code](https://github.com/mironov/react-redux-loading-bar/blob/gh-pages/src/demo_ajax.js).
+
+## RTL (Right-To-Left) Layout
+
+Pass `direction="rtl"` to make Loading Bar simulate progress from right to left:
+
+```jsx
+<LoadingBar direction="rtl" />
+```
+
+## Styling
+
+You can apply custom styling right on the `LoadingBar` component. For example you can change the color and height of the loading bar:
+
+```jsx
+<LoadingBar style={{ backgroundColor: 'blue', height: '5px' }} />
+```
+
+Alternatively, you can specify your own CSS class.
+
+**Please note that will disable default styling (which is `background-color: red; height: 3px; position: absolute;`).**
+
+```jsx
+<LoadingBar className="loading" />
+```
+
+Don't forget to set `height`, `background-color` and `position` for the `loading` class in your CSS files.
+
+## Configure Progress Simulation
+
+You can change updateTime (by default 200ms), maxProgress (by default 90%) and progressIncrease (by default 5%):
+
+```jsx
+<LoadingBar updateTime={100} maxProgress={95} progressIncrease={10} />
+```
+
+By default, the Loading Bar will only display if the action took longer than `updateTime` to finish. This helps keep things feeling snappy, and avoids the annoyingness of showing a Loading Bar for fractions of seconds. If you want to show Loading Bar even on quickly finished actions you can pass the `showFastActions` prop:
+
+```jsx
+<LoadingBar showFastActions />
+```
+
+## Reset progress
+
+You can dispatch the `resetLoading` action to ultimately hide Loading Bar even when multiple long running tasks are still in progress.
+
+## Tests
+
+```bash
+npm test
+```
 
 ## Contributing
 
-In lieu of a formal style guide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using `npm test`.
+In lieu of a formal styleguide, take care to maintain the existing coding style.
+Add unit tests for any new or changed functionality. Lint and test your code.
 
-## License
+## Contributors (in chronological order)
 
-Copyright (c) 2014 Michał Gołębiowski-Owczarek. Licensed under the MIT license.
+- [@mironov](https://github.com/mironov)
+- [@ThomasMarnet](https://github.com/ThomasMarnet)
+- [@hieuhlc](https://github.com/hieuhlc)
+- [@josefernand](https://github.com/josefernand)
+- [@greenpart](https://github.com/greenpart)
+- [@larrydahooster](https://github.com/larrydahooster)
+- [@janslow](https://github.com/janslow)
+- [@vitosamson](https://github.com/vitosamson)
+- [@seb0zz](https://github.com/seb0zz)
+- [@neogermi](https://github.com/neogermi)
+- [@MikeDevice](https://github.com/MikeDevice)
+- [@Kovensky](https://github.com/Kovensky)
+- [@dengbupapapa](https://github.com/dengbupapapa)
+
+To see what has changed in recent versions of Loading Bar, see the [CHANGELOG](https://github.com/mironov/react-redux-loading-bar/blob/master/CHANGELOG.md).
+
+Licensed MIT. Copyright 2016-current Anton Mironov.
