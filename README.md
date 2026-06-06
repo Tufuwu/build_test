@@ -1,133 +1,121 @@
-# dmn-js-properties-panel
+# niceware
 
-[![CI](https://github.com/bpmn-io/dmn-js-properties-panel/workflows/CI/badge.svg)](https://github.com/bpmn-io/dmn-js-properties-panel/actions?query=workflow%3ACI)
+[![Build Status](https://travis-ci.org/diracdeltas/niceware.svg?branch=master)](https://travis-ci.org/diracdeltas/niceware)
 
-This is properties panel extension for [dmn-js](https://github.com/bpmn-io/dmn-js).
+A JS library for generating random-yet-memorable passwords, either server-side in Node or in the browser. Each word provides 16 bits of entropy, so a useful password requires at least 3 words.
 
-![dmn-js-properties-panel screenshot](./docs/screenshot.png "Screenshot of the dmn-js editor + the properties panel")
+Because the wordlist is of exactly size 2^16, Niceware is also useful for convert cryptographic keys and other sequences of random bytes into human-readable phrases. With Niceware, a 128-bit key is equivalent to an 8-word phrase.
 
-## Features
+Demo: https://diracdeltas.github.io/niceware/
 
-The properties panel allows users to edit invisible DMN properties in a convenient way.
+**WARNING: The wordlist has not been rigorously checked for offensive words.
+Use at your own risk.**
 
-Some of the features are:
+## Sample use cases
 
-* Edit element ids and names
-* Edit execution related [Camunda](http://camunda.org) properties
-* Redo and undo (plugs into the [dmn-js](https://github.com/bpmn-io/dmn-js) editing cycle)
+* Niceware can be used to generate secure, semi-memorable, easy-to-type
+  passphrases. A random 3-5 word phrase in Niceware is equivalent to a strong
+  password for authentication to most online services. For instance,
+  `+8svofk0Y1o=` and `bacca cavort west volley` are equally strong (64 bits of
+  randomness).
+* Niceware can be used to display cryptographic key material in a way that
+  users can easily backup or copy between devices. For instance, the 128-bit
+  random seed used to generate a 256-bit ECC key (~equivalent to
+  a 3072-bit RSA key) is only 8 Niceware words. With this 8-word phrase, you
+  can reconstruct the entire public/private key pair.
 
+## Usage in Node
 
-## Usage
+To install:
 
-Provide two HTML elements, one for the properties panel and one for the DMN diagram:
-
-```html
-<div class="modeler">
-  <div id="canvas"></div>
-  <div id="properties"></div>
-</div>
+```
+npm install niceware
 ```
 
-Bootstrap [dmn-js](https://github.com/bpmn-io/dmn-js) with the properties panel, and a [properties provider](./lib/provider):
+To generate an 8-byte passphrase:
 
-```javascript
-import DmnModeler from 'dmn-js/lib/Modeler';
+```
+const niceware = require('niceware')
 
-import {
-  DmnPropertiesPanelModule,
-  DmnPropertiesProviderModule,
-} from 'dmn-js-properties-panel';
+// The number of bytes must be even
+const passphrase = niceware.generatePassphrase(8)
 
-var dmnModeler = new DmnModeler({
-  drd: {
-    propertiesPanel: {
-      parent: '#properties'
-    },
-    additionalModules: [
-      DmnPropertiesPanelModule,
-      DmnPropertiesProviderModule
-    ]
-  },
-  container: '#canvas'
-});
+// Result: [ 'deathtrap', 'stegosaur', 'nilled', 'nonscheduled' ]
 ```
 
+## Usage in browser
 
-### Dynamic Attach/Detach
+To use Niceware in modern browsers, include
+[browser/niceware.js](browser/niceware.js) in a script
+tag. Niceware is then available in the `window.niceware` object.
 
-You may attach or detach the properties panel dynamically to any element on the page, too:
-
-```javascript
-var propertiesPanel = dmnJS.get('propertiesPanel');
-
-// detach the panel
-propertiesPanel.detach();
-
-// attach it to some other element
-propertiesPanel.attachTo('#other-properties');
+```
+<script src='niceware.js'></script>
+<script>
+  const passphrase = window.niceware.generatePassphrase(8)
+</script>
 ```
 
+Niceware uses `window.{crypto, msCrypto}.getRandomValues` for entropy in the browser.
 
-### Use with Camunda properties
+## Docs
 
-In order to be able to edit [Camunda](https://camunda.org) related properties, use the [camunda properties provider](./lib/provider/camunda).
-In addition, you need to define the `camunda` namespace via [camunda-dmn-moddle](https://github.com/camunda/camunda-dmn-moddle).
+NOTE: When used in the browser, `Buffer` is replaced with `window.Uint8Array`.
 
-```javascript
-import DmnModeler from 'dmn-js/lib/Modeler';
-import {
-  DmnPropertiesPanelModule,
-  DmnPropertiesProviderModule,
-  CamundaPropertiesProviderModule
-} from 'dmn-js-properties-panel';
+* [niceware](#exp_module_niceware--niceware) ⏏
+    * [.bytesToPassphrase(bytes)](#module_niceware--niceware.bytesToPassphrase) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.passphraseToBytes(words)](#module_niceware--niceware.passphraseToBytes) ⇒ <code>Buffer</code>
+    * [.generatePassphrase(size)](#module_niceware--niceware.generatePassphrase) ⇒ <code>Array.&lt;string&gt;</code>
 
+<a name="exp_module_niceware--niceware"></a>
 
-// use Camunda properties provider
-import CamundaPropertiesProvider from 'src/provider/camunda';
+### niceware ⏏
+**Kind**: Exported constant  
+<a name="module_niceware--niceware.bytesToPassphrase"></a>
 
-// a descriptor that defines Camunda related DMN 1.1 XML extensions
-import camundaModdleDescriptor from 'camunda-dmn-moddle/resources/camunda';
+#### niceware.bytesToPassphrase(bytes) ⇒ <code>Array.&lt;string&gt;</code>
+Converts a byte array into a passphrase.
 
-var dmnModeler = new DmnModeler({
-  drd: {
-    propertiesPanel: {
-      parent: '#properties'
-    },
-    additionalModules: [
-      DmnPropertiesPanelModule,
-      DmnPropertiesProviderModule,
-      CamundaPropertiesProviderModule
-    ]
-  },
-  container: '#canvas'
-  // make camunda prefix known for import, editing and export
-  moddleExtensions: {
-    camunda: camundaModdleDescriptor
-  }
-});
+**Kind**: static method of [<code>niceware</code>](#exp_module_niceware--niceware)  
 
-...
-```
+| Param | Type | Description |
+| --- | --- | --- |
+| bytes | <code>Buffer</code> | The bytes to convert |
 
+<a name="module_niceware--niceware.passphraseToBytes"></a>
 
-## Additional Resources
+#### niceware.passphraseToBytes(words) ⇒ <code>Buffer</code>
+Converts a phrase back into the original byte array.
 
-* [Issue tracker](https://github.com/bpmn-io/dmn-js-properties-panel)
-* [Forum](https://forum.bpmn.io)
+**Kind**: static method of [<code>niceware</code>](#exp_module_niceware--niceware)  
 
+| Param | Type | Description |
+| --- | --- | --- |
+| words | <code>Array.&lt;string&gt;</code> | The words to convert |
 
-## Development
+<a name="module_niceware--niceware.generatePassphrase"></a>
 
-### Running the tests
+#### niceware.generatePassphrase(size) ⇒ <code>Array.&lt;string&gt;</code>
+Generates a random passphrase with the specified number of bytes.
+NOTE: `size` must be an even number.
 
-```bash
-npm install
+**Kind**: static method of [<code>niceware</code>](#exp_module_niceware--niceware)  
 
-export TEST_BROWSERS=Chrome
-npm run all
-```
+| Param | Type | Description |
+| --- | --- | --- |
+| size | <code>number</code> | The number of random bytes to use |
 
 
-## License
+## Niceware ports
 
-MIT
+* Chrome extension, thanks to Noah Feder: https://chrome.google.com/webstore/detail/niceware-password/dhnichgmciickpnnnhfcljljnfomadag
+* pip package, thanks to Alex Willmer: https://pypi.python.org/pypi/niceware
+* CLI, thanks to Alex Cross: https://www.npmjs.com/package/nicepass
+
+## Credits
+
+Niceware was inspired by
+[Diceware](http://world.std.com/~reinhold/diceware.html). Its wordlist is
+derived from [the SIL English word list](https://web.archive.org/web/20180803153208/http://www-01.sil.org/linguistics/wordlists/english/). This project
+is based on my work on OpenPGP key backup for the Yahoo
+[End-to-End](https://github.com/yahoo/end-to-end) project.
