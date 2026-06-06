@@ -1,21 +1,11 @@
-# MANIFEST.in file required to deliver test files with source tar
-include *.py
-include LICENSE
+include MANIFEST.in
 include README.md
-include test-requirements
-include dev-requirements
-recursive-include test *
-
-# all samples for clitest
-graft samples
-
-include tox.ini
-
-global-exclude .tox
-global-exclude *~
-global-exclude __pycache__
-global-exclude .coverage
-global-exclude *.py[co]
-global-exclude *.db
-global-exclude .git*
-global-exclude *.orig
+include CHANGELOG.md
+include Makefile
+include machine/musashi/softfloat/softfloat-macros
+include machine/musashi/softfloat/softfloat-specialize
+include machine/musashi/*.txt
+recursive-include amitools/data *
+recursive-include amitools/fs/block/bootcode *
+recursive-include machine *.pyx *.c *.h
+recursive-include gen *.c *.h
