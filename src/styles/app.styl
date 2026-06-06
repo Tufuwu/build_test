@@ -1,0 +1,73 @@
+@require 'tools/mixins.styl'
+
+// overriding the general layout to allow a sticky footer
+html,
+body
+    // TODO Remove the !important when https://github.com/cozy/cozy-bar/issues/705
+    // has been solved
+    height 100% !important // @stylint ignore
+    +medium-screen()
+        main > [role=main].u-flex
+            display flex
+
+    +mobile()
+        height inherit !important // @stylint ignore
+
+body
+    // Allows horizontal swipe on mobile
+    +mobile() // @stylint ignore
+        max-width 100vw
+        overflow-x hidden
+
+[role=application]
+    +mobile()
+        overflow auto
+
+.App
+    // Avoid mix-blend-mode from home-custom-background to be linked to the background color of the body.
+    // Must not be responsive to the theme.
+    background-color white
+    overflow-y overlay
+
+    &.custom-wallpaper
+        // black filter effect above the custom wallpaper image
+        &::before
+            content ''
+            position fixed
+            top 0
+            left 0
+            width 100%
+            height 100%
+            background-color rgba(0, 0, 0, .32)
+            backdrop-filter saturate(124%)
+
+    .corner
+        z-index var(--zIndex-nav)
+        margin rem(12) 2rem rem(-44) 0
+
+        .corner-button
+            +small-screen()
+                height 3rem
+                width 3rem
+                margin 0
+
+        +small-screen()
+            margin 0 0 -3rem
+
++small-screen()
+    .main-view, .home-custom-background
+        transition transform 200ms ease-out
+        will-change transform
+    .App--opened
+        .main-view
+            transform scale(1.3)
+
+        .home-custom-background
+            transform scale(1.1)
+
+
+.flagship-app .main-view
+    bottom var(--flagship-bottom-height)
+    overflow-y auto
+    position fixed
+    top var(--flagship-top-height)

@@ -1,229 +1,135 @@
-# Contributing to excel-parser-processor
+# How to contribute to Cozy Home?
 
-We would love for you to contribute to excel-parser-processor and help make it even better than it is
-today! As a contributor, here are the guidelines we would like you to follow:
+Thank you for your interest in contributing to Cozy! There are many ways to contribute, and we appreciate all of them.
 
- - [Code of Conduct](#coc)
- - [Question or Problem?](#question)
- - [Issues and Bugs](#issue)
- - [Feature Requests](#feature)
- - [Submission Guidelines](#submit)
- - [Coding Rules](#rules)
- - [Commit Message Guidelines](#commit)
+## Security Issues
 
-## <a name="coc"></a> Code of Conduct
-Help us keep excel-parser-processor open and inclusive. Please read and follow our [Code of Conduct][coc].
+If you discover a security issue, please bring it to our attention right away! Please **DO NOT** file a public issue, instead send your report privately to security AT cozycloud DOT cc.
 
-## <a name="question"></a> Got a Question or Problem?
+Security reports are greatly appreciated and we will publicly thank you for it. We currently do not offer a paid security bounty program, but are not ruling it out in the future.
 
-Do not open issues for general support questions as we want to keep GitHub issues for bug reports and feature requests.
-You've got much better chances of getting your question answered in real-time, you can reach out via [our gitter channel][gitter].
+## Bug Reports
 
-To save your and our time, we will systematically close all issues that are requests for general support and redirect people to gitter channel.
+While bugs are unfortunate, they're a reality in software. We can't fix what we don't know about, so please report liberally. If you're not sure if something is a bug or not, feel free to file a bug anyway.
 
-## <a name="issue"></a> Found a Bug?
-If you find a bug in the source code, you can help us by
-[submitting an issue](#submit-issue) to our [GitHub Repository][github]. Even better, you can
-[submit a Pull Request](#submit-pr) with a fix.
+Opening an issue is as easy as following [this link][issues] and filling out the fields. Here are some things you can write about your bug:
 
-## <a name="feature"></a> Missing a Feature?
-You can *request* a new feature by [submitting an issue](#submit-issue) to our GitHub
-Repository. If you would like to *implement* a new feature, please submit an issue with
-a  for your work first, to be sure that we can use it.
-Please consider what kind of change it is:
+* A short summary
+* What did you try, step by step?
+* What did you expect?
+* What did happen instead?
+* What is the version of the Cozy Drive?
 
-* For a **Major Feature**, first open an issue and outline your proposal so that it can be
-discussed. This will also allow us to better coordinate our efforts, prevent duplication of work,
-and help you to craft the change so that it is successfully accepted into the project.
-* **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
+## Pull Requests
 
-## <a name="submit"></a> Submission Guidelines
+Please keep in mind that:
 
-### <a name="submit-issue"></a> Submitting an Issue
+* Pull-Requests point to the `master` branch
+* You need to cover your code and feature by tests
+* You may add documentation in the `/docs` directory to explain your choices if needed
+* We recommend to use [task lists][checkbox] to explain steps / features in your Pull-Request description
+* you do _not_ need to build app to submit a PR
+* you should update the Transifex source locale file if you modify it for your feature needs (see [Localization section in README][localization])
 
-Before you submit an issue, please search the issue tracker, maybe an issue for your problem already exists and the discussion might inform you of workarounds readily available.
+### Workflow
 
-We want to fix all the issues as soon as possible, but before fixing a bug we need to reproduce and confirm it. 
-In order to reproduce bugs we will systematically ask you to provide a minimal reproduction scenario by attaching the excel file that caused an error, or the updated source code that caused 
-the error. A reproducible scenario gives us wealth of important information without going back & forth to you with additional questions like:
+Pull requests are the primary mechanism we use to change Cozy. GitHub itself has some [great documentation][pr] on using the Pull Request feature. We use the _fork and pull_ model described there.
 
-- version of excel-parser-processor used
-- 3rd-party libraries and their versions
-- and most importantly - a use-case that fails
+#### Step 1: Fork
 
-We will be insisting on a minimal reproduce scenario in order to save maintainers time and ultimately be able to fix more bugs. Interestingly, from our experience users often find coding problems themselves while preparing a minimal plunk. We understand that sometimes it might be hard to extract essentials bits of code from a larger code-base but we really need to isolate the problem before we can fix it.
-
-Unfortunately we are not able to investigate / fix bugs without a minimal reproduction, so if we don't hear back from you we are going to close an issue that don't have enough info to be reproduced.
-
-You can file new issues by filling out our [new issue form](https://github.com/btargac/excel-parser-processor/issues/new).
-
-
-### <a name="submit-pr"></a> Submitting a Pull Request (PR)
-Before you submit your Pull Request (PR) consider the following guidelines:
-
-* Search [GitHub](https://github.com/btargac/excel-parser-processor/pulls) for an open or closed PR
-  that relates to your submission. You don't want to duplicate effort.
-* Make your changes in a new git branch:
-
-     ```shell
-     git checkout -b my-fix-branch master
-     ```
-
-* Create your patch, **including appropriate test cases**.
-* Follow our [Coding Rules](#rules).
-* Run the full excel-parser-processor test suite, and ensure that all tests pass.
-* Commit your changes using a descriptive commit message that follows our
-  [commit message conventions](#commit). Adherence to these conventions
-  is necessary because release notes are automatically generated from these messages.
-
-     ```shell
-     git commit -a
-     ```
-  Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files.
-
-* Push your branch to GitHub:
-
-    ```shell
-    git push origin my-fix-branch
-    ```
-
-* In GitHub, send a pull request to `excel-parser-processor:master`.
-* If we suggest changes then:
-  * Make the required updates.
-  * Re-run the excel-parser-processor test suites to ensure tests are still passing.
-  * Rebase your branch and force push to your GitHub repository (this will update your Pull Request):
-
-    ```shell
-    git rebase master -i
-    git push -f
-    ```
-
-That's it! Thank you for your contribution!
-
-#### After your pull request is merged
-
-After your pull request is merged, you can safely delete your branch and pull the changes
-from the main (upstream) repository:
-
-* Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
-
-    ```shell
-    git push origin --delete my-fix-branch
-    ```
-
-* Check out the master branch:
-
-    ```shell
-    git checkout master -f
-    ```
-
-* Delete the local branch:
-
-    ```shell
-    git branch -D my-fix-branch
-    ```
-
-* Update your master with the latest upstream version:
-
-    ```shell
-    git pull --ff upstream master
-    ```
-
-## <a name="rules"></a> Coding Rules
-To ensure consistency throughout the source code, keep these rules in mind as you are working:
-
-* All features or bug fixes **must be tested** by one or more specs (unit-tests).
-* All public API methods **must be documented**.
-
-## <a name="commit"></a> Commit Message Guidelines
-
-We have very precise rules over how our git commit messages can be formatted.  This leads to **more
-readable messages** that are easy to follow when looking through the **project history**.  But also,
-we use the git commit messages to **generate the excel-parser-processor change log**.
-
-### Commit Message Format
-Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special
-format that includes a **type**, a **scope** and a **subject**:
+Fork the project on GitHub and [check out your copy locally][forking].
 
 ```
-<type>(<scope>): <subject>
-<BLANK LINE>
-<body>
-<BLANK LINE>
-<footer>
+$ git clone github.com/cozy/cozy-home.git
+$ cd cozy-home
+$ git remote add fork git://github.com/yourusername/cozy-home.git
 ```
 
-The **header** is mandatory and the **scope** of the header is optional.
+#### Step 2: Branch
 
-Any line of the commit message cannot be longer 100 characters! This allows the message to be easier
-to read on GitHub as well as in various git tools.
-
-Footer should contain a [closing reference to an issue](https://help.github.com/articles/closing-issues-via-commit-messages/) if any.
-
-Samples: (even more [samples](https://github.com/btargac/excel-parser-processor/commits/master))
+Create a branch and start hacking:
 
 ```
-docs(changelog): update change log to beta.5
-```
-```
-fix(release): need to depend on latest electron
-
-The version in our package.json gets copied to the one we publish, and users need the latest of these.
+$ git checkout -b my-branch origin/master
 ```
 
-### Revert
-If the commit reverts a previous commit, it should begin with `revert: `, followed by the header of the reverted commit.
-In the body it should say: `This reverts commit <hash>.`, where the hash is the SHA of the commit being reverted.
+#### Step 3: Code
 
-### Type
-Must be one of the following:
+Well, we think you know how to do that. Just be sure to follow the coding guidelines from the community ([standard JS][stdjs], comment the code, etc).
 
-* **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-* **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-* **docs**: Documentation only changes
-* **feat**: A new feature
-* **fix**: A bug fix
-* **perf**: A code change that improves performance
-* **refactor**: A code change that neither fixes a bug nor adds a feature
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-* **test**: Adding missing tests or correcting existing tests
+#### Step 4: Test
 
-### Scope
-The scope should be the name of the module affected (folder name or other meaningful words), and should prefix with *module:* (as perceived by person reading changelog generated from commit messages.
+Don't forget to add tests and be sure they are green:
 
-The following are some examples:
+```
+$ cd cozy-home
+$ npm run test
+```
 
-* **module:http**
-* **module:xlsx**
-* **module:OTHER_COMPONENT_NAME**
+#### Step 5: Commit
 
-There are currently a few exceptions to the "use module name" rule:
+Writing [good commit messages][commitmsg] is important. A commit message should describe what changed and why.
 
-* **packaging**: used for changes that change the npm package layout, e.g. public path changes, package.json changes, d.ts file/format changes, changes to bundles, etc.
-* **changelog**: used for updating the release notes in CHANGELOG.md
-* none/empty string: useful for `style`, `test` and `refactor` changes that are done across all packages (e.g. `style: add missing semicolons`)
+#### Step 6: Rebase
 
-### Subject
-The subject contains succinct description of the change:
+Use `git rebase` (_not_ `git merge`) to sync your work from time to time.
 
-* use the imperative, present tense: "change" not "changed" nor "changes"
-* don't capitalize first letter
-* no dot (.) at the end
+```
+$ git fetch origin
+$ git rebase origin/master my-branch
+```
 
-### Body
-Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes".
-The body should include the motivation for the change and contrast this with previous behavior.
+#### Step 7: Push
 
-### Footer
-The footer should contain any information about **Breaking Changes** and is also the place to
-reference GitHub issues that this commit **Closes**.
+```
+$ git push -u fork my-branch
+```
 
-**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+Go to <https://github.com/yourusername/cozy-home> and select your branch. Click the 'Pull Request' button and fill out the form.
 
-A detailed explanation can be found in this [document][commit-message-format].
+Alternatively, you can use [hub] to open the pull request from your terminal:
 
+```
+$ git pull-request -b master -m "My PR message" -o
+```
 
-[coc]: https://github.com/btargac/excel-parser-processor/blob/master/CODE_OF_CONDUCT.md
-[commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
-[github]: https://github.com/btargac/excel-parser-processor
-[gitter]: https://gitter.im/excel-parser-processor/
+Pull requests are usually reviewed within a few days. If there are comments to address, apply your changes in a separate commit and push that to your branch. Post a comment in the pull request afterwards; GitHub doesn't send out notifications when you add commits.
+
+## Writing documentation
+
+Documentation improvements are very welcome. We try to keep a good documentation in the `/docs` folder. But, you know, we are developers, we can forget to document important stuff that look obvious to us. And documentation can always be improved.
+
+## Translations
+
+Localization and translations are handled by [Transifex][tx], which is used by all Cozy's apps.
+
+As a _translator_, you can login to [Transifex][tx-signin] (using your Github account) and claim an access to the [app repository][tx-app]. Transifex will then create pull request on the repository, and the locales are merged after validating the pull request. [This tutorial][tx-start] can help you to learn how to make your first steps here. If you have any question, don't hesitate to ask us!
+
+As a _developer_, you just have to modify json in `/src/locales`. New locales will be automatically added to Transifex. If you need to pull or push manually locales, you can use [Transifex CLI](tx-cli). If you were using a [transifex-client](tx-client), you must move to [Transifex CLI](tx-cli) to be compatible with the v3 API.
+
+## Community
+
+You can help us by making our community even more vibrant. For example, you can write a blog post, take some videos, answer the questions on [the forum][forum], organize new meetups, and speak about what you like in Cozy!
+
+[issues]: https://github.com/cozy/cozy-home/issues/new
+
+[pr]: https://help.github.com/categories/collaborating-with-issues-and-pull-requests/
+
+[forking]: http://blog.campoy.cat/2014/03/github-and-go-forking-pull-requests-and.html
+
+[stdjs]: http://standardjs.com/
+
+[commitmsg]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+
+[localization]: https://github.com/cozy/cozy-home/blob/master/CONTRIBUTING.md#translations
+
+[hub]: https://hub.github.com/
+
+[tx]: https://www.transifex.com/cozy/
+[tx-signin]: https://www.transifex.com/signin/
+[tx-app]: https://www.transifex.com/cozy/cozy-home/dashboard/
+[tx-cli]: https://developers.transifex.com/docs/cli
+[tx-client]: https://github.com/transifex/transifex-client
+[tx-start]: https://help.transifex.com/en/articles/6248698-getting-started-as-a-translator
+
+[forum]: https://forum.cozy.io/

@@ -1,1 +1,1 @@
-electron >= 17.0.0
+["extends browserslist-config-cozy"]

@@ -1,0 +1,46 @@
+{
+  "verbose": true,
+  "baseDir": "./build",
+  "files": [
+    {
+      "path": "app-home.<hash>.min.css"
+    },
+    {
+      "path": "app/home.<hash>.js"
+    },
+    {
+      "path": "intents-home.<hash>.min.css"
+    },
+    {
+      "path": "intents/home.<hash>.js"
+    },
+    {
+      "path": "intents/index.html"
+    },
+    {
+      "path": "services/attributesHelpers/home.js"
+    },
+    {
+      "path": "services/deleteAccounts/home.js"
+    },
+    {
+      "path": "services/myselfFromIdenties/home.js"
+    },
+    {
+      "path": "services/polyfillFetch/home.js"
+    },
+    {
+      "path": "services/softDeleteOrRestoreAccounts/home.js",
+    },
+    {
+      "path": "services/updateAccounts/home.js"
+    },
+    {
+      "path": "vendors/home.<hash>.js"
+    },
+    {
+      "path": "vendors-home.<hash>.<hash>.min.css"
+    }
+  ],
+  "reportOutput": ["github"]
+}
