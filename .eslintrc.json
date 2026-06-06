@@ -1,33 +1,29 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module",
-      "ecmaFeatures": {
-          "experimentalObjectRestSpread": true
-      }
-  },
-  "rules": {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      "indent": ["error", 2, { "SwitchCase": 1 }],
-      "linebreak-style": ["error", "unix"],
-      "no-console": ["warn", { "allow": ["warn", "error"] }],
-      "no-loss-of-precision": "off",
-      "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
-      "quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }],
-      "semi": ["error", "always"]
-  },
-  "overrides": [{
-    "files": ["test/**/*.{js,ts}", "examples/**/*.js", "bin/**/*.js"],
+    "env": {
+        "es6": true,
+        "node": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 8
+    },
+    "extends": "eslint:recommended",
     "rules": {
-      "@typescript-eslint/no-var-requires": "off"
+        "comma-spacing":               ["error"],
+        "eqeqeq":                      ["error", "always"],
+        "indent":                      ["error", 4],
+        "key-spacing":                 ["error"],
+        "keyword-spacing":             ["error"],
+        "linebreak-style":             ["error", "unix"],
+        "no-multi-spaces":             ["error"],
+        "no-unused-vars":              ["error", {"args": "none"}],
+        "no-var":                      ["error"],
+        "no-console":                  ["off"],
+        "prefer-const":                ["error"],
+        "quotes":                      ["error", "single"],
+        "semi":                        ["error"],
+        "strict":                      ["error", "global"],
+        "space-before-blocks":         ["error"],
+        "space-before-function-paren": ["error", {"anonymous": "always", "named": "never"}]
     }
-  }],
-  "env": {
-      "es6": true,
-      "node": true,
-      "mocha": true
-  },
-  "extends": ["plugin:@typescript-eslint/recommended", "prettier"]
 }
