@@ -1,4 +1,4 @@
-[submodule "codemirror2/static/codemirror2"]
-	path = src/codemirror2/static/codemirror2
-    url = https://github.com/marijnh/CodeMirror.git
-    ignore = dirty
+[submodule "sphinx"]
+	path = sphinx
+	url = https://github.com/sphinx-doc/sphinx.git
+	branch = master
