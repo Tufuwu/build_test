@@ -1,73 +1,43 @@
 {
-  "name": "@teamsupercell/typings-for-css-modules-loader",
-  "version": "2.5.2",
-  "description": "Webpack loader that generates TypeScript typings for CSS modules from css-loader on the fly",
-  "main": "src/index.js",
+  "name": "inline-source-map",
+  "version": "0.6.2",
+  "description": "Adds source mappings and base64 encodes them, so they can be inlined in your generated file.",
+  "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "release": "release-it"
-  },
-  "author": "Tim Sebastian <tim.sebastian@gmail.com>",
-  "license": "MIT",
-  "keywords": [
-    "Typescript",
-    "TypeScript",
-    "CSS Modules",
-    "CSSModules",
-    "CSS Modules typings",
-    "Webpack",
-    "Webpack loader",
-    "Webpack css module typings loader",
-    "typescript webpack typings",
-    "css modules webpack typings"
-  ],
-  "dependencies": {
-    "camelcase": "^5.3.1",
-    "loader-utils": "^1.4.2",
-    "schema-utils": "^2.0.1"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.2.6",
-    "auto-changelog": "^2.2.1",
-    "css-loader": "*",
-    "css-loader3": "npm:css-loader@^3.1.0",
-    "eslint": "8.32.0",
-    "eslint-config-prettier": "^8.6.0",
-    "jest": "^29.3.1",
-    "memfs": "^3.4.13",
-    "prettier": "*",
-    "release-it": "^15.6.0",
-    "typescript": "^4.9.4",
-    "webpack": "^5.75.0"
-  },
-  "optionalDependencies": {
-    "prettier": "*"
+    "test-main": "tap test/*.js",
+    "test-0.8": "nave use 0.8 npm run test-main",
+    "test-0.10": "nave use 0.10 npm run test-main",
+    "test-0.12": "nave use 0.12 npm run test-main",
+    "test": "npm run test-main"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TeamSupercell/typings-for-css-modules-loader.git"
+    "url": "git://github.com/thlorenz/inline-source-map.git"
   },
-  "bugs": {
-    "url": "https://github.com/TeamSupercell/typings-for-css-modules-loader/issues"
+  "homepage": "https://github.com/thlorenz/inline-source-map",
+  "dependencies": {
+    "source-map": "~0.5.3"
   },
-  "homepage": "https://github.com/TeamSupercell/typings-for-css-modules-loader#readme",
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 2017
-    },
-    "extends": [
-      "prettier"
-    ]
+  "devDependencies": {
+    "tap": "~0.7.0",
+    "nave": "~0.5.0"
   },
-  "release-it": {
-    "github": {
-      "release": true
-    },
-    "git": {
-      "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
-    },
-    "hooks": {
-      "after:bump": "npx auto-changelog --commit-limit false https://raw.githubusercontent.com/release-it/release-it/master/templates/keepachangelog.hbs"
-    }
+  "keywords": [
+    "source",
+    "map",
+    "inline",
+    "base64",
+    "bundle",
+    "generate",
+    "transpile"
+  ],
+  "author": {
+    "name": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "http://thlorenz.com"
+  },
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.6"
   }
 }
