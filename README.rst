@@ -1,95 +1,150 @@
-=============================
-django-dynamic-preferences
-=============================
+|github-actions-badge|_
 
-.. image:: https://badge.fury.io/py/django-dynamic-preferences.png
-    :target: https://badge.fury.io/py/django-dynamic-preferences
+.. |github-actions-badge| image:: https://github.com/asuni/wavelet_prosody_toolkit/actions/workflows/check-toolkit.yaml/badge.svg?branch=travis2github-actions
+.. _github-actions-badge: https://github.com/asuni/wavelet_prosody_toolkit/actions?query=check-wavelet-prosody-toolkit
 
-.. image:: https://readthedocs.org/projects/django-dynamic-preferences/badge/?version=latest
-    :target: http://django-dynamic-preferences.readthedocs.org/en/latest/
+Wavelet prosody analyzer
+========================
 
-.. image:: https://github.com/agateblue/django-dynamic-preferences/actions/workflows/tests.yml/badge.svg
-    :target: https://github.com/agateblue/django-dynamic-preferences/actions/workflows/tests.yml
+antti.suni@helsinki.fi
 
-.. image:: https://opencollective.com/django-dynamic-preferences/backers/badge.svg
-    :alt: Backers on Open Collective
-    :target: #backers
+**UPDATE 3.2.2020**, Additional command-line tools: **batch-processing, global spectrum and analysis-synthesis:** `tools.rst <tools.rst>`__.
 
-.. image:: https://opencollective.com/django-dynamic-preferences/sponsors/badge.svg
-    :alt: Sponsors on Open Collective
-    :target: #sponsors
+|screenshot|
 
-Dynamic-preferences is a Django app, BSD-licensed, designed to help you manage your project settings. While most of the time,
-a ``settings.py`` file is sufficient, there are some situations where you need something more flexible such as:
+.. |screenshot| image:: screenshot.png
 
-* per-user settings (or, generally speaking, per instance settings)
-* settings change without server restart
+Description
+-----------
 
-For per-instance settings, you could actually store them in some kind of profile model. However, it means that every time you want to add a new setting, you need to add a new column to the profile DB table. Not very efficient.
+The program calculates f0, energy and duration features from speech
+wav-file, performs continuous wavelet analysis on combined features,
+finds prosodic events (prominences, boundaries) from the wavelet
+scalogram and aligns the events with transcribed units.
 
-Dynamic-preferences allow you to register settings (a.k.a. preferences) in a declarative way. Preferences values are serialized before storage in database, and automatically deserialized when you need them.
+See also:
 
-With dynamic-preferences, you can update settings on the fly, through django's admin or custom forms, without restarting your application.
+[1] Antti Suni, Juraj Šimko, Daniel Aalto, Martti Vainio, Hierarchical
+representation and estimation of prosody using continuous wavelet
+transform, Computer Speech & Language, Volume 45, 2017, Pages 123-136,
+ISSN 0885-2308, https://doi.org/10.1016/j.csl.2016.11.001.
 
-The project is tested and work under Python 3.6, 3.7, 3.8 and 3.9 and with django 2.2, 3.0 and 3.1.
+The default settings of the program are roughly the same as in the
+paper, duration signal was generated from word level labels.
 
-Features
---------
-
-* Simple to setup
-* Admin integration
-* Forms integration
-* Bundled with global and per-user preferences
-* Can be extended to other models if need (e.g. per-site preferences)
-* Integrates with django caching mechanisms to improve performance
-
-Documentation
--------------
-
-The full documentation is at https://django-dynamic-preferences.readthedocs.org.
-
-Changelog
----------
-
-See https://django-dynamic-preferences.readthedocs.io/en/latest/history.html
-
-Contributing
+Requirements
 ------------
 
-See https://django-dynamic-preferences.readthedocs.org/en/latest/contributing.html
+The wavelet prosody analysis depends on several packages which are installed automatically if you
+use the procedure describe in `./INSTALL.rst <INSTALL.rst>`__.
 
-Credits
+Here are the main dependencies:
 
-+++++++
+-  **pycwt** for the wavelet analysis (see https://github.com/regeirk/pycwt/LICENSE.txt )
+-  **pyyaml** for the configuration (see https://github.com/yaml/pyyaml/blob/master/LICENSE )
+-  **soundfile** for playing waves (see https://github.com/bastibe/SoundFile/blob/master/LICENSE )
+-  **wavio** for reading/writing wav (see https://github.com/WarrenWeckesser/wavio/blob/master/README.rst )
+-  **tgt** for reading/writing textgrid (see https://github.com/hbuschme/TextGridTools/blob/master/LICENSE )
+-  **pyqt5** for the gui (see https://www.riverbankcomputing.com/commercial/pyqt )
+-  **matplotlib** for the plot rendering (see https://github.com/matplotlib/matplotlib/blob/master/LICENSE/LICENSE )
 
-Contributors
+Here the optional dependencies:
 
+-  **pyreaper** for the f0 extraction (see https://github.com/r9y9/pyreaper/blob/master/LICENSE.md ).
+
+**The user is invited to have a look at the license of the dependencies.**
+
+Installation
 ------------
 
-This project exists thanks to all the people who contribute!
+see `./INSTALL.rst <INSTALL.rst>`__
 
-.. image:: https://opencollective.com/django-dynamic-preferences/contributors.svg?width=890&button=false
+Input information
+-----------------
 
-Backers
+-  audio files in wav format
+-  transcriptions in either htk .lab format or Praat textgrids
 
--------
+Usage:
+------
 
-Thank you to all our backers! `Become a backer`__.
+1. Assuming the installation process is done in **global mode**, just do
 
-.. image:: https://opencollective.com/django-dynamic-preferences/backers.svg?width=890
-    :target: https://opencollective.com/django-dynamic-preferences#backers
+.. code:: sh
 
-__ Backer_
-.. _Backer: https://opencollective.com/django-dynamic-preferences#backer
+	  wavelet_gui
 
-Sponsors
+Otherwise, go to the root directory of the program in the terminal, and start by
 
---------
+.. code:: sh
 
-Support us by becoming a sponsor. Your logo will show up here with a link to your website. `Become a sponsor`__.
+    python3 wavelet_prosody_toolkit/wavelet_gui.py
 
-.. image:: https://opencollective.com/django-dynamic-preferences/sponsor/0/avatar.svg
-    :target: https://opencollective.com/django-dynamic-preferences/sponsor/0/website
 
-__ Sponsor_
-.. _Sponsor: https://opencollective.com/django-dynamic-preferences#sponsor
+2. Select directory with speech and transciption files:
+   ``Select Speech Directory...``. Some examples are provided in
+   ``samples/`` directory. Files should have the same root, for example
+   file1.wav, file1.lab or file2.wav file2.TextGrid.
+
+3. Select features to use in analysis: ``Prosodic Feats for CWT..``
+
+4. Adjust Pitch tracking parameters for the speaker / environment, press
+   ``Reprocess`` to see changes Set range for possible pitch values,
+   typically males ~50-350Hz, females ~100-400Hz. If estimated track
+   skips obviously voiced portions, move voicing threshold slider left.
+
+-  Alternatively, pre-estimated f0 analyses can be used: file .f0 must
+   exist and it should be either in praat matrix format or as a list
+   file with one f0 value / line, frame shift must be constant 5ms. To
+   get suitable format from Praat, select wav and do:
+
+   -  To Pitch: 0.005, 120, 400
+   -  To Matrix
+   -  Save as matrix text file: “/.f0”
+
+5. Adjust the weights of prosodic features and choose if the final
+   signal is combined by summing or multiplying the features
+
+6. Select which tiers to use for durations signal generation / use
+   duration estimated from signal
+
+7. Select transcription level of interest: ``Select Tier``
+
+8. You can interactively zoom and move around with the button on top,
+   and play the visible section
+
+9. When everything is good, you can ``Process all`` which analyzes all
+   utterances in the directory with the current settings, and saves
+   prosodic labels in the speech directory as ``<wav_file_name>.prom``
+
+Prosodic labels are saved in a tab separated form with the following
+columns:
+
+.. code::
+
+    <file_name> <start_time> <end_time> <unit> <prominence strength> <boundary strength>
+
+Advanced Usage:
+---------------
+
+Additional customization of the input signals and wavelet analysis is possible by modifying the configuration file. The default configuration is located in:
+
+.. code:: sh
+
+	  wavelet_prosody_toolkit/configs/default.yaml
+
+You can view an online version here: https://github.com/asuni/wavelet_prosody_toolkit/blob/master/wavelet_prosody_toolkit/configs/default.yaml
+
+You are recommended to make a copy of the default.yaml file (to e.g. myconfig.yaml), and modify the copy.  To apply the modified configuration, start the program by
+
+.. code:: sh
+
+	  wavelet_gui --config path/to/myconfig.yaml
+
+Some helpful shortcuts
+----------------------
+
+Here are a list of shortcuts available in the GUI:
+
+- **CTRL+q** to quit
+- **F11** to switch between fullscreen et normal mode
