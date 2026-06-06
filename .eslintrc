@@ -1,0 +1,29 @@
+{
+  "parser": "babel-eslint",
+  "globals": {
+    "module": true,
+    "require": true,
+    "exports": true
+  },
+  "rules": {
+    "strict": 0,
+    "no-console": 0,
+    "linebreak-style": [
+      2,
+      "unix"
+    ],
+    "indent": [
+      2,
+      2
+    ],
+    "semi": [
+      2,
+      "always"
+    ]
+  },
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "extends": "eslint:recommended"
+}
