@@ -1,6 +1,0 @@
-pytest
-pytest-timeout
-pyvirtualdisplay
-entrypoint2
-pillow
-mypy
