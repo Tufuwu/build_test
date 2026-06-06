@@ -1,19 +1,11 @@
-# CommCare-Cloud
+# Festivus
 
-[![Build
-Status](https://travis-ci.com/dimagi/commcare-cloud.svg?branch=master)](https://travis-ci.com/dimagi/commcare-cloud)
+[![Build Status](https://travis-ci.com/festivus-es/festivus.svg?branch=master)](https://travis-ci.com/festivus-es/festivus)
 
-CommCare-Cloud is a suite of tools for standing up and managing a production
-[CommCare HQ](https://github.com/dimagi/commcare-hq/) server environment.
-
-For documentation and installation instructions, visit
-[https://dimagi.github.io/commcare-cloud/](https://dimagi.github.io/commcare-cloud/)
-or the `docs/` directory of this repository.
-
-
-# More Information
-
-* See something you'd like to improve?  We welcome [contributions](CONTRIBUTING.md).
-* To set up a local development environment for CommCare HQ, view the
-  [instructions](https://github.com/dimagi/commcare-hq/blob/master/DEV_SETUP.md)
-  in that repository.
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Andaluc%C3%ADa/Sevilla/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Catalu%C3%B1a/Barcelona/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Comunidad%20de%20Madrid/Madrid/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Comunitat%20Valenciana/Paterna/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Comunitat%20Valenciana/Burjassot/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Illes%20Balears/Palma%20de%20Mallorca/festivus.ics
+- https://festivus-es.github.io/festivus/Espa%C3%B1a/Illes%20Balears/S%C3%B3ller/festivus.ics

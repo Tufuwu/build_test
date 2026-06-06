@@ -1,9 +1,0 @@
-# Compiled files
-/.temp-*
-*.tfstate
-*.backup
-
-# Module directory
-.terraform/
-*/.terraform/
-secrets.auto.tfvars

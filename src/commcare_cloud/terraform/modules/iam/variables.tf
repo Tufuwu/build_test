@@ -1,3 +1,0 @@
-variable "account_alias" {
-}
-

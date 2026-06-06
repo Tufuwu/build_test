@@ -1,5 +1,0 @@
----
-# roles/webworker/meta/main.yml
-
-dependencies:
-  - role: shared_dir

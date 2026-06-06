@@ -1,4 +1,0 @@
----
-- name: Run ldconfig
-  become: yes
-  action: command ldconfig

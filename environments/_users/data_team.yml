@@ -1,9 +1,0 @@
-dev_users:
-  present:
-    - bderenzi
-    - mtheis
-    - esu
-    - slee
-    - kchen
-  absent:
-    - ymsosa
