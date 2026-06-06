@@ -1,75 +1,226 @@
-# Flair HQ
 
-## How to setup your own dev environment
+<a href="https://www.getpostman.com/"><img src="https://assets.getpostman.com/common-share/postman-logo-horizontal-320x132.png" /></a><br />
+_Manage all of your organization's APIs in Postman, with the industry's most complete API development environment._
 
-### 1. Create two subreddits for testing
+*Supercharge your API workflow.*  
+*Modern software is built on APIs. Postman helps you develop APIs faster.*
 
-You don't want to do testing on production so the we suggest you create 2 subreddits for testing purposes. [Start here](https://www.reddit.com/subreddits/create). You can choose any names for it (such as yourUsername and yourUsername1). Once you have the subreddits created, create another reddit account.  
-Your first account will automatically get mod permission on both subreddits and the other one you can use to testing from end user point of view.
+# postman-code-generators [![Build Status](https://travis-ci.com/postmanlabs/postman-code-generators.svg?branch=master)](https://travis-ci.com/postmanlabs/postman-code-generators)
 
-### 2. Install prerequisites
+This module converts a [Postman SDK](https://github.com/postmanlabs/postman-collection) Request Object into a code snippet of chosen language.
 
-   Make sure you have Node.js ([some helpful guides here](https://nodejs.org/en/download/package-manager/)) and MongoDB ([check it here](https://docs.mongodb.com/manual/installation/)) installed. Node.js 6.0.0 or greater is required. Install git.
-   
-### 3. Prepare the application folder 
+Every code generator has two identifiers: `language` and `variant`.
+* `language` of a code generator is the programming language in which the code snippet is generated.
+* `variant` of a code generator is the methodology or the underlying library used by the language to send requests. 
+ 
+List of supported code generators: 
 
-   Clone the repository using `git clone https://github.com/pokemontrades/flairhq.git`. Navigate into the directory `flairhq` and run `npm install` to install the dependencies. After all of them are installed you can start preparing your local configuration.  
-   Copy `config/local.example.js` to `config/local.js`. You'll use it in next steps.
-   
-### 4. Create a reddit app
+| Language | Variant        |
+|-----------|---------------|
+| C | libcurl |
+| C# | RestSharp | 
+| cURL | cURL | 
+| Dart | http | 
+| Go | Native | 
+| HTTP | HTTP | 
+| Java | OkHttp |
+| Java | Unirest |
+| JavaScript | Fetch | 
+| JavaScript | jQuery | 
+| JavaScript | XHR |
+| NodeJs | Axios | 
+| NodeJs | Native |
+| NodeJs | Request |
+| NodeJs | Unirest |
+| Objective-C| NSURLSession|
+| OCaml | Cohttp | 
+|PHP | cURL |
+|PHP | Guzzle |
+|PHP | pecl_http |
+|PHP | HTTP_Request2 |
+| PowerShell | RestMethod | 
+| Python | http.client |
+| Python | Requests |
+| R | httr |
+| R | RCurl |
+| Ruby | Net:HTTP |
+| Shell | Httpie |
+| Shell | wget |
+| Swift | URLSession | 
+## Table of contents 
 
-   Go to the site [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps). If this is your first reddit application, scroll down and click `Are you a developer? Create an app` button.  
-   Choose 'web app' as a type of your application. Set redirect uri to https://not-an-aardvark.github.io/reddit-oauth-helper/ (this is temporary link which will be needed in next step). Fill in 'name'. Other fields are optional.  
-   Copy the Client ID and Secret (as per screenshot below) to `config/local.js`. Do not close the tab.
-   
-   ![dev-setup-1](https://user-images.githubusercontent.com/15113729/31516749-e7a5bfc6-af99-11e7-92c4-1f3519aa0c41.png)
+1. [Getting Started](#getting-started)
+2. [Prerequisite](#prerequisite)
+3. [Usage](#usage)
+    1. [Using postman code generators as a Library](#using-postman-code-generators-as-a-library)
+4. [Development](#development)
+    1. [Installing Dependencies](#installing-dependencies)
+    2. [Testing](#testing)
+    3. [Packaging](#packaging)
+7. [Contributing](#contributing)
+8. [License](#license)
+
+## Getting Started
+To install postman-code-generators as your dependency
+```bash
+$ npm install postman-code-generators
+```
+To get a copy on your local machine
+```bash
+$ git clone https://github.com/postmanlabs/postman-code-generators.git
+```
+
+## Prerequisite
+To run any of the postman-code-generators, ensure that you have NodeJS >= v8. A copy of the NodeJS installable can be downloaded from https://nodejs.org/en/download/package-manager.
+
+## Usage
+
+### Using postman-code-generators as a Library 
+There are three functions that are exposed in postman-code-generators: getLanguageList, getOptions, and convert.
+
+#### getLanguageList
+This function returns a list of supported code generators. 
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    supportedCodegens = codegen.getLanguageList();
+    console.log(supportedCodegens);
+    // output:
+    // [
+    //   {
+    //     key: 'nodejs',
+    //     label: 'NodeJs',
+    //     syntax_mode: 'javascript',
+    //     variant: [
+    //       {
+    //         key: 'Requests'
+    //       },
+    //       {
+    //         key: 'Native'
+    //       },
+    //       {
+    //         key: 'Unirest'
+    //       }
+    //     ]
+    //   },
+    //   ...
+    // ]
+```
+
+#### getOptions 
+
+This function takes in three parameters and returns a callback  with error and supported options of that code generator.
+
+* `language` - language key from the language list returned from getLanguageList function
+* `variant` - variant key provided by getLanguageList function
+* `callback` - callback function with first parameter as error and second parameter as array of options supported by the codegen.
+
+A typical option has the following properties:
+* `name` - Display name
+* `id` - unique ID of the option
+* `type` - Data type of the option. (Allowed data types: `boolean`, `enum`, `positiveInteger`)
+* `default` - Default value. The value that is used if this option is not specified while creating code snippet
+* `description` - User friendly description.
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    language = 'nodejs',
+    variant = 'Request';
+
+    codegen.getOptions(language, variant, function (error, options) {
+      if (error) {
+        // handle error
+      }
+      console.log(options);
+    });
+// output: 
+//     [
+//     {
+//       name: 'Set indentation count',
+//       id: 'indentCount',
+//       type: 'positiveInteger',
+//       default: 2,
+//       description: 'Set the number of indentation characters to add per code level'
+//     },
+//     {
+//       name: 'Set indentation type',
+//       id: 'indentType',
+//       type: 'enum',
+//       availableOptions: ['Tab', 'Space'],
+//       default: 'Space',
+//       description: 'Select the character used to indent lines of code'
+//     },
+//     ...
+//   ];
+```
+
+#### convert 
+This function takes in five parameters and returns a callback with error and generated code snippet
+* `language` - lang key from the language list returned from getLanguageList function
+* `variant` - variant key provided by getLanguageList function
+* `request` - [Postman-SDK](https://github.com/postmanlabs/postman-collection) Request Object
+* `options` - Options that can be used to configure generated code snippet. Defaults will be used for the unspecified attributes  
+* `callback` - callback function with first parameter as error and second parameter as string for code snippet
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    sdk = require('postman-collection'), // require postman-collection in your project
+    request = new sdk.Request('https://www.google.com'),  //using postman sdk to create request 
+    language = 'nodejs',
+    variant = 'request',
+    options = {
+        indentCount: 3,
+        indentType: 'Space',
+        trimRequestBody: true,
+        followRedirect: true
+    };
+codegen.convert(language, variant, request, options, function(error, snippet) {
+    if (error) {
+        //  handle error
+    }
+    //  handle snippet
+});
+```
+## Development
 
 
-### 5. Generate refresh token for a moderator account
+### Installing dependencies
+This command will install all the dependencies in production mode.
+```bash
+$ npm install;
+```
+To install dev dependencies also for all codegens run: 
+```bash
+$ npm run deepinstall dev; 
+```
+### Testing 
+To run common repo test as well as tests (common structure test + individual codegen tests) for all the codegens
+```bash
+$ npm test; 
+```
+To run structure and individual tests on a single codegen
+```bash
+$ npm test <codegen-name>;
+# Here "codege-name" is the folder name of the codegen inside codegens folder
+```
+### Packaging 
+To create zipped package of all codegens
+```bash
+$ npm run package;
+```
+**Note:** The zipped package is created inside each codegen's folder.
 
-   **Make sure to use the account with mod permissions in this step**.  
-   Install [reddit-oauth-helper](https://github.com/not-an-aardvark/reddit-oauth-helper) to get a refresh token for a moderator on the subs. Use the scope: `flair modcontributors modflair modposts privatemessages read wikiedit wikiread`. **Remember to choose permanent token**.  
-   If you use web interface you should click `Allow` while redirected to reddit  
-   After that the current tab will be closed and you'll see your tokens at the bottom of the tool as shown on the screenshot. Copy your **refresh token** to config/local.js. In case any issues, try different browser.
-   
-  
-   ![dev-setup-3-1](https://user-images.githubusercontent.com/15113729/31516886-528e0596-af9a-11e7-9dd8-509fa469d0b6.png)
-	
-### 6. Change subreddits names
+To create zipped package of a single codegen
+```bash
+$ npm run package <codegen-name>
+```
 
-   In your application folder change all occurences of `pokemontrades` and `SVExchange` to the names of your testing subreddits. On Linux you can use:
-   
-   ```
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/pokemontrades/firstsubname/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/PokemonTrades/FIRSTSUBNAME/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/svexchange/secondsubname/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/SVExchange/SECONDSUBNAME/g" {} \;
-   ```
+## Contributing
+Please take a moment to read our [contributing guide](https://github.com/postmanlabs/postman-code-generators/blob/master/CONTRIBUTING.md) to learn about our development process.
+Open an [issue](https://github.com/postmanlabs/postman-code-generators/issues) first to discuss potential changes/additions.
 
-   Before commiting you can revert the changes using (if you use `username` and `username1` as sub names make sure to reverse the order of commands so `username` is not overwritten):
-   ```
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/secondsubname/svexchange/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/SECONDSUBNAME/SVExchange/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/firstsubname/pokemontrades/g" {} \;
-   find . -type f ! -path "./node_modules/*" ! -path "./.git/*" -exec sed -i "s/FIRSTSUBNAME/PokemonTrades/g" {} \;
-   ```
-
-
-### 7. Start the application
-
-   Before you can start you'll have to go to your reddit app settings and change redirect uri to http://localhost:1337/auth/reddit/callback. Then you can start MongoDB (check [here](https://docs.mongodb.com/manual/tutorial/manage-mongodb-processes/)) and start sails with `npm start`.  
-   Open http://localhost:1337 in your browser. You should see the starting page. Once you sign in as mod you can also add flair schema to both of your subreddits.
-	
-### :tada:Have fun with coding FlairHQ!:tada:
-
-   If you're not sure where to start, check [current issues](https://github.com/pokemontrades/flairhq/issues). Choose one, write a fix and make a pull request. Feel free to ask if you're not sure about anything.
-
-## Troubleshooting dev environment installation
-
-### How I can check if MongoDB started correctly?
-Check for 'waiting for connections' message as below:
-![dev-setup-4](https://user-images.githubusercontent.com/15113729/31516787-08c06e72-af9a-11e7-8472-b5222c23dc02.png)
-
-### How can I know that FlairHQ app started correctly?
-Check for the message 'Waiting' after 'watch' task is started:
-![dev-setup-5](https://user-images.githubusercontent.com/15113729/31516795-0d06f46a-af9a-11e7-9aca-efb808a9d2bf.png)
+## License
+This software is licensed under Apache-2.0. Copyright Postman, Inc. See the [LICENSE.md](LICENSE.md) file for more information.
