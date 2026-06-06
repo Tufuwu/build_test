@@ -1,11 +1,6 @@
-*.log
-npm-debug.log*
-node_modules
-.npm
-.idea
-.DS_Store
-.vscode
-.nyc_output
-coverage
-
-cjs
+/.css-compare
+/examples/dist
+/lib
+/node_modules
+package-lock.json
+yarn.lock
