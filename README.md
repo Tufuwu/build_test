@@ -1,89 +1,130 @@
-![tileserver-gl](https://cloud.githubusercontent.com/assets/59284/18173467/fa3aa2ca-7069-11e6-86b1-0f1266befeb6.jpeg)
+# npm-bump
 
+> A better `npm version major|minor|patch`
 
-# TileServer GL
-[![Build Status](https://travis-ci.org/maptiler/tileserver-gl.svg?branch=master)](https://travis-ci.org/maptiler/tileserver-gl)
-[![Docker Hub](https://img.shields.io/badge/docker-hub-blue.svg)](https://hub.docker.com/r/maptiler/tileserver-gl/)
+<!--
+[![Build Status](https://travis-ci.org/mgol/npm-bump.svg?branch=main)](https://travis-ci.org/mgol/npm-bump)
+[![Build status](https://ci.appveyor.com/api/projects/status/3lddln8y5hvn5pq0/branch/main?svg=true)](https://ci.appveyor.com/project/mgol/npm-bump/branch/main)
+-->
 
-Vector and raster maps with GL styles. Server-side rendering by MapLibre GL Native. Map tile server for MapLibre GL JS, Android, iOS, Leaflet, OpenLayers, GIS via WMTS, etc.
+## Installation
 
-Download vector tiles from [OpenMapTiles](https://data.maptiler.com/downloads/planet/).
-## Getting Started with Node
+To install invoke:
 
-Make sure you have Node.js version **14.20.0** or above installed. Node 16 is recommended. (running `node -v` it should output something like `v16.x.x`). Running without docker requires [Native dependencies](https://tileserver.readthedocs.io/en/latest/installation.html#npm) to be installed first.
-
-Install `tileserver-gl` with server-side raster rendering of vector tiles with npm. 
-
-```bash
-npm install -g tileserver-gl
+```shell
+npm install -g npm-bump
 ```
 
-Once installed, you can use it like the following examples.
+You now have the `npm-bump` binary available.
 
-using a mbtiles file
-```bash
-wget https://github.com/maptiler/tileserver-gl/releases/download/v1.3.0/zurich_switzerland.mbtiles
-tileserver-gl --mbtiles zurich_switzerland.mbtiles
-[in your browser, visit http://[server ip]:8080]
+If you want to use it as a module, invoke:
+
+```shell
+npm install npm-bump --save
 ```
 
-using a config.json + style + mbtiles file
-```bash
-wget https://github.com/maptiler/tileserver-gl/releases/download/v1.3.0/test_data.zip
-unzip test_data.zip
-tileserver-gl
-[in your browser, visit http://[server ip]:8080]
+## Rationale
+
+The aim of this module is to keep a repository in a state where if the `version` value in `package.json` points to a stable version, it's a tagged commit that was published to npm. Since one can add Git endpoints as packages' "versions", this allows to quickly check if an installed dependency uses a pre-release or a stable version.
+
+## Usage
+
+Once the package has been installed, it may be used from the terminal:
+
+```shell
+npm-bump releaseType
 ```
 
-Alternatively, you can use the `tileserver-gl-light` npm package instead, which is pure javascript, does not have any native dependencies, and can run anywhere, but does not contain rasterization on the server side made with Maplibre GL Native.
+where `releaseType` is one of: `major`, `minor` and `patch`.
 
-## Getting Started with Docker
+To use as a module, do the following:
 
-An alternative to npm to start the packed software easier is to install [Docker](https://www.docker.com/) on your computer and then run from the tileserver-gl directory
-
-Example using a mbtiles file
-```bash
-wget https://github.com/maptiler/tileserver-gl/releases/download/v1.3.0/zurich_switzerland.mbtiles
-docker run --rm -it -v $(pwd):/data -p 8080:8080 maptiler/tileserver-gl --mbtiles zurich_switzerland.mbtiles
-[in your browser, visit http://[server ip]:8080]
+```js
+var npmBump = require('npm-bump');
+npmBump(releaseType);
 ```
 
-Example using a config.json + style + mbtiles file
-```bash
-wget https://github.com/maptiler/tileserver-gl/releases/download/v1.3.0/test_data.zip
-unzip test_data.zip
-docker run --rm -it -v $(pwd):/data -p 8080:8080 maptiler/tileserver-gl
-[in your browser, visit http://[server ip]:8080]
+You can check the version of `npm-bump` via:
+
+```shell
+npm-bump --version
 ```
 
-Example using a different path
-```bash
-docker run --rm -it -v /your/local/config/path:/data -p 8080:8080 maptiler/tileserver-gl
-```
-replace '/your/local/config/path' with the path to your config file
+Regardless of using the package as a binary or a module, invoking the above code will result in:
 
+1. Creating a new commit that increases the project version to the nearest stable one having a larger `major`/`minor`/`patch` than currently.
+2. Tagging the commit with a specified version.
+3. Creating a new commit with an increased patch version and the `-pre` suffix added.
+4. Asking the user to do a final check and proceed or rollback.
 
-Alternatively, you can use the `maptiler/tileserver-gl-light` docker image instead, which is pure javascript, does not have any native dependencies, and can run anywhere, but does not contain rasterization on the server side made with Maplibre GL Native.
+If the user goes along, the new version gets published and created commits and tags pushed to the `origin` remote. Otherwise, all the changes are reversed.
 
-## Getting Started with Linux cli
+Until the user gives the final green light, everything happens locally and is fully reversible.
 
-Test from command line
-```bash
-wget https://github.com/maptiler/tileserver-gl/releases/download/v1.3.0/test_data.zip
-unzip -q test_data.zip -d test_data
-xvfb-run --server-args="-screen 0 1024x768x24" npm test
-```
+### Pre-releases
 
-Run from command line
-```bash
-xvfb-run --server-args="-screen 0 1024x768x24" node .
+If you supply `releaseType` other than `major`/`minor`/`patch`, it will be treated as a pre-release identifier and a proper pre-release version will be tagged & published. Such a version will be published with an npm tag equal to the identifier. For example, if your package is currently at version `1.0.0-pre`, the following command:
+
+```shell
+npm-bump beta
 ```
 
-## Documentation
+will publish a version `1.0.0-beta.0` under the tag `beta` and bump the version to `1.0.0-beta.1-pre`.
 
-You can read the full documentation of this project at https://tileserver.readthedocs.io/.
+## Options
 
-## Alternative
+You can optionally pass the remote name and the branch name to be used, in addition to a prefix to be applied to the version bump commit message. By default the remote is assumed to be `origin` and the branch: `main`.
 
-Discover MapTiler Server if you need a [map server with easy setup and user-friendly interface](https://www.maptiler.com/server/).
+You can also provide the `access` option with the `public` or `private` value to declare whether the package should be public or private. When not provided, it uses default npm behavior: scoped packages are private & unscoped ones - public.
 
+To customize, do the following:
+
+1. When using from shell:
+
+```shell
+npm-bump minor --remote origin --branch main --prefix "[no-ci]" --access public
+```
+
+or:
+
+```shell
+npm-bump minor -r origin -b main -p "[no-ci]" ---access public
+```
+
+Run:
+
+```shell
+npm-bump --help
+```
+
+or:
+
+```shell
+npm-bump -h
+```
+
+to see the full information about accepted options.
+
+2. When using as a library:
+
+```js
+var npmBump = require('npm-bump').custom({
+    remote: 'origin',
+    branch: 'main',
+    prefix: '[no-ci]',
+    access: 'public',
+});
+npmBump(minor);
+```
+
+## Supported Node.js versions
+
+This project aims to support all Node.js versions supported upstream with the exception of those in maintenance mode (see [Release README](https://github.com/nodejs/Release/blob/main/README.md) for more details).
+
+## Contributing
+
+In lieu of a formal style guide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using `npm test`.
+
+## License
+
+Copyright (c) 2014 Michał Gołębiowski-Owczarek. Licensed under the MIT license.
