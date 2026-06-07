@@ -1,55 +1,69 @@
 {
-  "private": true,
+  "name": "miniprogram-simulate",
+  "version": "1.5.7",
+  "description": "tools for miniprogram custom component unit test",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "build:prod": "npm run build:prod --workspaces",
-    "build:jsx-highcharts": "npm run build:prod --workspace packages/react-jsx-highcharts",
-    "lint": "eslint \"packages/*/+(src|test)/**\"",
-    "test": "npm run build:jsx-highcharts && jest",
-    "test:coverage": "npm run build:jsx-highcharts && jest --coverage",
-    "test:watch": "jest --watch"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.8",
-    "@babel/eslint-parser": "^7.15.8",
-    "@babel/plugin-transform-runtime": "^7.15.8",
-    "@babel/preset-env": "^7.15.8",
-    "@babel/preset-react": "^7.14.5",
-    "@babel/runtime": "^7.15.4",
-    "@testing-library/react": "^12.1.2",
-    "@types/react": "^17.0.33",
-    "babel-loader": "^8.2.3",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.4.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.27.1",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "eslint-plugin-react-perf": "^3.3.1",
-    "highcharts": "^9.3.0",
-    "jest": "^27.3.1",
-    "prettier": "^2.4.1",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-test-renderer": "^17.0.2",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.4.4",
-    "webpack": "^5.60.0",
-    "webpack-cli": "^4.9.1"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/react-jsx-highcharts",
-      "packages/react-jsx-highstock",
-      "packages/react-jsx-highmaps"
-    ]
+    "dev": "webpack --watch",
+    "build": "webpack",
+    "karma": "npm run build && karma start",
+    "test": "jest --bail",
+    "coverage": "jest --coverage --bail",
+    "codecov": "jest --coverage && codecov",
+    "lint": "eslint \"src/**/*.js\" --fix && eslint \"test/**/*.js\" --fix"
   },
   "jest": {
-    "projects": [
-      "<rootDir>/packages/*"
+    "testEnvironment": "jsdom",
+    "testURL": "https://jest.test",
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/*.js"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src"
     ]
+  },
+  "keywords": [
+    "miniprogram",
+    "custom component",
+    "unit test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wechat-miniprogram/miniprogram-simulate.git"
+  },
+  "author": "wechat-miniprogram",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "codecov": "^3.7.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "jest": "^26.0.1",
+    "karma": "^3.1.4",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-dirname-preprocessor": "latest",
+    "karma-filemap-preprocessor": "latest",
+    "karma-mocha": "^1.3.0",
+    "karma-webpack": "^3.0.5",
+    "mocha": "^5.2.0",
+    "pretty-format": "^26.0.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "csso": "^3.5.1",
+    "j-component": "^1.4.6",
+    "less": "^3.10.3",
+    "miniprogram-compiler": "latest",
+    "postcss": "^7.0.23"
   }
 }

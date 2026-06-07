@@ -1,129 +1,45 @@
-![React JSX Highcharts](https://user-images.githubusercontent.com/2003804/40681848-2d0f5ce2-6382-11e8-8ce9-cd49c409ad2e.png)
+# miniprogram-simulate
 
-[![Build Status](https://travis-ci.com/whawker/react-jsx-highcharts.svg?branch=master)](https://travis-ci.com/whawker/react-jsx-highcharts)
+[![](https://img.shields.io/npm/v/miniprogram-simulate.svg?style=flat)](https://www.npmjs.com/package/miniprogram-simulate)
+[![](https://img.shields.io/travis/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate)
+[![](https://img.shields.io/github/license/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate/blob/master/LICENSE)
+[![](https://img.shields.io/codecov/c/github/wechat-miniprogram/miniprogram-simulate.svg)](https://app.codecov.io/gh/wechat-miniprogram/miniprogram-simulate)
 
-[Highcharts](https://github.com/highcharts/highcharts) built with **proper React components**. More that just a simple wrapper - utilises the power of React props to create dynamic charts!
+## 介绍
 
-React JSX Highcharts offers separate packages for each Highcharts product.
+小程序自定义组件测试工具集。
 
-##### [Highcharts](/packages/react-jsx-highcharts)
+目前因为小程序独特的运行环境，所以对于小程序自定义组件的单元测试一直没有比较优雅的解决方案，此工具集就是为了解决此痛点而诞生的。将原本小程序自定义组件双线程分离运行的机制调整成单线程模拟运行，利用 dom 环境进行渲染，借此来完成整个自定义组件树的搭建。
 
-##### [Highstock](/packages/react-jsx-highstock)
+运行此工具集需要依赖 js 运行环境和 dom 环境，因此可以采用 jsdom + nodejs（如 jest），也可以采用真实浏览器环境（如 karma）。文档[使用简介](./docs/tutorial.md)中会提供简单的使用方式介绍。
 
-##### [Highmaps](/packages/react-jsx-highmaps)
+## 安装
 
-## Why React JSX Highcharts?
-
-Unlike other React Highcharts wrapper libraries, **React JSX Highcharts** is designed to be dynamic - it is optimised for _interactive_ charts that need to adapt to business logic in your React application.
-
-Other Highcharts wrappers completely destroy and recreate the chart when the configuration options change, which is _very_ wasteful and inefficient.
-
-React JSX Highcharts uses a different approach. By providing React components for each Highcharts component, we can observe exactly which prop has changed and call the optimal Highcharts method behind the scenes. For example, if the `data` prop were to change on a `<Series />` component, React JSX Highcharts can follow Highcharts best practices and use the `setData` method rather than the more expensive `update`.
-
-React JSX Highcharts also enables you to write your _own_ Highcharts components, via its exposed hooks.
-
-## Installation
-
-```sh
-# Install the appropriate React JSX package
-npm install --save react-jsx-highcharts
-#               or react-jsx-highstock
-#               or react-jsx-highmaps
-
-# And the peer dependencies
-npm install --save react react-dom prop-types highcharts@^9.0.0
+```
+npm install --save-dev miniprogram-simulate
 ```
 
-## Licensing
-
-React JSX Highcharts is free to use, however **Highcharts** itself requires a license for **commercial** use. [Highcharts license FAQs](https://shop.highsoft.com/faq).
-
-## [Documentation](https://github.com/whawker/react-jsx-highcharts/wiki)
-
-## [Examples](https://codesandbox.io/s/github/whawker/react-jsx-highcharts-examples)
-
-## Getting started
-
-The intention of this library is to provide a very thin abstraction of Highcharts using React components. This has been achieved by passing Highcharts configuration options as component props.
-
-In the vast majority of cases, the name of the configuration option, and the name of the component prop are the same.
-
-#### Example
-
-`<Tooltip />` component
-
-```jsx
-<Tooltip padding={10} hideDelay={250} shape="square" split />
-```
-
-This corresponds to the Highcharts' [`tooltip`](http://api.highcharts.com/highcharts/tooltip) configuration of
+## 使用
 
 ```js
-tooltip: {
-  enabled: true, // This is assumed when component is mounted
-  padding: 10,
-  hideDelay: 250,
-  shape: 'square',
-  split: true
-}
+const simulate = require('miniprogram-simulate')
+
+test('test sth', () => {
+    const id = simulate.load('/components/comp/index') // 加载自定义组件
+    const comp = simulate.render(id) // 渲染自定义组件
+    
+    // 使用自定义组件封装实例 comp 对象来进行各种单元测试
+})
 ```
 
-We aim to pass all configuration options using the same name, so we use [Highcharts' documentation](http://api.highcharts.com/highcharts) to figure out how to achieve the same with React JSX Highcharts.
+以上只是一个简单的例子，实际上这个工具集必须搭配 jest 或 jsdom/mocha 等测试框架来使用，更为详细的使用细节请参阅下述文档：
 
-### Note:
+* [使用简介](./docs/tutorial.md)
+* [接口文档](./docs/api.md)
+* [细节实现](./docs/detail.md)
+* [暂不支持特性](./docs/todo.md)
+* [更新日志](./docs/update.md)
 
-There are **two** exceptions to the above;
+## 协议
 
-#### Exception 1
-
-Where Highcharts **events** are concerned - instead of passing `events` as an object, we use the React convention _onEventName_.
-
-#### Example
-
-```jsx
-<SplineSeries
-  id="my-series"
-  data={myData}
-  onHide={this.handleHide}
-  onShow={this.handleShow}
-/>
-```
-
-This would correspond to the Highcharts configuration
-
-```js
-series: [
-  {
-    type: 'spline',
-    id: 'my-series',
-    data: myData,
-    events: { hide: this.handleHide, show: this.handleShow }
-  }
-];
-```
-
-#### Exception 2
-
-`text` configuration options are passed as a React child
-
-#### Example
-
-```jsx
-<Title>Some Text Here</Title>
-```
-
-This would correspond to the Highcharts configuration
-
-```js
-title: {
-  text: 'Some Text Here';
-}
-```
-
-## Acknowledgements
-
-Thanks to [Recharts](https://github.com/recharts/recharts) for the inspiration of building charts with separate components.
-
-Thanks to Highcharts themselves, obviously.
-
-Thanks to @anajavi for all the help and support in maintaining this project.
+[MIT](./LICENSE)

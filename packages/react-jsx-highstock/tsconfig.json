@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "target": "ES2020"
-  },
-  "include": ["./types/**/*"]
-}
