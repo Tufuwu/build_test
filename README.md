@@ -1,136 +1,75 @@
-# OpenCage Geocoding Module for Python
+[![Build Status](https://travis-ci.org/roverdotcom/django-inlinecss.svg?branch=master)](https://travis-ci.org/roverdotcom/django-inlinecss)
 
-A Python module to access the [OpenCage Geocoding API](https://opencagedata.com/).
+## About
 
-## Build Status / Code Quality / etc
+Inlining CSS is necessary for email generation and sending
+but is currently a surprisingly large hassle.
 
-[![PyPI version](https://badge.fury.io/py/opencage.svg)](https://badge.fury.io/py/opencage)
-[![Downloads](https://pepy.tech/badge/opencage/month)](https://pepy.tech/project/opencage)
-[![Versions](https://img.shields.io/pypi/pyversions/opencage)](https://pypi.org/project/opencage/)
-![GitHub contributors](https://img.shields.io/github/contributors/opencagedata/python-opencage-geocoder)
-[![Build Status](https://github.com/OpenCageData/python-opencage-geocoder/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/OpenCageData/python-opencage-geocoder/actions/workflows/build.yml)
-![Mastodon Follow](https://img.shields.io/mastodon/follow/109287663468501769?domain=https%3A%2F%2Fen.osm.town%2F&style=social)
-
-## Tutorial
-
-You can find a [comprehensive tutorial for using this module on the OpenCage site](https://opencagedata.com/tutorials/geocode-in-python).
+This library aims to make it a breeze in the Django
+template language.
 
 ## Usage
 
-Supports Python 3.7 or newer. Use the older opencage 1.x releases if you need Python 2.7 support.
+#### Step 1: Dependencies
 
-Install the module:
+- BeautifulSoup
+- cssutils
+- Python 3.8+
+- Django 3.2+
 
-```bash
-pip install opencage
-```
 
-Load the module:
+#### Step 2: Install django_inlinecss
 
-```python
-from opencage.geocoder import OpenCageGeocode
-```
-
-Create an instance of the geocoder module, passing a valid OpenCage Data Geocoder API key
-as a parameter to the geocoder modules's constructor:
+Add ```django_inlinecss``` to your ```settings.py```:
 
 ```python
-key = 'your-api-key-here'
-geocoder = OpenCageGeocode(key)
+INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.webdesign',
+        'django.contrib.contenttypes',
+        '...',
+        '...',
+        '...',
+        'django_inlinecss')
 ```
 
-Pass a string containing the query or address to be geocoded to the modules' `geocode` method:
+#### Step 3: Use the templatetag
 
-```python
-query = '82 Clerkenwell Road, London'
-results = geocoder.geocode(query)
+1. Place your CSS file somewhere staticfiles can find it
+2. Create your template:
+
+```html
+{% load inlinecss %}
+{% inlinecss "css/extra-padding.css" %}
+    <html>
+        <body>
+            <div class='lots-o-padding'>
+                Something in need of styling.
+            </div>
+        </body>
+    </html>
+{% endinlinecss %}
 ```
 
-You can add [additional parameters](https://opencagedata.com/api#forward-opt):
+#### Step 4: Prepare to be Wowed
 
-```python
-results = geocoder.geocode('London', no_annotations=1, language='es')
+```html
+<html>
+    <body>
+        <div style="padding-left: 10px; padding-right: 10px; padding-top: 10px;" class="lots-o-padding">
+            Something in need of styling.
+        </div>
+    </body>
+</html>
 ```
 
-For example you can use the proximity parameter to provide the geocoder with a hint:
+## Acknowledgements
 
-```python
-results = geocoder.geocode('London', proximity='42.828576, -81.406643')
-print(results[0]['formatted'])
-# u'London, ON N6A 3M8, Canada'
-```
+Thanks to Tanner Netterville for his efforts on [Pynliner](https://github.com/rennat/pynliner).
 
-### Reverse geocoding
+Thanks to Thomas Yip for his unit tests on the `soupselect` module. These tests
+helped on getting the core CSS2 selectors to work.
 
-Turn a lat/long into an address with the `reverse_geocode` method:
+## License
 
-```python
-result = geocoder.reverse_geocode(51.51024, -0.10303)
-```
-
-### Sessions
-
-You can reuse your HTTP connection for multiple requests by
-using a `with` block. This can help performance when making
-a lot of requests:
-
-```python
-queries = ['82 Clerkenwell Road, London', ...]
-with OpenCageGeocode(key) as geocoder:
-    # Queries reuse the same HTTP connection
-    results = [geocoder.geocode(query) for query in queries]
-```
-
-### Asyncronous requests
-
-You can run requests in parallel with the `geocode_async` and `reverse_geocode_async`
-method which have the same parameters and response as their synronous counterparts.
-You will need at least Python 3.7 and the `asyncio` and `aiohttp` packages installed.
-
-```python
-async with OpenCageGeocode(key) as geocoder:
-    results = await geocoder.geocode_async(address)
-```
-
-For a more complete example and links to futher tutorials on asyncronous IO see
-`batch.py` in the `examples` directory.
-
-### Non-SSL API use
-
-If you have trouble accesing the OpenCage API with https, e.g. issues with OpenSSL
-libraries in your enviroment, then you can set the 'http' protocol instead. Please
-understand that the connection to the OpenCage API will no longer be encrypted.
-
-```python
-geocoder = OpenCageGeocode('your-api-key', 'http')
-```
-
-### Command-line batch geocoding
-
-See `examples/batch.py` for an example to geocode a CSV file.
-
-<img src="batch-progress.gif"/>
-
-### Exceptions
-
-If anything goes wrong, then an exception will be raised:
-
-- `InvalidInputError` for non-unicode query strings
-- `NotAuthorizedError` if API key is missing, invalid syntax or disabled
-- `ForbiddenError` API key is blocked or suspended
-- `RateLimitExceededError` if you go past your rate limit
-- `UnknownError` if there's some problem with the API (bad results, 500 status code, etc)
-
-## Copyright & License
-
-This software is copyright OpenCage GmbH.
-Please see `LICENSE.txt`
-
-### Who is OpenCage GmbH?
-
-<a href="https://opencagedata.com"><img src="opencage_logo_300_150.png"/></a>
-
-We run a worldwide [geocoding API](https://opencagedata.com/api) and [geosearch](https://opencagedata.com/geosearch) service based on open data.
-Learn more [about us](https://opencagedata.com/about).
-
-We also run [Geomob](https://thegeomob.com), a series of regular meetups for location based service creators, where we do our best to highlight geoinnovation. If you like geo stuff, you will probably enjoy [the Geomob podcast](https://thegeomob.com/podcast/).
+MIT license. See LICENSE.md for more detail.
