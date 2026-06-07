@@ -1,5 +1,10 @@
-*.py[cow]
+*.pyc
+*.ipynb
 .idea
+.DS_Store
 build/
 dist/
-django_node_assets.egg-info/
+scratch/
+*.egg
+*.fcs
+*.egg-info
