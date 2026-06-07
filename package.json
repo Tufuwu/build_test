@@ -1,59 +1,52 @@
 {
-  "name": "postman-code-generators",
-  "version": "1.3.0",
-  "description": "Generates code snippets for a postman collection",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
+  "name": "mapsort",
+  "description": "Performant sorting for complex input",
+  "version": "1.0.8",
+  "main": "compiled/cjs/mapsort.min.js",
+  "module": "compiled/esm/mapsort.min.js",
+  "unpkg": "compiled/iife/mapsort.min.js",
+  "types": "index.d.ts",
+  "files": [
+    "source",
+    "compiled",
+    "index.d.ts",
+    "copying.txt",
+    "readme-nl.md"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "babel-jest": "^29.3.1",
+    "babel-loader": "^9.1.0",
+    "babel-preset-minify": "^0.5.2",
+    "benchmark": "^2.1.4",
+    "jest": "^29.3.1",
+    "lodash": "^4.17.21",
+    "rollup": "^3.9.0",
+    "typescript": "^4.9.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "scripts": {
-    "test": "npm/test.sh",
-    "package": "node npm/package.js",
-    "zip": "node npm/zip.js",
-    "prepack": "node npm/pre-package.js",
-    "postinstall": "node npm/deepinstall.js",
-    "deepinstall": "node npm/deepinstall.js",
-    "boilerplate": "node npm/boilerplate.js",
-    "cirequirements": "npm/ci-requirements.sh",
-    "test-lint": "node npm/test-lint.js"
+    "build": "rollup --config rollup.config.js",
+    "build-conceptual-benchmark": "webpack --config benchmarks/conceptual/webpack.config.js",
+    "test": "npm run-script build && jest && tsc --strict --noEmit --types \" \" test/type-test.ts",
+    "coverage": "TEST_TYPE=coverage jest --coverage"
+  },
+  "author": {
+    "name": "Nullhouse",
+    "url": "https://null.house"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/postmanlabs/code-generators"
+    "url": "https://github.com/Pimm/mapsort.git"
   },
-  "author": "Postman Labs <help@getpostman.com>",
-  "license": "Apache-2.0",
-  "homepage": "https://github.com/postmanlabs/code-generators",
-  "dependencies": {
-    "async": "3.2.2",
-    "path": "0.12.7",
-    "postman-collection": "3.6.11",
-    "shelljs": "0.8.5"
-  },
-  "devDependencies": {
-    "browserify": "14.5.0",
-    "chai": "4.3.6",
-    "chalk": "2.4.2",
-    "eslint": "5.16.0",
-    "dependency-check": "3.0.0",
-    "editorconfig": "0.15.3",
-    "eslint-plugin-jsdoc": "3.15.1",
-    "eslint-plugin-lodash": "2.7.0",
-    "eslint-plugin-mocha": "4.12.1",
-    "eslint-plugin-security": "1.4.0",
-    "istanbul": "0.4.5",
-    "js-yaml": "3.14.1",
-    "newman": "5.3.2",
-    "jsdoc": "3.6.10",
-    "mocha": "6.2.3",
-    "lodash": "4.17.21",
-    "nyc": "14.1.1",
-    "parse-gitignore": "1.0.1",
-    "pretty-ms": "3.2.0",
-    "recursive-readdir": "2.2.2",
-    "watchify": "3.11.1"
-  },
-  "engines": {
-    "node": ">=6"
-  }
+  "homepage": "https://null.house/open-source/mapsort",
+  "keywords": [
+    "performance",
+    "map",
+    "sort"
+  ]
 }

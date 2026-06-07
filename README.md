@@ -1,226 +1,85 @@
+# mapsort &middot; [![License (X11/MIT)](https://badgen.net/github/license/pimm/mapsort)](https://github.com/Pimm/mapsort/blob/master/copying.txt) [![npm version](https://badgen.net/npm/v/mapsort)](https://www.npmjs.com/package/mapsort) [![Test status](https://github.com/Pimm/mapsort/actions/workflows/test.yaml/badge.svg)](https://github.com/Pimm/mapsort/actions/workflows/test.yaml) [![Coverage status](https://coveralls.io/repos/github/Pimm/mapsort/badge.svg?branch=master)](https://coveralls.io/github/Pimm/mapsort?branch=master)
 
-<a href="https://www.getpostman.com/"><img src="https://assets.getpostman.com/common-share/postman-logo-horizontal-320x132.png" /></a><br />
-_Manage all of your organization's APIs in Postman, with the industry's most complete API development environment._
+Performant sorting for complex input.
 
-*Supercharge your API workflow.*  
-*Modern software is built on APIs. Postman helps you develop APIs faster.*
+## Preface
 
-# postman-code-generators [![Build Status](https://travis-ci.com/postmanlabs/postman-code-generators.svg?branch=master)](https://travis-ci.com/postmanlabs/postman-code-generators)
+**You do not need this library unless you are having performance issues.** `mapsort` does not add any functionality not present in plain JavaScript. Rather, it greatly improves your performance in case:
 
-This module converts a [Postman SDK](https://github.com/postmanlabs/postman-collection) Request Object into a code snippet of chosen language.
+* sorting is your bottleneck, and
+* the elements in your arrays require expensive preprocessing before their correct order can be determined.
 
-Every code generator has two identifiers: `language` and `variant`.
-* `language` of a code generator is the programming language in which the code snippet is generated.
-* `variant` of a code generator is the methodology or the underlying library used by the language to send requests. 
- 
-List of supported code generators: 
+# Concept
 
-| Language | Variant        |
-|-----------|---------------|
-| C | libcurl |
-| C# | RestSharp | 
-| cURL | cURL | 
-| Dart | http | 
-| Go | Native | 
-| HTTP | HTTP | 
-| Java | OkHttp |
-| Java | Unirest |
-| JavaScript | Fetch | 
-| JavaScript | jQuery | 
-| JavaScript | XHR |
-| NodeJs | Axios | 
-| NodeJs | Native |
-| NodeJs | Request |
-| NodeJs | Unirest |
-| Objective-C| NSURLSession|
-| OCaml | Cohttp | 
-|PHP | cURL |
-|PHP | Guzzle |
-|PHP | pecl_http |
-|PHP | HTTP_Request2 |
-| PowerShell | RestMethod | 
-| Python | http.client |
-| Python | Requests |
-| R | httr |
-| R | RCurl |
-| Ruby | Net:HTTP |
-| Shell | Httpie |
-| Shell | wget |
-| Swift | URLSession | 
-## Table of contents 
-
-1. [Getting Started](#getting-started)
-2. [Prerequisite](#prerequisite)
-3. [Usage](#usage)
-    1. [Using postman code generators as a Library](#using-postman-code-generators-as-a-library)
-4. [Development](#development)
-    1. [Installing Dependencies](#installing-dependencies)
-    2. [Testing](#testing)
-    3. [Packaging](#packaging)
-7. [Contributing](#contributing)
-8. [License](#license)
-
-## Getting Started
-To install postman-code-generators as your dependency
-```bash
-$ npm install postman-code-generators
+Imagine we are sorting this array of numbers, represented as strings:
+```javascript
+['12.4', '1.62', '3.35']
 ```
-To get a copy on your local machine
-```bash
-$ git clone https://github.com/postmanlabs/postman-code-generators.git
+Sorting them with no compare function would place `'12.4'` before `'3.35'`, so we need such a function:
+```javascript
+['12.4', '1.62', '3.35'].sort((a, b) => parseFloat(a) - parseFloat(b));
+```
+This works!
+
+The only drawback is that `parseFloat` is called twice every time our compare function is used, resulting in 6 `parseFloat` calls in this example (4 if the original order were optimal).
+
+A dozen `parseFloat` calls is fine. However, next time we might be sorting names. _Lucia Ávila_ would like to appear amidst the other **A**s, and we have to correctly handle [diacritics](https://en.wikipedia.org/wiki/Diacritic). _Amelie de Wit_ would like to appear amidst the other **W**s, and we have to detect [tussenvoegsels](https://en.wikipedia.org/wiki/Tussenvoegsel). And the number of calls to the compare function grows loglinearly with the number of names. As our preprocessing becomes more expensive and our arrays become longer, this could produce perceivable hiccups.
+
+`mapsort` reduces the number of times an element is preprocessed to 1:
+```javascript
+mapSort(
+	['12.4', '1.62', '3.35'],
+	parseFloat,
+	(a, b) => a - b
+);
 ```
 
-## Prerequisite
-To run any of the postman-code-generators, ensure that you have NodeJS >= v8. A copy of the NodeJS installable can be downloaded from https://nodejs.org/en/download/package-manager.
+# Installation
 
-## Usage
-
-### Using postman-code-generators as a Library 
-There are three functions that are exposed in postman-code-generators: getLanguageList, getOptions, and convert.
-
-#### getLanguageList
-This function returns a list of supported code generators. 
-
-##### Example:
-```js
-var codegen = require('postman-code-generators'), // require postman-code-generators in your project
-    supportedCodegens = codegen.getLanguageList();
-    console.log(supportedCodegens);
-    // output:
-    // [
-    //   {
-    //     key: 'nodejs',
-    //     label: 'NodeJs',
-    //     syntax_mode: 'javascript',
-    //     variant: [
-    //       {
-    //         key: 'Requests'
-    //       },
-    //       {
-    //         key: 'Native'
-    //       },
-    //       {
-    //         key: 'Unirest'
-    //       }
-    //     ]
-    //   },
-    //   ...
-    // ]
+Install `mapsort` using npm or Yarn and import the function:
+```javascript
+import mapSort from 'mapsort';
 ```
 
-#### getOptions 
+Alternatively, include `mapsort` through unpkg:
+```html
+<script src="https://unpkg.com/mapsort@^1.0.8"></script>
+```
+This alternative makes the function available at `window.mapSort`.
 
-This function takes in three parameters and returns a callback  with error and supported options of that code generator.
+# Usage
 
-* `language` - language key from the language list returned from getLanguageList function
-* `variant` - variant key provided by getLanguageList function
-* `callback` - callback function with first parameter as error and second parameter as array of options supported by the codegen.
-
-A typical option has the following properties:
-* `name` - Display name
-* `id` - unique ID of the option
-* `type` - Data type of the option. (Allowed data types: `boolean`, `enum`, `positiveInteger`)
-* `default` - Default value. The value that is used if this option is not specified while creating code snippet
-* `description` - User friendly description.
-
-##### Example:
-```js
-var codegen = require('postman-code-generators'), // require postman-code-generators in your project
-    language = 'nodejs',
-    variant = 'Request';
-
-    codegen.getOptions(language, variant, function (error, options) {
-      if (error) {
-        // handle error
-      }
-      console.log(options);
-    });
-// output: 
-//     [
-//     {
-//       name: 'Set indentation count',
-//       id: 'indentCount',
-//       type: 'positiveInteger',
-//       default: 2,
-//       description: 'Set the number of indentation characters to add per code level'
-//     },
-//     {
-//       name: 'Set indentation type',
-//       id: 'indentType',
-//       type: 'enum',
-//       availableOptions: ['Tab', 'Space'],
-//       default: 'Space',
-//       description: 'Select the character used to indent lines of code'
-//     },
-//     ...
-//   ];
+``` javascript
+const sortedArray = mapSort(
+	array,
+	element => {
+		// Return the version of "element" which is ideal for
+		// sorting. This version is passed to the compare
+		// function below.
+	},
+	(a, b) => {
+		// (Optional.) Return a negative number if a comes
+		// before b; a positive number if b comes before a; or
+		// 0 if they are equal.
+	}
+);
 ```
 
-#### convert 
-This function takes in five parameters and returns a callback with error and generated code snippet
-* `language` - lang key from the language list returned from getLanguageList function
-* `variant` - variant key provided by getLanguageList function
-* `request` - [Postman-SDK](https://github.com/postmanlabs/postman-collection) Request Object
-* `options` - Options that can be used to configure generated code snippet. Defaults will be used for the unspecified attributes  
-* `callback` - callback function with first parameter as error and second parameter as string for code snippet
+## Notes
 
-##### Example:
-```js
-var codegen = require('postman-code-generators'), // require postman-code-generators in your project
-    sdk = require('postman-collection'), // require postman-collection in your project
-    request = new sdk.Request('https://www.google.com'),  //using postman sdk to create request 
-    language = 'nodejs',
-    variant = 'request',
-    options = {
-        indentCount: 3,
-        indentType: 'Space',
-        trimRequestBody: true,
-        followRedirect: true
-    };
-codegen.convert(language, variant, request, options, function(error, snippet) {
-    if (error) {
-        //  handle error
-    }
-    //  handle snippet
-});
-```
-## Development
+* Contrary to [`[].sort`][mdn-sort], this library **does not sort in-place**. It returns a new, sorted array. The original array is left untouched.
+* This library maps each element of your array to a "sortable" version but returns a sorted array containing the originals. I.e. in the example above `['1.62', '3.35', '12.4']` is returned; not `[1.62, 3.35, 12.4]`.
+* This library [probably][stable-sorting] performs stable sorting.
+
+# License (X11/MIT)
+Copyright (c) 2019-2021 Pimm "de Chinchilla" Hogeling, Edo Rivai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+**The Software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. in no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software.**
 
 
-### Installing dependencies
-This command will install all the dependencies in production mode.
-```bash
-$ npm install;
-```
-To install dev dependencies also for all codegens run: 
-```bash
-$ npm run deepinstall dev; 
-```
-### Testing 
-To run common repo test as well as tests (common structure test + individual codegen tests) for all the codegens
-```bash
-$ npm test; 
-```
-To run structure and individual tests on a single codegen
-```bash
-$ npm test <codegen-name>;
-# Here "codege-name" is the folder name of the codegen inside codegens folder
-```
-### Packaging 
-To create zipped package of all codegens
-```bash
-$ npm run package;
-```
-**Note:** The zipped package is created inside each codegen's folder.
-
-To create zipped package of a single codegen
-```bash
-$ npm run package <codegen-name>
-```
-
-## Contributing
-Please take a moment to read our [contributing guide](https://github.com/postmanlabs/postman-code-generators/blob/master/CONTRIBUTING.md) to learn about our development process.
-Open an [issue](https://github.com/postmanlabs/postman-code-generators/issues) first to discuss potential changes/additions.
-
-## License
-This software is licensed under Apache-2.0. Copyright Postman, Inc. See the [LICENSE.md](LICENSE.md) file for more information.
+[mdn-sort]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+[stable-sorting]: https://github.com/Pimm/mapsort/blob/master/documentation/stable-sorting.md
