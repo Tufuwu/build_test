@@ -1,0 +1,73 @@
+{
+  "definitions": {
+    "Node": {
+      "type": "object",
+      "patternProperties": {
+        "^ACCESSIBILITY$": {
+          "$ref": "#/definitions/AccessibilityWrapper"
+        },
+        "^COPY$": {
+          "$ref": "#/definitions/TranslationWrapper"
+        },
+        "^(?!COPY|ACCESSIBILITY).*$": {
+          "$ref": "#/definitions/Node"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AccessibilityWrapper": {
+      "type": "object",
+      "properties": {
+        "LABEL": {
+          "$ref": "#/definitions/TranslationWrapper"
+        },
+        "HINT": {
+          "$ref": "#/definitions/TranslationWrapper"
+        },
+        "VALUE": {
+          "$ref": "#/definitions/TranslationWrapper"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Translation": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "TranslationWrapper": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Translation"
+        },
+        {
+          "$ref": "#/definitions/PluralWrapper"
+        }
+      ]
+    },
+    "PluralWrapper": {
+      "type": "object",
+      "properties": {
+        "ZERO": {
+          "$ref": "#/definitions/Translation"
+        },
+        "ONE": {
+          "$ref": "#/definitions/Translation"
+        },
+        "OTHER": {
+          "$ref": "#/definitions/Translation"
+        }
+      },
+      "required": ["ONE", "OTHER"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "patternProperties": {
+    "^.*$": {
+      "$ref": "#/definitions/Node"
+    }
+  },
+  "additionalProperties": false
+}

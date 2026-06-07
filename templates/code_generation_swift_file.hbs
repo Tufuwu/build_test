@@ -1,0 +1,96 @@
+// DO NOT EDIT. This file is auto-generated using Localicious (https://github.com/PicnicSupermarket/localicious).
+
+import UIKit
+
+public protocol LocalizationProvider {
+    var translationKey: String? { get }
+    var accessibilityHintKey: String? { get }
+    var accessibilityLabelKey: String? { get }
+    var accessibilityValueKey: String? { get }
+    var translationArgs: [CVarArg]? { get }
+}
+
+public struct LocaliciousData: LocalizationProvider {
+    public let accessibilityIdentifier: String
+    public let accessibilityHintKey: String?
+    public let accessibilityLabelKey: String?
+    public let accessibilityValueKey: String?
+    public let translationKey: String?
+    public let translationArgs: [CVarArg]?
+}
+
+public enum LocaliciousQuantity: String {
+    case zero = "ZERO"
+    case one = "ONE"
+    case other = "OTHER"
+
+    init(quantity: Int) {
+        switch true {
+        case quantity == 0:
+            self = .zero
+        case quantity == 1:
+            self = .one
+        default:
+            self = .other
+        }
+    }
+}
+
+public extension LocalizationProvider {
+    var translation: String? {
+        return translationKey.map { translation(forKey: $0) } ?? nil
+    }
+
+    var accessibilityHint: String? {
+        return accessibilityHintKey.map { translation(forKey: $0) } ?? nil
+    }
+
+    var accessibilityLabel: String? {
+        return accessibilityLabelKey.map { translation(forKey: $0) } ?? nil
+    }
+
+    var accessibilityValue: String? {
+        return accessibilityValueKey.map { translation(forKey: $0) } ?? nil
+    }
+
+    func translation(forKey key: String, withBundle bundle: Bundle = Bundle.main) -> String? {
+        let value = bundle.localizedString(forKey: key, value: nil, table: nil)
+
+        guard value != key else {
+            return nil
+        }
+
+        let translationArgs = self.translationArgs ?? []
+        guard translationArgs.count > 0 else { return value }
+
+        return String(format: value, arguments: translationArgs)
+    }
+}
+
+public extension UIButton {
+    func setLocalicious(_ data: LocaliciousData, for controlState: UIControl.State) {
+        setTitle(data.translation, for: controlState)
+        self.accessibilityIdentifier = data.accessibilityIdentifier
+        self.accessibilityValue = data.accessibilityValue
+        self.accessibilityHint = data.accessibilityHint
+        self.accessibilityLabel = data.accessibilityLabel
+    }
+}
+
+public extension UILabel {
+    func setLocalicious(_ data: LocaliciousData) {
+        self.text = data.translation
+        self.accessibilityIdentifier = data.accessibilityIdentifier
+        self.accessibilityValue = data.accessibilityValue
+        self.accessibilityHint = data.accessibilityHint
+        self.accessibilityLabel = data.accessibilityLabel
+    }
+}
+
+{{#translations}}
+public struct L {
+{{#children}}
+{{> child}}
+{{/children}}
+}
+{{/translations}}

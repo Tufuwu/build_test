@@ -1,59 +1,40 @@
 {
-  "name": "wink-nlp",
-  "version": "1.14.3",
-  "description": "Developer friendly Natural Language Processing ✨",
-  "keywords": [
-    "NLP",
-    "natural language processing",
-    "tokenize",
-    "SBD",
-    "sentence boundary detection",
-    "negation handling",
-    "sentiment analysis",
-    "POS Tagging",
-    "NER",
-    "named entity extraction",
-    "custom entity detection",
-    "word vectors",
-    "visualization",
-    "pattern matching",
-    "stemmer",
-    "bm25",
-    "vectorizer",
-    "winkNLP",
-    "winkjs",
-    "wink"
-  ],
-  "main": "src/wink-nlp.js",
-  "scripts": {
-    "pretest": "npm run lint",
-    "test": "nyc --reporter=html --reporter=lcov --reporter=text mocha ./test/",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "sourcedocs": "docker -i src -o ./sourcedocs --sidebar yes",
-    "lint": "eslint ./src/*.js ./test/*.js",
-    "perf": "node benchmark/run.js",
-    "dtslint": "dtslint types"
+  "name": "@picnicsupermarket/localicious",
+  "version": "1.0.1",
+  "description": "A toolchain for working with localization files in a platform-agnostic way.",
+  "bin": {
+    "localicious": "bin/localicious"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/winkjs/wink-nlp.git"
-  },
-  "author": "Sanjaya Kumar Saxena",
+  "repository": "https://github.com/PicnicSupermarket/localicious",
+  "author": "Picnic Technologies",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/winkjs/wink-nlp/issues"
+  "private": false,
+  "dependencies": {
+    "ajv": "^6.10.2",
+    "better-ajv-errors": "^0.6.7",
+    "commander": "^3.0.1",
+    "git-clone": "^0.1.0",
+    "handlebars": "^4.4.5",
+    "js-yaml": "^3.13.1"
   },
-  "homepage": "http://winkjs.org/",
   "devDependencies": {
-    "benchmark": "^2.1.4",
-    "chai": "^4.3.7",
-    "coveralls": "^3.1.1",
-    "docker": "^1.0.0",
-    "dtslint": "^4.2.1",
-    "eslint": "^8.36.0",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-jest": "^22.19.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2"
   },
-  "runkitExampleFilename": "./runkit-example.js",
-  "types": "types/index.d.ts"
+  "scripts": {
+    "lint": "yarn eslint --fix bin/**/* src/**/*.js tests/**/*.js",
+    "lint-on-ci": "yarn eslint bin/**/* src/**/*.js tests/**/*.js",
+    "test": "jest"
+  },
+  "prettier": {
+    "printWidth": 100
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
 }
