@@ -1,9 +1,0 @@
-Yoast\YoastSeoForNeos\Controller\DataController:
-  properties:
-    translationCache:
-      object:
-        factoryObjectName: Neos\Flow\Cache\CacheManager
-        factoryMethodName: getCache
-        arguments:
-          1:
-            value: YoastSeoForNeos_TranslationCache

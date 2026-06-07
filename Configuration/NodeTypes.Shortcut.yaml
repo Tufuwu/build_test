@@ -1,3 +1,0 @@
-'Neos.Neos:Shortcut':
-  superTypes:
-    'Yoast.YoastSeoForNeos:Mixin.SEO': false

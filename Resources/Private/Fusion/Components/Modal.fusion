@@ -1,3 +1,0 @@
-prototype(Yoast.YoastSeoForNeos:Component.Modal) < prototype(Neos.Neos:ContentComponent) {
-    renderer = '<div id="yoast-modal"></div>'
-}

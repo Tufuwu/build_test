@@ -1,3 +1,0 @@
-prototype(Neos.Fusion:GlobalCacheIdentifiers) {
-    yoastSeoPreviewMode = ${request.arguments.yoastSeoPreviewMode ? true : false}
-}
