@@ -1,53 +1,76 @@
 {
-    "name": "openseadragon",
-    "version": "5.0.1",
-    "description": "Provides a smooth, zoomable user interface for HTML/Javascript.",
-    "keywords": [
-        "image",
-        "zoom",
-        "pan",
-        "openseadragon",
-        "seadragon",
-        "deepzoom",
-        "dzi",
-        "iiif",
-        "osm",
-        "tms"
-    ],
-    "homepage": "https://openseadragon.github.io/",
-    "funding": "https://opencollective.com/openseadragon",
-    "bugs": {
-        "url": "https://github.com/openseadragon/openseadragon/issues"
+  "name": "ember-angle-brackets-codemod",
+  "version": "5.1.0",
+  "description": "Codemod to convert to Angle brackets syntax",
+  "keywords": [
+    "codemod-cli",
+    "codemods",
+    "ember",
+    "ember-codemod"
+  ],
+  "homepage": "https://github.com/ember-codemods/ember-angle-brackets-codemod#readme",
+  "bugs": {
+    "url": "https://github.com/ember-codemods/ember-angle-brackets-codemod/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ember-codemods/ember-angle-brackets-codemod.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "bin": "./bin/cli.js",
+  "scripts": {
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
+    "debug:integration": "node --inspect-brk ./test/run-test.js",
+    "debug:test": "node --inspect-brk ./node_modules/.bin/jest -i -t ",
+    "lint": "eslint . --cache",
+    "release": "release-it",
+    "test": "codemod-cli test --coverage",
+    "test:integration": "node ./test/run-test.js",
+    "test:notelemetry": " node ./test/run-test-without-telemetry.js"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "transforms/angle-brackets/transform.js"
+    ]
+  },
+  "dependencies": {
+    "codemod-cli": "^3.1.2",
+    "debug": "^4.3.1",
+    "ember-codemods-telemetry-helpers": "^2.1.0",
+    "ember-template-recast": "^5.0.1",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "execa": "^5.0.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "release-it": "^14.6.1",
+    "release-it-lerna-changelog": "^3.1.0"
+  },
+  "engines": {
+    "node": "10.* || >=12.*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md",
+        "launchEditor": true
+      }
     },
-    "license": "BSD-3-Clause",
-    "files": [
-        "build/openseadragon/"
-    ],
-    "main": "build/openseadragon/openseadragon.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/openseadragon/openseadragon.git"
+    "git": {
+      "tagName": "v${version}"
     },
-    "devDependencies": {
-        "eslint-plugin-compat": "^4.1.2",
-        "grunt": "^1.6.1",
-        "grunt-contrib-clean": "^2.0.1",
-        "grunt-contrib-compress": "^2.0.0",
-        "grunt-contrib-concat": "^2.1.0",
-        "grunt-contrib-connect": "^3.0.0",
-        "grunt-contrib-qunit": "^7.0.1",
-        "grunt-contrib-uglify": "^5.0.1",
-        "grunt-contrib-watch": "^1.1.0",
-        "grunt-eslint": "^24.0.1",
-        "grunt-git-describe": "^2.4.4",
-        "grunt-istanbul": "^0.8.0",
-        "grunt-text-replace": "^0.4.0",
-        "qunit": "^2.19.4"
-    },
-    "scripts": {
-        "test": "grunt test",
-        "prepare": "grunt build",
-        "build": "grunt build",
-        "dev": "grunt dev"
+    "github": {
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
     }
+  }
 }
