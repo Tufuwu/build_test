@@ -1,0 +1,3 @@
+'Neos.Neos:Document':
+  superTypes:
+    'Yoast.YoastSeoForNeos:Mixin.SEO': true

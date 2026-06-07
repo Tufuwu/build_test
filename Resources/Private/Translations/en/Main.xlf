@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product="Yoast.YoastSeoForNeos" source-language="en" datatype="plaintext">
+        <body>
+            <trans-unit id="editPreviewModes.yoastSeoView">
+                <source>Yoast SEO View</source>
+            </trans-unit>
+
+            <trans-unit id="header">
+                <source>Yoast SEO Analysis</source>
+            </trans-unit>
+
+            <trans-unit id="inspector.loading">
+                <source>Loading…</source>
+            </trans-unit>
+            <trans-unit id="inspector.emptyText">
+                <source>Not available</source>
+            </trans-unit>
+            <trans-unit id="inspector.renderedTitle">
+                <source>Rendered title</source>
+            </trans-unit>
+            <trans-unit id="inspector.renderedDescription">
+                <source>Rendered description</source>
+            </trans-unit>
+            <trans-unit id="inspector.results">
+                <source>Analysis results</source>
+            </trans-unit>
+            <trans-unit id="inspector.seoScore">
+                <source>Focus Keyphrase</source>
+            </trans-unit>
+            <trans-unit id="inspector.contentScore">
+                <source>Readability analysis</source>
+            </trans-unit>
+            <trans-unit id="inspector.showAllResults">
+                <source>Show all results</source>
+            </trans-unit>
+            <trans-unit id="inspector.editSnippetPreview">
+                <source>Toggle Snippet Preview</source>
+            </trans-unit>
+            <trans-unit id="inspector.problems">
+                <source>Problems</source>
+            </trans-unit>
+            <trans-unit id="inspector.improvements">
+                <source>Improvements</source>
+            </trans-unit>
+            <trans-unit id="inspector.goodResults">
+                <source>Good results</source>
+            </trans-unit>
+
+            <trans-unit id="inspector.resultType.titleWidth">
+                <source>Title width</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.titleKeyword">
+                <source>Title keyword</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.metaDescriptionKeyword">
+                <source>Meta description keyword</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.metaDescriptionLength">
+                <source>Meta description length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.textSentenceLength">
+                <source>Text sentence length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.textImages">
+                <source>Text images</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.textLength">
+                <source>Text length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.textParagraphTooLong">
+                <source>Text paragraph length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.textTransitionWords">
+                <source>Text transition words</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.keywordDensity">
+                <source>Keyword density</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.urlLength">
+                <source>URL length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.urlStopWords">
+                <source>URL stopwords</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.urlKeyword">
+                <source>URL keyword</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.subheadingsKeyword">
+                <source>Subheadings keyword occurency</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.subheadingsTooLong">
+                <source>Subheading length</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.fleschReadingEase">
+                <source>Flesch reading ease</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.passiveVoice">
+                <source>Passive voice</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.introductionKeyword">
+                <source>Introduction keyword</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.externalLinks">
+                <source>External links</source>
+            </trans-unit>
+            <trans-unit id="inspector.resultType.internalLinks">
+                <source>Internal links</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

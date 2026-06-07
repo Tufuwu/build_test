@@ -1,0 +1,4 @@
+prototype(Yoast.YoastSeoForNeos:Component.Header) < prototype(Neos.Fusion:Tag) {
+    tagName = 'h1'
+    content = ${I18n.translate('header', null, [], 'Main', 'Yoast.YoastSeoForNeos', null, interfaceLanguage)}
+}

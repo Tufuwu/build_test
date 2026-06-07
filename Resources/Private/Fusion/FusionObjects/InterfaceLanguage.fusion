@@ -1,0 +1,3 @@
+prototype(Yoast.YoastSeoForNeos:InterfaceLanguage) {
+    @class = 'Yoast\\YoastSeoForNeos\\FusionObjects\\InterfaceLanguageImplementation'
+}

@@ -1,238 +1,219 @@
-# Localicious
+# Yoast SEO integration for Neos CMS
 
-localicious is a toolchain for working with localization files in a platform-agnostic way. With it, you can:
+[![Latest Stable Version](https://poser.pugx.org/yoast/yoast-seo-for-neos/v/stable)](https://packagist.org/packages/yoast/yoast-seo-for-neos)
+[![Total Downloads](https://poser.pugx.org/yoast/yoast-seo-for-neos/downloads)](https://packagist.org/packages/yoast/yoast-seo-for-neos)
+[![License](https://poser.pugx.org/yoast/yoast-seo-for-neos/license)](https://packagist.org/packages/yoast/yoast-seo-for-neos)
+[![Build Status](https://travis-ci.com/Yoast/Yoast-SEO-for-Neos.svg?branch=master)](https://travis-ci.com/Yoast/Yoast-SEO-for-Neos)
 
-* Maintain all your localized copy and accessibility key/value pairs in one file, grouped per component.
-* Verify the integrity of your base localization file against a schema
-* Generate locale files for both Android, iOS or JS from your base localization file
+## What does it do
 
-The goals of localicious are:
+This package provides a new backend preview and inspector integration for [Neos CMS](https://neos.io) to look at 
+your page with the help of the [Yoast SEO](https://github.com/Yoast/YoastSEO.js) plugin.
 
-* **Copywriter-friendliness**
-  
-  Likewise, it should be easy for copywriters to change and add copy. For each string copywriters should be able to easily get an overview of the translations provided for the various languages.
+This view will show you a preview snippet how the selected page will look in the Google search results
+and will give you insights and helpers to further improve the page for search engines.
 
-* **Developer-friendliness**
-  
-  It should be easy for developers maintaining and developing features to work with the new system. They should be able to trust that the necessary copy will be there for any language. Moreover, the format in which the copy is delivered should be predictable to minimise dependencies between developers and copywriters in a fast-paced environment.
+These insights are generated via the official Open Source **Yoast SEO** javascript plugin by [Yoast](https://yoast.com).
+This package is being developed in partnership with *Yoast BV* and has been moved into the Yoast namespace since version 1.0.
 
-* **Robustness**
+We try to keep this package up-to-date with releases by Yoast but depending on the compatibility and available time 
+this might take up to a few weeks after Yoast releases a new version of their library.
 
-  One cannot blindly import localization files into the app and expect everything to work. Therefore, localicious enables both validation and conversion. Together, these two operations can support a robust workflow that minimises the potential for mistakes.
+## Examples
 
-## Workflow
+![Preview in the Neos demo site](Documentation/snippet-preview.jpg) 
 
-localicious assumes the following workflow:
+![Inspector view in a blog](Documentation/inspector.jpg) 
 
-1. You keep all your localizable strings in a YAML file that adheres to the structure defined by localicious.
-2. When committed to a source repository, the YAML file is guaranteed to have passed localicious verification.
-3. You point to the current working version of the YAML file in your iOS or Android project.
-4. Using localicious, you generate the localization files when desired.
+## Installation
 
-## Requirements and installation
+Add the dependency to your site package like this
 
-localicious requires node 10.12.0 or later.
-
-## The Localicipe
-
-The central concept of localicious is the so-called Localicipe. It is a YAML file that contains all localized copy and accessibility strings grouped by feature and screen. The strings in the Localicipe can be divided into different collections. Multiple collections can be combined when [Converting the Localicipe](#converting-the-localicipe) into platform specific outputs.
-
-Using collections it's easy to keep track of strings that are used on a single platform and strings that are shared across multiple platforms. 
-For an existing iOS and Android app, it could be useful to create three different collections: 
-- `IOS`(containing all iOS specific strings) 
-- `ANDROID`(containing all Android specific strings)
-- `SHARED`(containing all strings that are shared between iOS and Android).
-
-Each leaf node in a collection is either a `COPY` group or an `ACCESSIBILITY` group. The required structure of both groups is explained below:
-```
-<COLLECTION NAME>:
-  Feature:
-    Screen:
-      Element:
-        COPY:
-          en: "Translation for English speakers"
-          nl: "Vertaling voor Nederlandstaligen"
-        ACCESSIBILITY:
-          HINT|LABEL|VALUE:
-            en: "Accessibility for English speakers"
-            nl: "Toegankelijkheid voor Nederlandstaligen"
-      AnotherElement:
-        COPY:
-          ZERO|ONE|OTHER:
-            en: "Plural translation for English speakers"
-            nl: "Meervoudige vertaling voor Nederlandstaligen"
-        ...
-      ...
-    ...
-  ...
-...
+```console
+composer require --no-update yoast/yoast-seo-for-neos
 ```
 
-## Retrieving the Localicipe
+And then run `composer update` in your projects root folder.
 
-If you are working with a team, you probably want to store your Localicipe in a Git repository and manage changes like you handle changes to your source code. Localicious supports that workflow. Simply create a repository that hosts your Localicipe. Then, in the root of the source repository of your Android or iOS project, you add the following `LocaliciousConfig.yaml`:
+### Deploying to production
 
+As the package adds some additional permissions to the system you should flush the session cache once after 
+the first deployment of your website which includes this package. This prevents errors for your logged in editors:
+
+```console
+./flow flow:session:destroyAll
 ```
-source:
-  git:
-    url: 'https://github.com/localicious/localicious-test.git'
-languages:
-  - en
-  - nl
-outputTypes:
-  - IOS
-collections:
-  - IOS
-  - SHARED
+    
+This will force them to login again, so be careful and warn them before doing this.    
+    
+## Dependencies
+
+This package currently only requires Neos >= 3.0 but it's suggested to also have the `neos/seo` package installed.
+This package expects some document node properties to be present like `titleOverride` and `metaDescription` which
+are provided via the `neos/seo` package. But you can of course provide them yourself if you don't want to use
+the `neos/seo` package.
+
+## Supported languages
+
+There are three different kinds of language support:
+
+### Backend localization for the Neos implementation
+
+These are localizations for all Neos CMS specifics not related to the wordpress version of YoastSEO.
+
+* English ✅             
+* German ✅   
+
+If you can provide the backend localizations for other languages than the ones provided in the 
+table above, please create a PR.                                                                                   
+
+### Supported languages of the analyzer results in the backend 
+
+These are localizations for the recommendations that the analysis provides and will be selected based on 
+the current users backend language.
+
+Please consult [YoastSEO on wordpress](https://translate.wordpress.org/projects/wp-plugins/wordpress-seo).
+
+### Supported content languages for the analyzer                 
+
+These are the content languages that the analyzer supports. If the language of your content is not contained in the
+list the analysis will still work but not give the same quality of recommendations.
+
+Please consult [YoastSEO.js readme](https://github.com/Yoast/YoastSEO.js/blob/develop/README.md).
+
+## Configuration
+
+In your `Settings.yaml` you can override the following options:
+
+```yaml
+Yoast:
+ YoastSeoForNeos:
+   defaultContentLocale: en-US
+   languageToLocaleMapping: [...]
+```          
+and
+
+```yaml
+Neos:
+  Neos:
+    Ui:
+      frontendConfiguration:
+        Yoast.YoastSeoForNeos:
+          contentSelector: body
 ```
+          
+### defaultContentLocale 
 
-To retrieve the latest version of the file in your repository, simply run `localicious install`. localicious also supports specifying a specific Git branch (by adding `:branch`).
+The analyzer will use the `lang` attribute rendered by the `Neos.Seo` package of your website to detect the 
+language of your content. This option sets the default if `Neos.Seo` cannot detect it.
+If no `lang` attribute is rendered the javascript part will use `en_US`.
 
-## Converting the Localicipe
+Note that the html standard requires a `-` in the locale while Neos and Yoast internally use `_` and convert if needed. 
 
-Using the `render` command, a Localicipe can be converted into platform specific outputs. Here's an overview on how the command works:
+Check https://github.com/Yoast/YoastSEO.js#supported-languages for supported languages and the capabilities.
+If you use a locale that Yoast doesn't understand don't expect perfect results. 
 
-**Syntax**
+### languageToLocaleMapping
 
-`localicious render <localicipe path> <output path>`
+This array defines which translation should be used in the Yoast SEO analyzer depending on the selected interface
+language of a Neos user.
 
-**Options**
+See the `Settings.yaml` of this package and if you for example want a different version localized translation,
+check out the folder `Resources/Private/Languages` and see which ones are supported and then update the mapping
+accordingly.
 
-`--outputTypes/-ot` (required)
-- The platform/language for which the output files will be generated (`Localized.strings` for iOS, `strings.xml` for Android, `strings.json` for JS).
-- Available options are: `ios`, `android` or `js`
+For example the default mapping for `de` is `de_DE` but can be changed to Swiss German with the following configuration:
 
-`--collections/-c` (required)
-- The collections, defined in the Localicipe, that should be included into the output.
-
-`--languages/-l` (required)
-- The languages that should be included into the output.
-
-Consider the following Localicipe:
-
+```yaml
+Yoast:
+  YoastSeoForNeos:
+    languageToLocaleMapping:
+      de: de_CH
 ```
----
-# Strings that are used in Android only
-ANDROID:
-  Checkout:
-    OrderOverview:
-      Total:
-        COPY:
-          en: 'Total price: %1{{s}}'  # This placeholder will expand to %1$@ on iOS and %1$s on Android
-          nl: 'Totaal: %1{{s}}'
-# Strings that are used in iOS only
-IOS:
-  Settings:
-    PushPermissionsRequest:
-      Title:
-        COPY:
-          en: 'Stay up to date'
-          nl: 'Blijf op de hoogte'
-# Strings that are shared between Android and iOS
-SHARED:
-  Delivery:
-    Widget:
-      Title:
-        COPY:
-          en: "Help"
-          nl: "Help"
-      SubTitle:
-        COPY:
-          ZERO:
-            en: '%1{{d}} Pending order'
-            nl: '%1{{d}} Lopende bestelling'
-          ONE:
-            en: '%1{{d}} Pending order'
-            nl: '%1{{d}} Lopende bestelling'
-          OTHER:
-            en: '%1{{d}} Pending Orders'
-            nl: '%1{{d}} Lopende bestellingen'
-```
+            
+### contentSelector
 
-By running the following localicious command:
+This setting allows you to specify a different element in your rendered page where the analysis should retrieve it's
+content from. This can be used for example to select your content wrap to exclude hidden content for modals and other
+elements.
 
-`localicious render ./copy.yaml ./output_path --outputTypes android --collections ANDROID,SHARED --languages en`
+Example:
 
-We can generate a strings.xml file for Android with the English translations provided:
-
-```
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="Checkout.OrderOverview.Total.COPY">Total price: %1$s</string>
-  <string name="Delivery.Widget.Title.COPY">Help</string>
-  <plurals name="Delivery.Widget.SubTitle.COPY">
-    <item quantity="zero">%1$d Pending order</item>
-    <item quantity="one">%1$d Pending order</item>
-    <item quantity="other">%1$d Pending Orders</item>
-  </plurals>
-</resources>
-```
-
-A similar file with the Dutch translations will be created as well if we request localicious to do so:
-
-`localicious render ./copy.yaml ./output_path --outputTypes android --collections ANDROID,SHARED --languages en,nl`
-
-By changing the destination output type, like so:
-
-`localicious render ./copy.yaml ./output_path --outputTypes ios --collections IOS,SHARED --languages en`
-
-the following Localizable.strings file will be generated for iOS:
-
-```
-"Settings.PushPermissionsRequest.Title.COPY" = "Stay up to date";
-"Delivery.Widget.Title.COPY" = "Help";
-"Delivery.Widget.SubTitle.COPY.ZERO" = "%1$d Pending order";
-"Delivery.Widget.SubTitle.COPY.ONE" = "%1$d Pending order";
-"Delivery.Widget.SubTitle.COPY.OTHER" = "%1$d Pending Orders";
+```yaml
+Neos:
+  Neos:
+    Ui:
+      frontendConfiguration:
+        Yoast.YoastSeoForNeos:
+          contentSelector: .my-content
 ```
 
-## Validating
+## Usage 
 
-Whenever we make changes to the Localicipe, it is important to verify that the format of the file is still correct.
-Using the `validate` command, a Localicipe can be validated.
+### Preview mode
 
-**Syntax**
+After installation the new preview mode is available in the Neos backend which you can select form the `Edit / Preview` panel.
 
-`localicious validate <localicipe path> <output path>`
+This is useful to check several pages after another and optimize SEO properties.
+The preview also shows a preview how a page could look as Google search result.
 
-**Options**
+### Inspector
 
-`--collections/-c` (required)
-- The collections, defined in the Localicipe, that should be validated.
+In the inspector a new group "Yoast" is added in the SEO-Tab with the following fields:
 
-`--required-languages/-l` (required)
-- The languages that are required in the provided Localicipe.
+* focusKeyword: The main keyword this document is optimized for. This is needed by yoast for calculating metrics.
+* isCornerstone: Mark the document as exceptionally important for yoast. This will enforce more strict content-rules.
 
-`--optional-languages/-o`
-- The languages that are optional in the provided Localicipe.
+The group also contains a live analyzer which will check your content and SEO data and show you the results.
+Depending on your nodetype configuration the analyzer will update after you change something and show you up-to-date
+information without needing a reload of the whole page.  
 
+This view is helpful when optimizing a single page while working on it's content.
 
-Imagine that we change the file in the previous example and add another entry for iOS:
+## FAQ
 
+### I get a login modal after opening the Yoast tab in the inspector
+
+First try to log out and log in again as the session might be missing some policy information.
+
+If that doesn't help then the policy file of this package might not have been loaded.
+Clear your caches and make sure they appear when running `flow security:showeffectivepolicy --privilegeType "Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege"`.
+Then logout and login again and everything should work again.
+
+## Contributing && issues
+
+* Contributions are very welcome. 
+* Pull requests are even better!
+* Please open issues for [this project](https://github.com/Yoast/Yoast-SEO-for-Neos/issues) if you have problems with the backend module or other Neos specific features.
+* Please open issues for [Yoast SEO](https://github.com/Yoast/javascript/tree/master/packages/yoastseo) if you have problems with the analyzer itself or translations of any hints and warnings generated by the analyzer.
+
+### Building the assets
+
+First install dependencies with `yarn`:
+
+```console
+yarn
 ```
-Settings:
-  PushPermissionsRequest:
-    Subtitle:
-      COPY
-        en: 'Stay up to date'
+
+You can generate the `js` and `css` files by running the following command:
+
+```console
+yarn build
+```    
+#### Building and watching the app for the edit mode
+
+```console
+yarn build:editMode
+```
+```console
+yarn watch:editMode
 ```
 
-Using the validation feature, we can validate whether the structure of the file is still correct after the change:
+#### Building and watching the inspector view
 
-`localicious validate ./copy.yaml --collections IOS --required-languages en,nl`
-
-Since we forgot to add a Dutch localization for the `Settings.PushPermissionsRequest.Subtitle.COPY` key, this will fail:
-
+```console
+yarn build:inspectorView
 ```
-❌ Your Localicipe contains some issues.
+```console
+yarn watch:inspectorView
 ```
-
-localicious also supports the concept of optional languages. If we were to run the validator as follows:
-
-`localicious validate ./copy.yaml --collections IOS --required-languages en --optional-languages nl`
-
-the above file would pass validation even without the Dutch translation missing for some entries.
-
-## Migration
-
-Read all migration details in our [Migration Guide](MIGRATION.md).

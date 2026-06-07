@@ -1,0 +1,6 @@
+yoastSeoView = Yoast.YoastSeoForNeos:Documents.YoastSeoView
+
+// Disable edit preview mode when we render the yoast seo preview
+root.editPreviewMode {
+    condition.@process.disableInYoastSeoPreview = ${request.arguments.yoastSeoPreviewMode ? false : value}
+}
