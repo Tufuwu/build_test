@@ -1,2 +1,2 @@
-Sphinx>=4
-Pallets-Sphinx-Themes
+Sphinx>=3.2.1
+myst-parser>=0.15.1
