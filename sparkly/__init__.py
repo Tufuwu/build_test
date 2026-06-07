@@ -14,21 +14,9 @@
 # limitations under the License.
 #
 
-dev:
-	docker-compose build dev
-	docker-compose run dev bash
-	docker-compose down -v ; exit $$retcode
+from sparkly.session import SparklySession
 
-dist:
-	docker-compose build dev
-	docker-compose run --no-deps dev python setup.py bdist_wheel ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
+assert SparklySession
 
-docs:
-	docker-compose build dev
-	docker-compose run --no-deps dev python -m sphinx -b html docs/source docs/build
 
-test:
-	docker-compose build test
-	docker-compose run test tox ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
-
-.PHONY: docs dist
+__version__ = '3.0.0'

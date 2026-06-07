@@ -14,21 +14,24 @@
 # limitations under the License.
 #
 
-dev:
-	docker-compose build dev
-	docker-compose run dev bash
-	docker-compose down -v ; exit $$retcode
 
-dist:
-	docker-compose build dev
-	docker-compose run --no-deps dev python setup.py bdist_wheel ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
+class SparklyException(Exception):
+    """Base exception of sparkly lib."""
 
-docs:
-	docker-compose build dev
-	docker-compose run --no-deps dev python -m sphinx -b html docs/source docs/build
 
-test:
-	docker-compose build test
-	docker-compose run test tox ; retcode="$$?" ; docker-compose down -v ; exit $$retcode
+class UnsupportedDataType(SparklyException):
+    """Happen when schema defines unsupported data type."""
+    pass
 
-.PHONY: docs dist
+
+class FixtureError(SparklyException):
+    """Happen when testing data setup or teardown fails."""
+    pass
+
+
+class InvalidArgumentError(SparklyException):
+    """Happen when invalid parameters are passed to a function."""
+
+
+class WriteError(SparklyException):
+    """Happen when errors occured while writting dataframe into storage."""
