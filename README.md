@@ -1,57 +1,226 @@
-uap-core [![Build Status](https://secure.travis-ci.org/ua-parser/uap-core.svg?branch=master)](https://travis-ci.org/ua-parser/uap-core) [![Backers on Open Collective](https://opencollective.com/ua-parser/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/ua-parser/sponsors/badge.svg)](#sponsors) 
-========
 
-This repository contains the core of [BrowserScope][2]'s original [user agent string parser][3]: data collected over the years by [Steve Souders][4] and numerous other contributors, extracted into a separate [YAML file][5] so as to be reusable _as is_ by implementations in any programming language.
+<a href="https://www.getpostman.com/"><img src="https://assets.getpostman.com/common-share/postman-logo-horizontal-320x132.png" /></a><br />
+_Manage all of your organization's APIs in Postman, with the industry's most complete API development environment._
 
-This repo itself does _not_ contain a parser: only the necessary data to build one. There exists a ref implementation, along with multiple, production-ready implementations in various programming languages.
+*Supercharge your API workflow.*  
+*Modern software is built on APIs. Postman helps you develop APIs faster.*
 
-Maintainers
------------
+# postman-code-generators [![Build Status](https://travis-ci.com/postmanlabs/postman-code-generators.svg?branch=master)](https://travis-ci.com/postmanlabs/postman-code-generators)
 
-* [Com Menthol](https://github.com/commenthol)
-* [Lindsey Simon](https://github.com/elsigh) ([@elsigh](https://twitter.com/elsigh))
-* [Tobie Langel](https://github.com/tobie) ([@tobie](https://twitter.com/tobie))
+This module converts a [Postman SDK](https://github.com/postmanlabs/postman-collection) Request Object into a code snippet of chosen language.
 
-Communication channels
------------------------
+Every code generator has two identifiers: `language` and `variant`.
+* `language` of a code generator is the programming language in which the code snippet is generated.
+* `variant` of a code generator is the methodology or the underlying library used by the language to send requests. 
+ 
+List of supported code generators: 
 
-* \#ua-parser on freenode <irc://chat.freenode.net#ua-parser>
-* [mailing list](https://groups.google.com/forum/#!forum/ua-parser)
+| Language | Variant        |
+|-----------|---------------|
+| C | libcurl |
+| C# | RestSharp | 
+| cURL | cURL | 
+| Dart | http | 
+| Go | Native | 
+| HTTP | HTTP | 
+| Java | OkHttp |
+| Java | Unirest |
+| JavaScript | Fetch | 
+| JavaScript | jQuery | 
+| JavaScript | XHR |
+| NodeJs | Axios | 
+| NodeJs | Native |
+| NodeJs | Request |
+| NodeJs | Unirest |
+| Objective-C| NSURLSession|
+| OCaml | Cohttp | 
+|PHP | cURL |
+|PHP | Guzzle |
+|PHP | pecl_http |
+|PHP | HTTP_Request2 |
+| PowerShell | RestMethod | 
+| Python | http.client |
+| Python | Requests |
+| R | httr |
+| R | RCurl |
+| Ruby | Net:HTTP |
+| Shell | Httpie |
+| Shell | wget |
+| Swift | URLSession | 
+## Table of contents 
 
-Contributing Changes to regexes.yaml
-------------------------------------
+1. [Getting Started](#getting-started)
+2. [Prerequisite](#prerequisite)
+3. [Usage](#usage)
+    1. [Using postman code generators as a Library](#using-postman-code-generators-as-a-library)
+4. [Development](#development)
+    1. [Installing Dependencies](#installing-dependencies)
+    2. [Testing](#testing)
+    3. [Packaging](#packaging)
+7. [Contributing](#contributing)
+8. [License](#license)
 
-Please read the [contributors' guide](CONTRIBUTING.md)
+## Getting Started
+To install postman-code-generators as your dependency
+```bash
+$ npm install postman-code-generators
+```
+To get a copy on your local machine
+```bash
+$ git clone https://github.com/postmanlabs/postman-code-generators.git
+```
 
-## Credits
-### Contributors
+## Prerequisite
+To run any of the postman-code-generators, ensure that you have NodeJS >= v8. A copy of the NodeJS installable can be downloaded from https://nodejs.org/en/download/package-manager.
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<img src="https://opencollective.com/ua-parser/contributors.svg?width=890&button=false" />
+## Usage
+
+### Using postman-code-generators as a Library 
+There are three functions that are exposed in postman-code-generators: getLanguageList, getOptions, and convert.
+
+#### getLanguageList
+This function returns a list of supported code generators. 
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    supportedCodegens = codegen.getLanguageList();
+    console.log(supportedCodegens);
+    // output:
+    // [
+    //   {
+    //     key: 'nodejs',
+    //     label: 'NodeJs',
+    //     syntax_mode: 'javascript',
+    //     variant: [
+    //       {
+    //         key: 'Requests'
+    //       },
+    //       {
+    //         key: 'Native'
+    //       },
+    //       {
+    //         key: 'Unirest'
+    //       }
+    //     ]
+    //   },
+    //   ...
+    // ]
+```
+
+#### getOptions 
+
+This function takes in three parameters and returns a callback  with error and supported options of that code generator.
+
+* `language` - language key from the language list returned from getLanguageList function
+* `variant` - variant key provided by getLanguageList function
+* `callback` - callback function with first parameter as error and second parameter as array of options supported by the codegen.
+
+A typical option has the following properties:
+* `name` - Display name
+* `id` - unique ID of the option
+* `type` - Data type of the option. (Allowed data types: `boolean`, `enum`, `positiveInteger`)
+* `default` - Default value. The value that is used if this option is not specified while creating code snippet
+* `description` - User friendly description.
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    language = 'nodejs',
+    variant = 'Request';
+
+    codegen.getOptions(language, variant, function (error, options) {
+      if (error) {
+        // handle error
+      }
+      console.log(options);
+    });
+// output: 
+//     [
+//     {
+//       name: 'Set indentation count',
+//       id: 'indentCount',
+//       type: 'positiveInteger',
+//       default: 2,
+//       description: 'Set the number of indentation characters to add per code level'
+//     },
+//     {
+//       name: 'Set indentation type',
+//       id: 'indentType',
+//       type: 'enum',
+//       availableOptions: ['Tab', 'Space'],
+//       default: 'Space',
+//       description: 'Select the character used to indent lines of code'
+//     },
+//     ...
+//   ];
+```
+
+#### convert 
+This function takes in five parameters and returns a callback with error and generated code snippet
+* `language` - lang key from the language list returned from getLanguageList function
+* `variant` - variant key provided by getLanguageList function
+* `request` - [Postman-SDK](https://github.com/postmanlabs/postman-collection) Request Object
+* `options` - Options that can be used to configure generated code snippet. Defaults will be used for the unspecified attributes  
+* `callback` - callback function with first parameter as error and second parameter as string for code snippet
+
+##### Example:
+```js
+var codegen = require('postman-code-generators'), // require postman-code-generators in your project
+    sdk = require('postman-collection'), // require postman-collection in your project
+    request = new sdk.Request('https://www.google.com'),  //using postman sdk to create request 
+    language = 'nodejs',
+    variant = 'request',
+    options = {
+        indentCount: 3,
+        indentType: 'Space',
+        trimRequestBody: true,
+        followRedirect: true
+    };
+codegen.convert(language, variant, request, options, function(error, snippet) {
+    if (error) {
+        //  handle error
+    }
+    //  handle snippet
+});
+```
+## Development
 
 
-### Backers
+### Installing dependencies
+This command will install all the dependencies in production mode.
+```bash
+$ npm install;
+```
+To install dev dependencies also for all codegens run: 
+```bash
+$ npm run deepinstall dev; 
+```
+### Testing 
+To run common repo test as well as tests (common structure test + individual codegen tests) for all the codegens
+```bash
+$ npm test; 
+```
+To run structure and individual tests on a single codegen
+```bash
+$ npm test <codegen-name>;
+# Here "codege-name" is the folder name of the codegen inside codegens folder
+```
+### Packaging 
+To create zipped package of all codegens
+```bash
+$ npm run package;
+```
+**Note:** The zipped package is created inside each codegen's folder.
 
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/ua-parser#backer)]
+To create zipped package of a single codegen
+```bash
+$ npm run package <codegen-name>
+```
 
-<a href="https://opencollective.com/ua-parser#backers" target="_blank"><img src="https://opencollective.com/ua-parser/backers.svg?width=890"></a>
+## Contributing
+Please take a moment to read our [contributing guide](https://github.com/postmanlabs/postman-code-generators/blob/master/CONTRIBUTING.md) to learn about our development process.
+Open an [issue](https://github.com/postmanlabs/postman-code-generators/issues) first to discuss potential changes/additions.
 
-
-### Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/ua-parser#sponsor)]
-
-<a href="https://opencollective.com/ua-parser/sponsor/0/website" target="_blank"><img src="https://opencollective.com/ua-parser/sponsor/0/avatar.svg"></a>
-
-
-
-License
--------
-
-The data contained in `regexes.yaml` is Copyright 2009 Google Inc. and available under the [Apache License, Version 2.0][6].
-
-[2]: http://www.browserscope.org
-[3]: http://code.google.com/p/ua-parser/
-[4]: http://stevesouders.com/
-[5]: https://raw.github.com/ua-parser/uap-core/master/regexes.yaml
-[6]: http://www.apache.org/licenses/LICENSE-2.0
+## License
+This software is licensed under Apache-2.0. Copyright Postman, Inc. See the [LICENSE.md](LICENSE.md) file for more information.
