@@ -1,35 +1,75 @@
-from setuptools import setup
+import codecs
+import os
+import re
 
-# read in version string
-VERSION_FILE = 'flowio/_version.py'
-__version__ = ''  # to avoid inspection warning and check if __version__ was loaded
-exec(open(VERSION_FILE).read())
+from setuptools import Command, setup
 
-# empty strings evaluate as False in a boolean context
-if not __version__:
-    raise RuntimeError("__version__ string not found in file %s" % VERSION_FILE)
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+
+def read(fname):
+    file_path = os.path.join(os.path.dirname(__file__), fname)
+    return codecs.open(file_path, encoding="utf-8").read()
+
+
+def get_version():
+    changes_path = os.path.join(BASE_PATH, "CHANGES.rst")
+    regex = r"^#*\s*(?P<version>[0-9]+\.[0-9]+(\.[0-9]+)?)$"
+    with codecs.open(changes_path, encoding="utf-8") as changes_file:
+        for line in changes_file:
+            res = re.match(regex, line)
+            if res:
+                return res.group("version")
+    return "0.0.0"
+
+
+version = get_version()
+
+
+class VersionCommand(Command):
+    description = "print current library version"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        print(version)
+
 
 setup(
-    name='FlowIO',
-    version=__version__,
-    packages=['flowio'],
-    package_data={'': []},
-    description='FlowIO is a Python library for reading / writing Flow Cytometry Standard (FCS) files',
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author='Scott White',
-    author_email='whitews@gmail.com',
-    license='BSD',
-    license_files=('LICENSE',),
-    url='https://github.com/whitews/flowio',
-    requires=[],
+    name="pytest-deadfixtures",
+    version=version,
+    author="João Luiz Lorencetti",
+    author_email="me@dirtycoder.net",
+    maintainer="João Luiz Lorencetti",
+    maintainer_email="me@dirtycoder.net",
+    license="MIT",
+    url="https://github.com/jllorencetti/pytest-deadfixtures",
+    description="A simple plugin to list unused fixtures in pytest",
+    long_description=read("README.rst"),
+    py_modules=["pytest_deadfixtures"],
+    install_requires=["pytest>=3.0.0"],
     classifiers=[
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.7'
-    ]
+        "Development Status :: 5 - Production/Stable",
+        "Framework :: Pytest",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Testing",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: MIT License",
+    ],
+    cmdclass={"version": VersionCommand},
+    entry_points={"pytest11": ["deadfixtures = pytest_deadfixtures"]},
 )
