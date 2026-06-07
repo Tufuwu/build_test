@@ -1,24 +1,19 @@
-# Github actions workflow name
 name: CI
-
-# Triggers the workflow on push or pull request events
 on:
   push:
-    branches: [main]
+    branches: ['main']
   pull_request:
-    branches: [main ]
-
+    branches: ['*']
 jobs:
-  jest_test:
-    name: miniprogram-simulate test with jest
+  test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [9, 8, 7, 6]
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-    - run: npm install
-    - run: npm run test
-    - run: npm run codecov
-
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm test

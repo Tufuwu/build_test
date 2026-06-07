@@ -1,45 +1,78 @@
-# miniprogram-simulate
+# https-pem
 
-[![](https://img.shields.io/npm/v/miniprogram-simulate.svg?style=flat)](https://www.npmjs.com/package/miniprogram-simulate)
-[![](https://img.shields.io/travis/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate)
-[![](https://img.shields.io/github/license/wechat-miniprogram/miniprogram-simulate.svg)](https://github.com/wechat-miniprogram/miniprogram-simulate/blob/master/LICENSE)
-[![](https://img.shields.io/codecov/c/github/wechat-miniprogram/miniprogram-simulate.svg)](https://app.codecov.io/gh/wechat-miniprogram/miniprogram-simulate)
+Self-signed PEM key and certificate ready for use in your HTTPS server.
 
-## 介绍
+A dead simple way to get an HTTPS server running in development with no
+need to generate the self signed PEM key and certificate.
 
-小程序自定义组件测试工具集。
+[![Build status](https://travis-ci.org/watson/https-pem.svg?branch=master)](https://travis-ci.org/watson/https-pem)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 
-目前因为小程序独特的运行环境，所以对于小程序自定义组件的单元测试一直没有比较优雅的解决方案，此工具集就是为了解决此痛点而诞生的。将原本小程序自定义组件双线程分离运行的机制调整成单线程模拟运行，利用 dom 环境进行渲染，借此来完成整个自定义组件树的搭建。
-
-运行此工具集需要依赖 js 运行环境和 dom 环境，因此可以采用 jsdom + nodejs（如 jest），也可以采用真实浏览器环境（如 karma）。文档[使用简介](./docs/tutorial.md)中会提供简单的使用方式介绍。
-
-## 安装
+## Installation
 
 ```
-npm install --save-dev miniprogram-simulate
+npm install https-pem
 ```
 
-## 使用
+**Warning:** Upon installation a private key and a self signed
+certificate will be generated inside `./node_modules/https-pem`. The
+certificate is valid for 365 days and no attempt have been made to make
+this secure in any way. I suggest only using this for testing and
+development where you just need an easy and quick way to run an HTTPS
+server with Node.js.
+
+## Example Usage
 
 ```js
-const simulate = require('miniprogram-simulate')
+var https = require('https')
+var pem = require('https-pem')
 
-test('test sth', () => {
-    const id = simulate.load('/components/comp/index') // 加载自定义组件
-    const comp = simulate.render(id) // 渲染自定义组件
-    
-    // 使用自定义组件封装实例 comp 对象来进行各种单元测试
+var server = https.createServer(pem, function (req, res) {
+  res.end('This is servered over HTTPS')
+})
+
+server.listen(443, function () {
+  console.log('The server is running on https://localhost')
 })
 ```
 
-以上只是一个简单的例子，实际上这个工具集必须搭配 jest 或 jsdom/mocha 等测试框架来使用，更为详细的使用细节请参阅下述文档：
+### Connecting
 
-* [使用简介](./docs/tutorial.md)
-* [接口文档](./docs/api.md)
-* [细节实现](./docs/detail.md)
-* [暂不支持特性](./docs/todo.md)
-* [更新日志](./docs/update.md)
+When connecting to an HTTPS server from Node.js that uses a self-signed
+certificate, `https.request` will normally emit an `error` and refuse to
+complete the reuqest. To get around that simply set the
+`rejectUnauthorized` option to `false`:
 
-## 协议
+```js
+var opts = { rejectUnauthorized: false }
 
-[MIT](./LICENSE)
+var req = https.request(opts, function (res) {
+  // ...
+})
+
+req.end()
+```
+
+If using `curl` to connect to a Node.js HTTPS server using a
+self-signed certificate, use the `-k` option:
+
+```
+curl -k https://localhost:443
+```
+
+## API
+
+The `https-pem` module simply exposes an object with two properties:
+`key` and `cert`.
+
+### `pem.key`
+
+The private key (RSA).
+
+### `pem.cert`
+
+The certificate.
+
+## License
+
+MIT
