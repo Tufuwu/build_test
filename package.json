@@ -1,76 +1,52 @@
 {
-  "name": "ember-angle-brackets-codemod",
-  "version": "5.1.0",
-  "description": "Codemod to convert to Angle brackets syntax",
-  "keywords": [
-    "codemod-cli",
-    "codemods",
-    "ember",
-    "ember-codemod"
-  ],
-  "homepage": "https://github.com/ember-codemods/ember-angle-brackets-codemod#readme",
-  "bugs": {
-    "url": "https://github.com/ember-codemods/ember-angle-brackets-codemod/issues"
+  "name": "@callstack/eslint-config",
+  "version": "14.1.1",
+  "description": "ESLint preset extending recommended ESLint config, TypeScript, Prettier and Jest",
+  "engines": {
+    "node": ">=18.0.0"
   },
+  "main": "./react-native.js",
+  "homepage": "https://github.com/callstack/eslint-config-callstack#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ember-codemods/ember-angle-brackets-codemod.git"
+    "url": "https://github.com/callstack/eslint-config-callstack.git"
   },
+  "author": "Michał Pierzchała <thymikee@gmail.com>",
   "license": "MIT",
-  "author": "",
-  "bin": "./bin/cli.js",
-  "scripts": {
-    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
-    "debug:integration": "node --inspect-brk ./test/run-test.js",
-    "debug:test": "node --inspect-brk ./node_modules/.bin/jest -i -t ",
-    "lint": "eslint . --cache",
-    "release": "release-it",
-    "test": "codemod-cli test --coverage",
-    "test:integration": "node ./test/run-test.js",
-    "test:notelemetry": " node ./test/run-test-without-telemetry.js"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "transforms/angle-brackets/transform.js"
-    ]
-  },
+  "keywords": [
+    "eslint",
+    "eslint config",
+    "callstack"
+  ],
   "dependencies": {
-    "codemod-cli": "^3.1.2",
-    "debug": "^4.3.1",
-    "ember-codemods-telemetry-helpers": "^2.1.0",
-    "ember-template-recast": "^5.0.1",
-    "winston": "^3.3.3"
+    "@babel/core": "^7.22.20",
+    "@babel/eslint-parser": "^7.22.15",
+    "@babel/plugin-syntax-flow": "^7.22.5",
+    "@babel/plugin-transform-react-jsx": "^7.22.15",
+    "@react-native/eslint-plugin": "^0.74.0 || ^0.73.0 || ^0.72.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jest": "^27.4.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-native": "^4.1.0",
+    "eslint-plugin-react-native-a11y": "^3.3.0",
+    "eslint-restricted-globals": "^0.2.0",
+    "prettier": "^3.0.3"
+  },
+  "peerDependencies": {
+    "eslint": ">=8.1.0"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "eslint": "^7.25.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "execa": "^5.0.0",
-    "jest": "^26.6.3",
-    "prettier": "^2.2.1",
-    "release-it": "^14.6.1",
-    "release-it-lerna-changelog": "^3.1.0"
+    "eslint": "^8.49.0",
+    "typescript": "^5.2.2"
   },
-  "engines": {
-    "node": "10.* || >=12.*"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "release-it": {
-    "plugins": {
-      "release-it-lerna-changelog": {
-        "infile": "CHANGELOG.md",
-        "launchEditor": true
-      }
-    },
-    "git": {
-      "tagName": "v${version}"
-    },
-    "github": {
-      "release": true,
-      "tokenRef": "GITHUB_AUTH"
-    }
+  "scripts": {
+    "test": "yarn --cwd test && yarn --cwd test eslint --max-warnings 0 --report-unused-disable-directives --ext .js,.ts,.jsx,.tsx ."
   }
 }
