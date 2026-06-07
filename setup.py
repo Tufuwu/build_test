@@ -1,64 +1,69 @@
-# -*- coding: utf-8 -*-
+#/usr/bin/env python
 
-import io
+import os
+import sys
 from setuptools import setup, find_packages
 
-readme = io.open('README.rst', encoding="utf-8").read()
-changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
-version = '0.7.1'
+# if you are not using vagrant, just delete os.link directly,
+# The hard link only saves a little disk space, so you should not care
+if os.environ.get('USER', '') == 'vagrant':
+    del os.link
 
 
-def long_description():
-    """
-    return readme + changes, removing directive blocks that are only valid in the context
-    of sphinx doc"""
+ROOT_DIR = os.path.dirname(__file__)
+SOURCE_DIR = os.path.join(ROOT_DIR)
 
-    def remove_block(text, token, margin=0):
-        input_lines = text.splitlines()
-        for i, l in enumerate(input_lines):
-            if l.startswith(token):
-                break
-        start = i
-        end = input_lines.index("", start + margin)
-        return "\n".join(input_lines[:start] + input_lines[end:])
+if sys.version_info < (3, 6):
+    raise RuntimeError(
+        "opencage requires Python 3.7 or newer"
+        "Use older opencage 1.x for Python 2.7 or 3.6"
+    )
 
-    readme_ = remove_block(readme, ".. mermaid::", margin=2)
-    readme_ = remove_block(readme_, ".. autoclasstree::")
-    readme_ = remove_block(readme_, ".. autoclasstree::")
-    readme_ = remove_block(readme_, ".. versionchanged::")
-    return "{}\n\n{}".format(readme_, changes)
-
+# try for testing
+try:
+    with open(os.path.join(SOURCE_DIR, 'README.md'), encoding="utf-8") as f:
+        LONG_DESCRIPTION = f.read()
+except FileNotFoundError:
+    LONG_DESCRIPTION = ""
 
 setup(
-    name='sphinxcontrib-mermaid',
-    version=version,
-    url='https://github.com/mgaitan/sphinxcontrib-mermaid',
-    download_url='https://pypi.python.org/pypi/sphinxcontrib-mermaid',
-    license='BSD',
-    author=u'Martín Gaitán',
-    author_email='gaitan@gmail.com',
-    description='Mermaid diagrams in yours Sphinx powered docs',
-    long_description=long_description(),
+    name="opencage",
+    version="2.2.0",
+    description="Wrapper module for the OpenCage Geocoder API",
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
+    author="OpenCage GmbH",
+    author_email="info@opencagedata.com",
+    url="https://github.com/OpenCageData/python-opencage-geocoder/",
+    download_url="https://github.com/OpenCageData/python-opencage-geocoder/tarball/2.1.0",
+    license="BSD",
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    keywords=['geocoding', 'geocoder'],
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
         'Environment :: Web Environment',
+        "Development Status :: 5 - Production/Stable",
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+        "Programming Language :: Python :: 3 :: Only",
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Documentation',
-        'Topic :: Utilities',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Topic :: Scientific/Engineering :: GIS',
+        'Topic :: Utilities'
     ],
-    platforms='any',
-    packages=find_packages(),
-    include_package_data=True,
-    namespace_packages=['sphinxcontrib'],
+    install_requires=[
+        'Requests>=2.26.0',
+        'backoff>=1.10.0'
+    ],
+    test_suite='pytest',
+    tests_require=[
+        'httpretty>=0.9.6',
+        'pylint==2.15.9',
+        'pytest>=6.0'
+    ],
 )
